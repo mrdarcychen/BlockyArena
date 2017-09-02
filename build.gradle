@@ -1,0 +1,11 @@
+plugins {
+    id 'org.spongepowered.plugin' version '0.8.1'
+}
+
+group = 'net.huskycraft'
+version = '0.1.0'
+description = ''
+
+dependencies {
+    compile 'org.spongepowered:spongeapi:6.0.0'
+}
