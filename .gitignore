@@ -4,3 +4,5 @@ build
 gradle
 gradlew
 gradlew.bat
+META-INF
+out
