@@ -20,6 +20,10 @@ public class HuskyArena {
     @Inject
     private Logger logger;
 
+    public Logger getLogger() {
+        return logger;
+    }
+
     @Inject
     @ConfigDir(sharedRoot = false)
     private Path configDir;
@@ -52,5 +56,6 @@ public class HuskyArena {
         } catch (IOException e) {
             logger.warn("Error creating arenas directory");
         }
+
     }
 }
