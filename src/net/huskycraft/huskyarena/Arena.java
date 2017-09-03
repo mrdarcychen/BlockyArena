@@ -10,22 +10,20 @@ import java.io.IOException;
 
 public class Arena {
 
-    HuskyArena plugin;
     private File arenaConfig;
     private ConfigurationLoader<CommentedConfigurationNode> loader;
     private ConfigurationNode rootNode;
 
-    public Arena(HuskyArena plugin, String name, int lobbyCountdown, int gameCountdown) {
+    public Arena(HuskyArena plugin, String name) {
 
-        this.plugin = plugin;
         arenaConfig = new File(plugin.getArenaDir().toFile(), name + ".conf");
         loader = HoconConfigurationLoader.builder().setFile(arenaConfig).build();
 
         try {
             rootNode = loader.load();
             rootNode.getNode("arena-name").setValue(name);
-            rootNode.getNode("lobby-countdown").setValue(lobbyCountdown);
-            rootNode.getNode("game-countdown").setValue(gameCountdown);
+            rootNode.getNode("lobby-countdown").setValue(10);
+            rootNode.getNode("game-countdown").setValue(60);
             rootNode.getNode("red-team-size").setValue(null);
             rootNode.getNode("blue-team-size").setValue(null);
             rootNode.getNode("max-deaths").setValue(1);

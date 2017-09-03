@@ -1,11 +1,16 @@
 package net.huskycraft.huskyarena;
 
+import net.huskycraft.huskyarena.commands.CreateCmd;
 import org.slf4j.Logger;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.args.GenericArguments;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
+import org.spongepowered.api.text.Text;
 
 import javax.inject.Inject;
 import java.io.IOException;
@@ -45,9 +50,11 @@ public class HuskyArena {
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         createArenaDir();
+        registerCommands();
     }
 
     private void createArenaDir() {
+
         arenaDir = Paths.get(getConfigDir().toString() + "/arenas");
         try {
             if (!arenaDir.toFile().exists()) {
@@ -56,6 +63,20 @@ public class HuskyArena {
         } catch (IOException e) {
             logger.warn("Error creating arenas directory");
         }
+    }
+
+    private void registerCommands() {
+
+        CommandSpec createCmd = CommandSpec.builder()
+                .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
+                .executor(new CreateCmd(this))
+                .build();
+
+        CommandSpec arenaCommandSpec = CommandSpec.builder()
+                .child(createCmd, "create")
+                .build();
+
+        Sponge.getCommandManager().register(this, arenaCommandSpec, "huskyarena", "arena");
 
     }
 }
