@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 public class HuskyArena {
 
     @Inject
-    private Logger logger;
+    public Logger logger;
 
     public Logger getLogger() {
         return logger;
@@ -51,6 +51,7 @@ public class HuskyArena {
     public void onPreInit(GamePreInitializationEvent event) {
         createArenaDir();
         registerCommands();
+        ArenaManager am = new ArenaManager(this);
     }
 
     private void createArenaDir() {
@@ -77,6 +78,5 @@ public class HuskyArena {
                 .build();
 
         Sponge.getCommandManager().register(this, arenaCommandSpec, "huskyarena", "arena");
-
     }
 }
