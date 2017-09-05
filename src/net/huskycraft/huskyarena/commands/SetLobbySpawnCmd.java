@@ -1,6 +1,5 @@
 package net.huskycraft.huskyarena.commands;
 
-
 import net.huskycraft.huskyarena.Arena;
 import net.huskycraft.huskyarena.HuskyArena;
 import org.spongepowered.api.command.CommandException;
@@ -9,15 +8,16 @@ import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.UUID;
 
-public class CreateCmd implements CommandExecutor {
+public class SetLobbySpawnCmd implements CommandExecutor{
 
-    private HuskyArena plugin;
+    HuskyArena plugin;
 
-    public CreateCmd(HuskyArena plugin) {
+    public SetLobbySpawnCmd(HuskyArena plugin) {
         this.plugin = plugin;
     }
 
@@ -26,10 +26,10 @@ public class CreateCmd implements CommandExecutor {
 
         Player player = (Player)src;
         UUID uuid = player.getUniqueId();
-        String name = args.<String>getOne("name").get();
-        Arena arena = new Arena(plugin, name);
-        plugin.getArenaManager().arenaCreators.put(uuid, arena);
-        player.sendMessage(Text.of("Successfully create arena."));
+        Arena arena = plugin.getArenaManager().arenaCreators.get(uuid);
+        Location<World> lobbyspawn = player.getLocation();
+        arena.setLobbySpawn(lobbyspawn);
+
 
         return CommandResult.success();
     }

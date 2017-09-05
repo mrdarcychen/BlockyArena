@@ -1,6 +1,7 @@
 package net.huskycraft.huskyarena;
 
 import net.huskycraft.huskyarena.commands.CreateCmd;
+import net.huskycraft.huskyarena.commands.SetLobbySpawnCmd;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -47,11 +48,17 @@ public class HuskyArena {
         return arenaDir;
     }
 
+    public ArenaManager arenaManager;
+
+    public ArenaManager getArenaManager() {
+        return arenaManager;
+    }
+
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         createArenaDir();
         registerCommands();
-        ArenaManager am = new ArenaManager(this);
+        arenaManager = new ArenaManager(this);
     }
 
     private void createArenaDir() {
@@ -73,8 +80,14 @@ public class HuskyArena {
                 .executor(new CreateCmd(this))
                 .build();
 
+        CommandSpec setLobbySpawnCmd = CommandSpec.builder()
+                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("name"))))
+                .executor(new SetLobbySpawnCmd(this))
+                .build();
+
         CommandSpec arenaCommandSpec = CommandSpec.builder()
                 .child(createCmd, "create")
+                .child(setLobbySpawnCmd, "setlobbyspawn")
                 .build();
 
         Sponge.getCommandManager().register(this, arenaCommandSpec, "huskyarena", "arena");
