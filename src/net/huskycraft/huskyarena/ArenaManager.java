@@ -5,18 +5,25 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.UUID;
 
 public class ArenaManager {
 
     private HuskyArena plugin;
 
     public ArrayList<Path> arenaFiles;
+    public HashMap<UUID, Arena> arenaCreators;
 
     public ArenaManager(HuskyArena plugin) {
 
         this.plugin = plugin;
+        arenaFiles = new ArrayList<>();
+        arenaCreators = new HashMap<>();
+        registerArenas();
+    }
 
-        plugin.getLogger().info("works properly");
+    private void registerArenas() {
         arenaFiles = new ArrayList<>();
 
         try {

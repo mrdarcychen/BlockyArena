@@ -1,12 +1,12 @@
 package net.huskycraft.huskyarena;
 
-import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+
 
 import java.io.File;
 import java.io.IOException;
@@ -39,8 +39,7 @@ public class Arena {
     private int redTeamSize;
     private int blueTeamSize;
 
-    public Arena(HuskyArena plugin, String name, Location<World> lobbySpawn, Location<World> redTeamSpawn,
-                 Location<World> blueTeamSpawn) {
+    public Arena(HuskyArena plugin, String name) {
 
         this.plugin = plugin;
         this.arenaName = name;
@@ -84,10 +83,6 @@ public class Arena {
             rootNode.getNode("lobby-countdown").setValue(10);
             rootNode.getNode("game-countdown").setValue(60);
             rootNode.getNode("max-deaths").setValue(1);
-
-            rootNode.getNode("Locations", "lobby-spawn").setValue(lobbySpawn);
-            rootNode.getNode("Locations", "red-team-spawn").setValue(redTeamSpawn);
-            rootNode.getNode("Locations", "blue-team-spawn").setValue(blueTeamSpawn);
             loader.save(rootNode);
 
         } catch (IOException e) {
@@ -102,11 +97,28 @@ public class Arena {
             gameCountdown = rootNode.getNode("game-countdown").getInt();
             maxDeaths = rootNode.getNode("max-deaths").getInt();
 
-            lobbySpawn = rootNode.getNode("Locations", "lobby-spawn").getValue(TypeToken.of(Location.class));
-            redTeamSpawn = rootNode.getNode("Locations", "red-team-spawn").getValue(TypeToken.of(Location.class));
-            blueTeamSpawn = rootNode.getNode("Locations", "blue-team-spawn").getValue(TypeToken.of(Location.class));
         } catch (Exception e) {
             plugin.getLogger().warn("Error loading arena config.");
         }
+    }
+
+    public void setLobbySpawn(Location<World> lobbySpawn) {
+        this.lobbySpawn = lobbySpawn;
+        World extent = lobbySpawn.getExtent();
+
+        double lobbySpawnX = lobbySpawn.getX();
+        double lobbySpawnY = lobbySpawn.getY();
+        double lobbySpawnZ = lobbySpawn.getZ();
+
+        try {
+            rootNode = loader.load();
+            rootNode.getNode("Locations", "lobby-spawn", "X").setValue(lobbySpawnX);
+            rootNode.getNode("Locations", "lobby-spawn", "Y").setValue(lobbySpawnY);
+            rootNode.getNode("Locations", "lobby-spawn", "Z").setValue(lobbySpawnZ);
+            loader.save(rootNode);
+        } catch (IOException e) {
+            plugin.getLogger().warn("Error saving lobby spawn.");
+        }
+
     }
 }
