@@ -2,6 +2,7 @@ package net.huskycraft.huskyarena.commands;
 
 import net.huskycraft.huskyarena.Arena;
 import net.huskycraft.huskyarena.HuskyArena;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -13,11 +14,11 @@ import org.spongepowered.api.world.World;
 
 import java.util.UUID;
 
-public class SetLobbySpawnCmd implements CommandExecutor{
+public class SetSpawnCmd implements CommandExecutor{
 
     HuskyArena plugin;
 
-    public SetLobbySpawnCmd(HuskyArena plugin) {
+    public SetSpawnCmd(HuskyArena plugin) {
         this.plugin = plugin;
     }
 
@@ -27,9 +28,12 @@ public class SetLobbySpawnCmd implements CommandExecutor{
         Player player = (Player)src;
         UUID uuid = player.getUniqueId();
         Arena arena = plugin.getArenaManager().arenaCreators.get(uuid);
-        Location<World> lobbyspawn = player.getLocation();
-        arena.setLobbySpawn(lobbyspawn);
-
+        Location<World> spawn = player.getLocation();
+        try {
+            arena.setSpawn(args.getOne("type").get().toString(), spawn);
+        } catch (ObjectMappingException e) {
+            e.printStackTrace();
+        }
 
         return CommandResult.success();
     }
