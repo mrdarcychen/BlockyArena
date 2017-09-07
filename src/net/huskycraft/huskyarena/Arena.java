@@ -40,7 +40,7 @@ public class Arena {
 
     // dynamic configurations
 
-    private boolean arenaStatus;
+    private boolean status;
     private int redTeamSize;
     private int blueTeamSize;
 
@@ -194,4 +194,11 @@ public class Arena {
         }
     }
 
+    public void setStatus(boolean status) {
+        this.status = status;
+    }
+
+    public boolean getStatus() {
+        return status;
+    }
 }
