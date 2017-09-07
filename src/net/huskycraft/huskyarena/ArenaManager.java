@@ -12,27 +12,54 @@ public class ArenaManager {
 
     private HuskyArena plugin;
 
-    public ArrayList<Path> arenaFiles;
+    public HashMap<Path, Boolean> arenaFiles;   //false represents file not loaded
+
+    public ArrayList<Arena> loadedArenas;   //arenas loaded from the config files in arenaConfig directory
+
     public HashMap<UUID, Arena> arenaCreators;
 
     public ArenaManager(HuskyArena plugin) {
 
         this.plugin = plugin;
-        arenaFiles = new ArrayList<>();
+        arenaFiles = new HashMap<>();
         arenaCreators = new HashMap<>();
         registerArenas();
     }
 
-    private void registerArenas() {
-        arenaFiles = new ArrayList<>();
+    public void initiateArena() {
+        Arena arena = getAvailableArena();
+    }
 
+    private void registerArenas() {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getArenaDir(), "*.conf");
             for (Path path : stream) {
-                arenaFiles.add(path);
+                arenaFiles.put(path, false);
             }
         } catch (IOException e) {
             plugin.getLogger().warn("Error loading existing arena configs.");
         }
+    }
+
+    private Arena getAvailableArena() {
+        //loops through all loaded arenas
+        if (loadedArenas.size() != 0) {
+            for (Arena arena : loadedArenas) {
+                if (arena.getStatus() == false) {
+                    return arena;
+                }
+            }
+        }
+
+        //if no arena is loaded or all loaded arenas are in use, loads a new arena
+        for (Path path : arenaFiles.keySet()) {
+            if (arenaFiles.get(path) == false) {
+                Arena arena = new Arena(path);
+                arenaFiles.replace(path, true);
+                loadedArenas.add(arena);
+                return arena;
+            }
+        }
+        return null;
     }
 }
