@@ -11,6 +11,8 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -60,6 +62,11 @@ public class HuskyArena {
         createArenaDir();
         registerCommands();
         arenaManager = new ArenaManager(this);
+    }
+
+    @Listener
+    public void onServerStarted(GameStartedServerEvent event) {
+        arenaManager.initiateArena();
     }
 
     private void createArenaDir() {
