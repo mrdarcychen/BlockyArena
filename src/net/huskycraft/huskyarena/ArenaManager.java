@@ -23,14 +23,16 @@ public class ArenaManager {
         this.plugin = plugin;
         arenaFiles = new HashMap<>();
         arenaCreators = new HashMap<>();
+        loadedArenas = new ArrayList<>();
         registerArenas();
     }
 
     public void initiateArena() {
         Arena arena = getAvailableArena();
+        plugin.getLogger().info(arena.toString());
     }
 
-    private void registerArenas() {
+    public void registerArenas() {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getArenaDir(), "*.conf");
             for (Path path : stream) {
@@ -54,7 +56,7 @@ public class ArenaManager {
         //if no arena is loaded or all loaded arenas are in use, loads a new arena
         for (Path path : arenaFiles.keySet()) {
             if (arenaFiles.get(path) == false) {
-                Arena arena = new Arena(path);
+                Arena arena = new Arena(plugin, path);
                 arenaFiles.replace(path, true);
                 loadedArenas.add(arena);
                 return arena;

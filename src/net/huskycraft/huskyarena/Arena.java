@@ -10,13 +10,11 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.*;
 
 public class Arena {
 
@@ -52,8 +50,9 @@ public class Arena {
         initConfig();
     }
 
-    public Arena(Path arenaConfig) {
+    public Arena(HuskyArena plugin, Path arenaConfig) {
 
+        this.plugin = plugin;
         this.arenaConfig = arenaConfig;
         loader = HoconConfigurationLoader.builder().setPath(arenaConfig).build();
 
@@ -94,9 +93,13 @@ public class Arena {
 
     private void loadConfig() {
         try {
+            rootNode = loader.load();
 
-            UUID uuid = rootNode.getNode("World-UUID").getValue(TypeToken.of(UUID.class));
-            extent = Sponge.getServer().getWorld(uuid).get();
+            String worldName = rootNode.getNode("World-Name").getString();
+            if (!Sponge.getServer().getWorld(worldName).isPresent()) {
+                plugin.getLogger().warn(worldName + " is not present.");
+            }
+            extent = Sponge.getServer().getWorld(worldName).get();
             arenaName = rootNode.getNode("Arena-Name").getString();
             lobbyCountdown = rootNode.getNode("Lobby-Countdown").getInt();
             gameCountdown = rootNode.getNode("Game-Countdown").getInt();
@@ -124,11 +127,11 @@ public class Arena {
 
     public void setSpawn(String type, Location<World> spawn) throws ObjectMappingException {
 
-        extent = spawn.getExtent();
+        String worldName = spawn.getExtent().getName();
 
         try  {
             rootNode = loader.load();
-            rootNode.getNode("Locations", "World-UUID").setValue(TypeToken.of(UUID.class), extent.getUniqueId());
+            rootNode.getNode("World-Name").setValue(worldName);
             loader.save(rootNode);
         } catch (IOException e) {
             plugin.getLogger().warn("Error saving spawn world extent.");
