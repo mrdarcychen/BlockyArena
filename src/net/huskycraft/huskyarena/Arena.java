@@ -215,4 +215,12 @@ public class Arena {
     public Location getBlueSpawn() {
         return blueTeamSpawn;
     }
+
+    public int getLobbyCountdown() {
+        return lobbyCountdown;
+    }
+
+    public int getGameCountdown() {
+        return gameCountdown;
+    }
 }
