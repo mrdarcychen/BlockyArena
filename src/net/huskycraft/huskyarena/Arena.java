@@ -207,4 +207,12 @@ public class Arena {
     public Location getLobbySpawn() {
         return lobbySpawn;
     }
+
+    public Location getRedSpawn() {
+        return redTeamSpawn;
+    }
+
+    public Location getBlueSpawn() {
+        return blueTeamSpawn;
+    }
 }

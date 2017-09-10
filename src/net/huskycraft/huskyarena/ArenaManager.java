@@ -41,6 +41,7 @@ public class ArenaManager {
 
         Arena arena = getAvailableArena();
         GameSession session = new GameSession(plugin, arena);
+        sessions.add(session);
         return session;
     }
     public void initiateSession() {
