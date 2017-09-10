@@ -2,6 +2,7 @@ package net.huskycraft.huskyarena;
 
 import net.huskycraft.huskyarena.commands.CreateCmd;
 import net.huskycraft.huskyarena.commands.DoneCmd;
+import net.huskycraft.huskyarena.commands.JoinCmd;
 import net.huskycraft.huskyarena.commands.SetSpawnCmd;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -66,7 +67,7 @@ public class HuskyArena {
 
     @Listener
     public void onServerStarted(GameStartedServerEvent event) {
-        arenaManager.initiateArena();
+
     }
 
     private void createArenaDir() {
@@ -97,10 +98,15 @@ public class HuskyArena {
                 .executor(new DoneCmd(this))
                 .build();
 
+        CommandSpec joinCmd = CommandSpec.builder()
+                .executor(new JoinCmd(this))
+                .build();
+
         CommandSpec arenaCommandSpec = CommandSpec.builder()
                 .child(createCmd, "create")
                 .child(setSpawnCmd, "setspawn")
                 .child(doneCmd, "done")
+                .child(joinCmd, "join")
                 .build();
 
         Sponge.getCommandManager().register(this, arenaCommandSpec, "huskyarena", "arena");

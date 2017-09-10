@@ -16,6 +16,8 @@ public class ArenaManager {
 
     public ArrayList<Arena> loadedArenas;   //arenas loaded from the config files in arenaConfig directory
 
+    public ArrayList<GameSession> sessions;
+
     public HashMap<UUID, Arena> arenaCreators;
 
     public ArenaManager(HuskyArena plugin) {
@@ -24,12 +26,26 @@ public class ArenaManager {
         arenaFiles = new HashMap<>();
         arenaCreators = new HashMap<>();
         loadedArenas = new ArrayList<>();
+        sessions = new ArrayList<>();
         registerArenas();
     }
 
-    public void initiateArena() {
+    public GameSession getAvailableSession() {
+        if (sessions.size() != 0) {
+            for (GameSession session : sessions) {
+                if (session.status == false) {
+                    return session;
+                }
+            }
+        }
+
         Arena arena = getAvailableArena();
-        plugin.getLogger().info(arena.toString());
+        GameSession session = new GameSession(plugin, arena);
+        return session;
+    }
+    public void initiateSession() {
+        Arena arena = getAvailableArena();
+        GameSession session = getAvailableSession();
     }
 
     public void registerArenas() {
