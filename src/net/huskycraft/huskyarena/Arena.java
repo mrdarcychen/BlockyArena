@@ -1,6 +1,5 @@
 package net.huskycraft.huskyarena;
 
-import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -203,5 +202,9 @@ public class Arena {
 
     public boolean getStatus() {
         return status;
+    }
+
+    public Location getLobbySpawn() {
+        return lobbySpawn;
     }
 }
