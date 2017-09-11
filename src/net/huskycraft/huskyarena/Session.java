@@ -1,16 +1,26 @@
 package net.huskycraft.huskyarena;
 
 import com.typesafe.config.ConfigException;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.block.ChangeBlockEvent;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.entity.DestructEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class Session {
@@ -41,10 +51,16 @@ public class Session {
         canJoin = true;
     }
 
-    private void sessionAboutToStart() {
-        // TODO
-        lobbyTimer = Task.builder().execute(() -> sessionStarting()).delay(arena.getLobbyCountdown(), TimeUnit.SECONDS).submit(plugin);
-        plugin.getLogger().info("Timer is on.");
+    private void countdown(int countdown) {
+        if (countdown == 0) {
+            sessionStarting();
+        } else {
+            for (Player player : players) {
+                player.sendTitle(Title.builder().title(Text.of(countdown)).fadeIn(2).fadeOut(2).stay(16).build());
+                player.playSound(SoundTypes.BLOCK_DISPENSER_DISPENSE, player.getHeadRotation(), 100);
+            }
+            Task.builder().execute(() -> countdown(countdown - 1)).delay(1, TimeUnit.SECONDS).submit(plugin);
+        }
     }
 
     private void sessionStarting() {
@@ -68,11 +84,22 @@ public class Session {
         gameTimer = Task.builder().execute(() -> sessionStopping()).delay(arena.getGameCountdown(), TimeUnit.SECONDS).submit(plugin);
     }
 
+    @Listener
+    public void onPlayerDeath(DamageEntityEvent event, @First Player player) {
+        plugin.getLogger().info("Damage!");
+        if (player.health().get() < 1) {
+            event.setCancelled(true);
+            Entity killer = event.getCause().first(Entity.class).get();
+            player.sendMessage(Text.of("You were killed by " + killer.toString()));
+        }
+    }
+
     /**
      * Calculating player stats and announce winner.
      */
     private void sessionStopping() {
         // TODO
+
     }
 
     /**
@@ -110,7 +137,7 @@ public class Session {
     private void checkSessionPreReq() throws NullPointerException{
         plugin.getLogger().debug("Check session prereq.");
         if (players.size() == minPlayer) {
-            sessionAboutToStart();
+            countdown(arena.getLobbyCountdown());
         } else if (players.size() < minPlayer) {
             try {
                 lobbyTimer.cancel();
