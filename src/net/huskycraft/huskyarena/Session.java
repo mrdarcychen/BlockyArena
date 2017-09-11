@@ -1,17 +1,19 @@
 package net.huskycraft.huskyarena;
 
+import com.typesafe.config.ConfigException;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
-import java.nio.file.PathMatcher;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-public class GameSession {
+public class Session {
 
     private HuskyArena plugin;
 
@@ -21,25 +23,32 @@ public class GameSession {
     private ArrayList<Player> teamBlue;
     private ArrayList<Player> teamRed;
 
+    private HashMap<Player, Location<World>> onJoinLocations;
+
     Task lobbyTimer, gameTimer;
 
     private int minPlayer = 2;
     public boolean status;
+    public boolean canJoin;
 
-    public GameSession(HuskyArena plugin, Arena arena) {
+    public Session(HuskyArena plugin, Arena arena) {
         this.plugin = plugin;
         this.arena = arena;
         players = new ArrayList<>();
         teamBlue = new ArrayList<>();
         teamRed = new ArrayList<>();
+        onJoinLocations = new HashMap<>();
+        canJoin = true;
     }
 
     private void sessionAboutToStart() {
         // TODO
         lobbyTimer = Task.builder().execute(() -> sessionStarting()).delay(arena.getLobbyCountdown(), TimeUnit.SECONDS).submit(plugin);
+        plugin.getLogger().info("Timer is on.");
     }
 
     private void sessionStarting() {
+        canJoin = false;
         Collections.shuffle(players);
         for (Player player : players) {
             if (players.indexOf(player) % 2 == 0) {
@@ -78,19 +87,37 @@ public class GameSession {
     }
 
     public void add(Player player) {
-        players.add(player);
-        player.getInventory().clear();
-        player.gameMode().set(GameModes.ADVENTURE);
-        player.setLocation(arena.getLobbySpawn());
+        if (canJoin != false) {
+            onJoinLocations.put(player, player.getLocation());
+            players.add(player);
+            plugin.getSessionManager().playerSession.put(player, this);
+            player.getInventory().clear();
+            player.gameMode().set(GameModes.ADVENTURE);
+            player.setLocation(arena.getLobbySpawn());
+            player.sendMessage(Text.of("You're in session."));
+            checkSessionPreReq();
+        }
+    }
+
+    public void remove(Player player) {
+        players.remove(player);
+        plugin.getSessionManager().playerSession.remove(player);
+        player.setLocation(onJoinLocations.get(player));
+        player.sendMessage(Text.of("You've left the session."));
         checkSessionPreReq();
     }
 
-    private void checkSessionPreReq() {
-        if (players.size() < minPlayer) {
-            lobbyTimer.cancel();
-        }
+    private void checkSessionPreReq() throws NullPointerException{
+        plugin.getLogger().debug("Check session prereq.");
         if (players.size() == minPlayer) {
             sessionAboutToStart();
+        } else if (players.size() < minPlayer) {
+            try {
+                lobbyTimer.cancel();
+                plugin.getLogger().info("Timer is off.");
+                plugin.getLogger().debug("Timer is off (debugger).");
+            } catch (NullPointerException e) {}
         }
+
     }
 }
