@@ -1,16 +1,9 @@
 package net.huskycraft.huskyarena;
 
-import com.typesafe.config.ConfigException;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.block.ChangeBlockEvent;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.Event;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
@@ -20,7 +13,6 @@ import org.spongepowered.api.world.World;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 public class Session {
@@ -84,16 +76,6 @@ public class Session {
         gameTimer = Task.builder().execute(() -> sessionStopping()).delay(arena.getGameCountdown(), TimeUnit.SECONDS).submit(plugin);
     }
 
-    @Listener
-    public void onPlayerDeath(DamageEntityEvent event, @First Player player) {
-        plugin.getLogger().info("Damage!");
-        if (player.health().get() < 1) {
-            event.setCancelled(true);
-            Entity killer = event.getCause().first(Entity.class).get();
-            player.sendMessage(Text.of("You were killed by " + killer.toString()));
-        }
-    }
-
     /**
      * Calculating player stats and announce winner.
      */
@@ -132,6 +114,32 @@ public class Session {
         player.setLocation(onJoinLocations.get(player));
         player.sendMessage(Text.of("You've left the session."));
         checkSessionPreReq();
+    }
+
+    public void eliminate(Player player, Event event) {
+        if (teamRed.contains(player)) teamRed.remove(player);
+        if (teamBlue.contains(player)) teamBlue.remove(player);
+        player.setLocation(arena.getLobbySpawn());
+        //Player killer = (Player) event.getCause().first(DamageSource.class).get();
+        player.sendMessage(Text.of("You were killed."));
+        player.getHealthData().set(player.getHealthData().maxHealth());
+        checkSessionCondition();
+    }
+
+    private void checkSessionCondition() {
+        if (teamRed.size() == 0 && teamBlue.size() != 0) {
+            for (Player player : players) {
+                player.sendMessage(Text.of("Team blue won!"));
+                player.setLocation(onJoinLocations.get(player));
+                plugin.getSessionManager().playerSession.remove(player);
+            }
+        } else if (teamRed.size() != 0 && teamBlue.size() == 0) {
+            for (Player player : players) {
+                player.sendMessage(Text.of("Team red won!"));
+                player.setLocation(onJoinLocations.get(player));
+                plugin.getSessionManager().playerSession.remove(player);
+            }
+        }
     }
 
     private void checkSessionPreReq() throws NullPointerException{

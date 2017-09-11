@@ -1,20 +1,16 @@
 package net.huskycraft.huskyarena;
 
-import net.huskycraft.huskyarena.commands.*;
+import net.huskycraft.huskyarena.Commands.*;
+import net.huskycraft.huskyarena.Listeners.EntityListener;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.DestructEntityEvent;
-import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -68,6 +64,7 @@ public class HuskyArena {
     public void onPreInit(GamePreInitializationEvent event) {
         createArenaDir();
         registerCommands();
+        Sponge.getEventManager().registerListeners(this, new EntityListener(this));
         arenaManager = new ArenaManager(this);
         sessionManager = new SessionManager(this);
     }
@@ -124,5 +121,6 @@ public class HuskyArena {
                 .build();
 
         Sponge.getCommandManager().register(this, arenaCommandSpec, "huskyarena", "arena");
+
     }
 }

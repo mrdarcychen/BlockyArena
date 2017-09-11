@@ -1,4 +1,4 @@
-package net.huskycraft.huskyarena.commands;
+package net.huskycraft.huskyarena.Commands;
 
 
 import net.huskycraft.huskyarena.Arena;
