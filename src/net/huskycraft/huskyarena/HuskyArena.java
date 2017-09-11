@@ -1,9 +1,6 @@
 package net.huskycraft.huskyarena;
 
-import net.huskycraft.huskyarena.commands.CreateCmd;
-import net.huskycraft.huskyarena.commands.DoneCmd;
-import net.huskycraft.huskyarena.commands.JoinCmd;
-import net.huskycraft.huskyarena.commands.SetSpawnCmd;
+import net.huskycraft.huskyarena.commands.*;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -53,9 +50,14 @@ public class HuskyArena {
     }
 
     public ArenaManager arenaManager;
+    public SessionManager sessionManager;
 
     public ArenaManager getArenaManager() {
         return arenaManager;
+    }
+
+    public SessionManager getSessionManager() {
+        return sessionManager;
     }
 
     @Listener
@@ -63,6 +65,7 @@ public class HuskyArena {
         createArenaDir();
         registerCommands();
         arenaManager = new ArenaManager(this);
+        sessionManager = new SessionManager(this);
     }
 
     @Listener
@@ -102,11 +105,16 @@ public class HuskyArena {
                 .executor(new JoinCmd(this))
                 .build();
 
+        CommandSpec quitCmd = CommandSpec.builder()
+                .executor(new QuitCmd(this))
+                .build();
+
         CommandSpec arenaCommandSpec = CommandSpec.builder()
                 .child(createCmd, "create")
                 .child(setSpawnCmd, "setspawn")
                 .child(doneCmd, "done")
                 .child(joinCmd, "join")
+                .child(quitCmd, "quit")
                 .build();
 
         Sponge.getCommandManager().register(this, arenaCommandSpec, "huskyarena", "arena");
