@@ -1,4 +1,4 @@
-package net.huskycraft.huskyarena.commands;
+package net.huskycraft.huskyarena.Commands;
 
 import net.huskycraft.huskyarena.Arena;
 import net.huskycraft.huskyarena.HuskyArena;
@@ -12,8 +12,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-
-import java.util.UUID;
 
 public class SetSpawnCmd implements CommandExecutor{
 
