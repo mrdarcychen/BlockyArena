@@ -1,7 +1,9 @@
 package net.huskycraft.huskyarena;
 
-import net.huskycraft.huskyarena.Commands.*;
-import net.huskycraft.huskyarena.Listeners.EntityListener;
+import net.huskycraft.huskyarena.commands.*;
+import net.huskycraft.huskyarena.managers.ArenaManager;
+import net.huskycraft.huskyarena.managers.SessionManager;
+import net.huskycraft.huskyarena.listeners.EntityListener;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;

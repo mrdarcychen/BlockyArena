@@ -4,6 +4,7 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.Event;
+import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
@@ -100,7 +101,6 @@ public class Session {
             onJoinLocations.put(player, player.getLocation());
             players.add(player);
             plugin.getSessionManager().playerSession.put(player, this);
-            player.getInventory().clear();
             player.gameMode().set(GameModes.ADVENTURE);
             player.setLocation(arena.getLobbySpawn());
             player.sendMessage(Text.of("You're in session."));
@@ -119,10 +119,14 @@ public class Session {
     public void eliminate(Player player, Event event) {
         if (teamRed.contains(player)) teamRed.remove(player);
         if (teamBlue.contains(player)) teamBlue.remove(player);
-        player.setLocation(arena.getLobbySpawn());
-        //Player killer = (Player) event.getCause().first(DamageSource.class).get();
-        player.sendMessage(Text.of("You were killed."));
+        if (event.getCause().first(DamageSource.class).get() instanceof Player) {
+            Player killer = (Player) event.getCause().first(DamageSource.class).get();
+            player.sendMessage(Text.of("You were killed by" + killer));
+        } else {
+            player.sendMessage(Text.of("You were anonymously killed."));
+        }
         player.getHealthData().set(player.getHealthData().maxHealth());
+        player.setLocation(arena.getLobbySpawn());
         checkSessionCondition();
     }
 
