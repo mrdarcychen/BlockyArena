@@ -1,4 +1,7 @@
-package net.huskycraft.huskyarena;
+package net.huskycraft.huskyarena.managers;
+
+import net.huskycraft.huskyarena.Arena;
+import net.huskycraft.huskyarena.HuskyArena;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;

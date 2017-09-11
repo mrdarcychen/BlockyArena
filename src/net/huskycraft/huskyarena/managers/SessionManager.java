@@ -1,5 +1,8 @@
-package net.huskycraft.huskyarena;
+package net.huskycraft.huskyarena.managers;
 
+import net.huskycraft.huskyarena.Arena;
+import net.huskycraft.huskyarena.HuskyArena;
+import net.huskycraft.huskyarena.Session;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
