@@ -1,5 +1,6 @@
 package net.huskycraft.huskyarena.commands;
 
+import net.huskycraft.huskyarena.Arena;
 import net.huskycraft.huskyarena.HuskyArena;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -24,6 +25,8 @@ public class DoneCmd implements CommandExecutor{
             player.sendMessage(Text.of("You're not currently creating an arena."));
             return CommandResult.empty();
         }
+        Arena arena = plugin.getArenaManager().arenaCreators.get(player.getUniqueId());
+        plugin.getArenaManager().loadedArenas.add(arena);
         plugin.getArenaManager().arenaCreators.remove(player.getUniqueId());
         player.sendMessage(Text.of("Done creating arena."));
 

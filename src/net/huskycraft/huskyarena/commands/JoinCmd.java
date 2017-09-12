@@ -22,8 +22,12 @@ public class JoinCmd implements CommandExecutor{
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
         if (!plugin.getSessionManager().playerSession.containsKey(player)) {
-            Session session = plugin.getSessionManager().getAvailableSession();
-            session.add(player);
+            try {
+                Session session = plugin.getSessionManager().getAvailableSession();
+                session.add(player);
+            } catch (NullPointerException e) {
+                player.sendMessage(Text.of("No available arena."));
+            }
         } else {
             player.sendMessage(Text.of("You've alreay joined a session!"));
         }

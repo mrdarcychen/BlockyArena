@@ -29,7 +29,7 @@ public class CreateCmd implements CommandExecutor {
         String name = args.<String>getOne("name").get();
         Arena arena = new Arena(plugin, name);
         plugin.getArenaManager().arenaCreators.put(uuid, arena);
-        player.sendMessage(Text.of("Successfully create arena."));
+        player.sendMessage(Text.of("Start creating arena."));
 
         return CommandResult.success();
     }

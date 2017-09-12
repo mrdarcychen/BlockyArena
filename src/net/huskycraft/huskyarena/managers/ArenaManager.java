@@ -30,15 +30,21 @@ public class ArenaManager {
         registerArenas();
     }
 
-    public void registerArenas() {
+    private void registerArenas() {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getArenaDir(), "*.conf");
             for (Path path : stream) {
-                arenaFiles.put(path, false);
+                if (!arenaFiles.containsKey(path)) {
+                    arenaFiles.put(path, false);
+                }
             }
         } catch (IOException e) {
             plugin.getLogger().warn("Error loading existing arena configs.");
         }
+    }
+
+    public void loadArena(Arena arena) {
+
     }
 
     public Arena getAvailableArena() {
@@ -60,6 +66,8 @@ public class ArenaManager {
                 return arena;
             }
         }
+
+        registerArenas();
         return null;
     }
 }
