@@ -62,9 +62,11 @@ public class Session {
         for (Player player : players) {
             if (players.indexOf(player) % 2 == 0) {
                 teamBlue.add(player);
+                player.sendMessage(Text.of("You're in blue team!"));
                 player.setLocation(arena.getBlueSpawn());
             } else {
                 teamRed.add(player);
+                player.sendMessage(Text.of("You're in red team!"));
                 player.setLocation(arena.getRedSpawn());
             }
         }
@@ -136,12 +138,14 @@ public class Session {
                 player.sendMessage(Text.of("Team blue won!"));
                 player.setLocation(onJoinLocations.get(player));
                 plugin.getSessionManager().playerSession.remove(player);
+                plugin.getSessionManager().sessions.remove(this);
             }
         } else if (teamRed.size() != 0 && teamBlue.size() == 0) {
             for (Player player : players) {
                 player.sendMessage(Text.of("Team red won!"));
                 player.setLocation(onJoinLocations.get(player));
                 plugin.getSessionManager().playerSession.remove(player);
+                plugin.getSessionManager().sessions.remove(this);
             }
         }
     }

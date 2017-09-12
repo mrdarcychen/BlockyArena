@@ -33,6 +33,7 @@ public class SessionManager {
         }
 
         Arena arena = plugin.getArenaManager().getAvailableArena();
+        if (arena == null) return null;
         Session session = new Session(plugin, arena);
         sessions.add(session);
         return session;
