@@ -22,25 +22,27 @@ public class Session {
 
     private Arena arena;
 
-    private ArrayList<Player> players;
-    private ArrayList<Player> teamBlue;
-    private ArrayList<Player> teamRed;
+    private ArrayList<Player> players;  //all players in the session
+    private ArrayList<Player> teamBlue; //players in team blue
+    private ArrayList<Player> teamRed;  //players in team red
 
     private HashMap<Player, Location<World>> onJoinLocations;
 
     Task lobbyTimer, gameTimer;
 
-    private int minPlayer = 2;
-    public boolean status;
-    public boolean canJoin;
+    private int minPlayer;
+    public boolean canJoin; //canJoin is true when in lobby wait period, false when the game starts
 
     public Session(HuskyArena plugin, Arena arena) {
+
         this.plugin = plugin;
         this.arena = arena;
+        arena.setStatus(true);
         players = new ArrayList<>();
+        onJoinLocations = new HashMap<>();
         teamBlue = new ArrayList<>();
         teamRed = new ArrayList<>();
-        onJoinLocations = new HashMap<>();
+        minPlayer = arena.getMinPlayer();
         canJoin = true;
     }
 
@@ -52,7 +54,7 @@ public class Session {
                 player.sendTitle(Title.builder().title(Text.of(countdown)).fadeIn(2).fadeOut(2).stay(16).build());
                 player.playSound(SoundTypes.BLOCK_DISPENSER_DISPENSE, player.getHeadRotation(), 100);
             }
-            Task.builder().execute(() -> countdown(countdown - 1)).delay(1, TimeUnit.SECONDS).submit(plugin);
+            lobbyTimer = Task.builder().execute(() -> countdown(countdown - 1)).delay(1, TimeUnit.SECONDS).submit(plugin);
         }
     }
 
@@ -83,84 +85,83 @@ public class Session {
      * Calculating player stats and announce winner.
      */
     private void sessionStopping() {
-        // TODO
-
+        gameTimer.cancel();
+        for (Player player : players) {
+            player.setLocation(onJoinLocations.get(player));
+            player.sendMessage(Text.of("Session is over."));
+            plugin.getSessionManager().playerSession.remove(player);
+        }
+        sessionStopped();
     }
 
-    /**
-     * Teleport all players to spawn and refresh world.
-     */
     private void sessionStopped() {
-        // TODO
-    }
-
-    public Arena getArena() {
-        return arena;
-    }
-
-    public void add(Player player) {
-        if (canJoin != false) {
-            onJoinLocations.put(player, player.getLocation());
-            players.add(player);
-            plugin.getSessionManager().playerSession.put(player, this);
-            player.gameMode().set(GameModes.ADVENTURE);
-            player.setLocation(arena.getLobbySpawn());
-            player.sendMessage(Text.of("You're in session."));
-            checkSessionPreReq();
-        }
-    }
-
-    public void remove(Player player) {
-        players.remove(player);
-        plugin.getSessionManager().playerSession.remove(player);
-        player.setLocation(onJoinLocations.get(player));
-        player.sendMessage(Text.of("You've left the session."));
-        checkSessionPreReq();
-    }
-
-    public void eliminate(Player player, Event event) {
-        if (teamRed.contains(player)) teamRed.remove(player);
-        if (teamBlue.contains(player)) teamBlue.remove(player);
-        if (event.getCause().first(DamageSource.class).get() instanceof Player) {
-            Player killer = (Player) event.getCause().first(DamageSource.class).get();
-            player.sendMessage(Text.of("You were killed by" + killer));
-        } else {
-            player.sendMessage(Text.of("You were anonymously killed."));
-        }
-        player.getHealthData().set(player.getHealthData().maxHealth());
-        player.setLocation(arena.getLobbySpawn());
-        checkSessionCondition();
+        teamBlue.clear();
+        teamRed.clear();
+        players.clear();
+        onJoinLocations.clear();
+        canJoin = true;
     }
 
     private void checkSessionCondition() {
         if (teamRed.size() == 0 && teamBlue.size() != 0) {
             for (Player player : players) {
                 player.sendMessage(Text.of("Team blue won!"));
-                player.setLocation(onJoinLocations.get(player));
-                plugin.getSessionManager().playerSession.remove(player);
-                plugin.getSessionManager().sessions.remove(this);
             }
         } else if (teamRed.size() != 0 && teamBlue.size() == 0) {
             for (Player player : players) {
                 player.sendMessage(Text.of("Team red won!"));
-                player.setLocation(onJoinLocations.get(player));
-                plugin.getSessionManager().playerSession.remove(player);
-                plugin.getSessionManager().sessions.remove(this);
             }
         }
+        sessionStopping();
     }
 
-    private void checkSessionPreReq() throws NullPointerException{
-        plugin.getLogger().debug("Check session prereq.");
+    private void checkStartingPreCond() {
         if (players.size() == minPlayer) {
             countdown(arena.getLobbyCountdown());
         } else if (players.size() < minPlayer) {
             try {
                 lobbyTimer.cancel();
-                plugin.getLogger().info("Timer is off.");
-                plugin.getLogger().debug("Timer is off (debugger).");
-            } catch (NullPointerException e) {}
+            } catch (NullPointerException e) {
+            }
         }
+    }
 
+    public void add(Player player) {
+        if (canJoin) {
+            onJoinLocations.put(player, player.getLocation());
+            players.add(player);
+            plugin.getSessionManager().playerSession.put(player, this);
+            player.gameMode().set(GameModes.ADVENTURE);
+            player.setLocation(arena.getLobbySpawn());
+            player.sendMessage(Text.of("You're in session."));
+            checkStartingPreCond();
+        }
+    }
+
+    public void remove(Player player) {
+        players.remove(player);
+        if (teamBlue.contains(player)) teamBlue.remove(player);
+        if (teamRed.contains(player)) teamRed.remove(player);
+        plugin.getSessionManager().playerSession.remove(player);
+        player.setLocation(onJoinLocations.get(player));
+        player.sendMessage(Text.of("You've left the session."));
+        if (canJoin) {
+            checkStartingPreCond();
+        } else {
+            checkSessionCondition();
+        }
+    }
+
+    public void eliminate(Player player) {
+        if (teamRed.contains(player)) {
+            teamRed.remove(player);
+        } else if (teamBlue.contains(player)) {
+            teamBlue.remove(player);
+        }
+        player.sendMessage(Text.of("You were killed."));
+        //player.health().set(player.getHealthData().maxHealth().getMaxValue());
+        player.setLocation(arena.getLobbySpawn());
+        checkSessionCondition();
     }
 }
+
