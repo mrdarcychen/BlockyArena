@@ -15,13 +15,17 @@ public class EntityListener {
     }
 
     @Listener
-    public void onPlayerDeath(DamageEntityEvent event) {
-        if (event.getTargetEntity() instanceof Player && event.willCauseDeath()) {
+    public void onDamageEntity(DamageEntityEvent event) {
+        if (event.getTargetEntity() instanceof Player) {
             Player player = (Player) event.getTargetEntity();
             if (plugin.getSessionManager().playerSession.containsKey(player)) {
-                event.setCancelled(true);
-                Session session = plugin.getSessionManager().playerSession.get(player);
-                session.eliminate(player, event);
+                if (plugin.getSessionManager().playerSession.get(player).canJoin) {
+                    event.setCancelled(true);
+                } else if (event.willCauseDeath()) {
+                    event.setCancelled(true);
+                    Session session = plugin.getSessionManager().playerSession.get(player);
+                    session.eliminate(player);
+                }
             }
         }
     }

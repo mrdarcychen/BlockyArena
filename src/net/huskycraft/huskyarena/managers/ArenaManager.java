@@ -22,7 +22,6 @@ public class ArenaManager {
     public HashMap<UUID, Arena> arenaCreators;
 
     public ArenaManager(HuskyArena plugin) {
-
         this.plugin = plugin;
         arenaFiles = new HashMap<>();
         arenaCreators = new HashMap<>();
@@ -43,23 +42,24 @@ public class ArenaManager {
         }
     }
 
-    public void loadArena(Arena arena) {
-
-    }
+    /*
+    returns a registered, loaded, and unpaired arena.
+    returns null if no arena presents
+     */
 
     public Arena getAvailableArena() {
-        //loops through all loaded arenas
+        //loops through all loaded arenas, returns the first unpaired arena
         if (loadedArenas.size() != 0) {
             for (Arena arena : loadedArenas) {
-                if (arena.getStatus() == false) {
+                if (!arena.getStatus()) {
                     return arena;
                 }
             }
         }
 
-        //if no arena is loaded or all loaded arenas are in use, loads a new arena
+        //if no arena is loaded or all loaded arenas are paired, loads and returns a new arena
         for (Path path : arenaFiles.keySet()) {
-            if (arenaFiles.get(path) == false) {
+            if (!arenaFiles.get(path)) {
                 Arena arena = new Arena(plugin, path);
                 arenaFiles.replace(path, true);
                 loadedArenas.add(arena);

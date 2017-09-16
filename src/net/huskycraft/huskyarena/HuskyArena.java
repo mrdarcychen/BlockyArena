@@ -95,15 +95,18 @@ public class HuskyArena {
         CommandSpec createCmd = CommandSpec.builder()
                 .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
                 .executor(new CreateCmd(this))
+                .permission("huskyarena.admin")
                 .build();
 
         CommandSpec setSpawnCmd = CommandSpec.builder()
                 .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))))
                 .executor(new SetSpawnCmd(this))
+                .permission("huskyarena.admin")
                 .build();
 
         CommandSpec doneCmd = CommandSpec.builder()
                 .executor(new DoneCmd(this))
+                .permission("huskyarena.admin")
                 .build();
 
         CommandSpec joinCmd = CommandSpec.builder()

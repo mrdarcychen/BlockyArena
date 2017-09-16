@@ -30,6 +30,7 @@ public class Arena {
     private int gameCountdown;
 
     private int maxDeaths;
+    private int minPlayer;
     private Location<World> lobbySpawn;
     private Location<World> redTeamSpawn;
     private Location<World> blueTeamSpawn;
@@ -37,7 +38,7 @@ public class Arena {
 
     // dynamic configurations
 
-    private boolean status;
+    private boolean status; //true if arena is paired with session, false otherwise
     private int redTeamSize;
     private int blueTeamSize;
 
@@ -45,7 +46,12 @@ public class Arena {
 
         this.plugin = plugin;
         this.arenaName = name;
+        this.status = false;
 
+        lobbyCountdown = 10;
+        gameCountdown = 60;
+        maxDeaths = 1;
+        minPlayer = 2;
         initConfig();
     }
 
@@ -54,6 +60,7 @@ public class Arena {
         this.plugin = plugin;
         this.arenaConfig = arenaConfig;
         loader = HoconConfigurationLoader.builder().setPath(arenaConfig).build();
+        this.status = false;
 
         loadConfig();
     }
@@ -80,9 +87,10 @@ public class Arena {
 
             rootNode = loader.load();
             rootNode.getNode("Arena-Name").setValue(arenaName);
-            rootNode.getNode("Lobby-Countdown").setValue(10);
-            rootNode.getNode("Game-Countdown").setValue(60);
-            rootNode.getNode("Max-Deaths").setValue(1);
+            rootNode.getNode("Lobby-Countdown").setValue(lobbyCountdown);
+            rootNode.getNode("Game-Countdown").setValue(gameCountdown);
+            rootNode.getNode("Max-Deaths").setValue(maxDeaths);
+            rootNode.getNode("Min-Player").setValue(minPlayer);
             loader.save(rootNode);
 
         } catch (IOException e) {
@@ -103,6 +111,7 @@ public class Arena {
             lobbyCountdown = rootNode.getNode("Lobby-Countdown").getInt();
             gameCountdown = rootNode.getNode("Game-Countdown").getInt();
             maxDeaths = rootNode.getNode("Max-Deaths").getInt();
+            minPlayer = rootNode.getNode("Min-Player").getInt();
 
             lobbySpawn = new Location(extent,
                     rootNode.getNode("Locations", "Lobby-Spawn", "X").getDouble(),
@@ -222,5 +231,9 @@ public class Arena {
 
     public int getGameCountdown() {
         return gameCountdown;
+    }
+
+    public int getMinPlayer() {
+        return minPlayer;
     }
 }

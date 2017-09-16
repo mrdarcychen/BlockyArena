@@ -23,10 +23,13 @@ public class SessionManager {
 
     }
 
+    /*
+    returns a session that matches an arena and is still in lobby wait period
+     */
     public Session getAvailableSession() {
         if (sessions.size() != 0) {
             for (Session session : sessions) {
-                if (session.status == false) {
+                if (session.canJoin) {
                     return session;
                 }
             }
