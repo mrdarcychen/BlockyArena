@@ -26,6 +26,7 @@ public class QuitCmd implements CommandExecutor{
             session.remove(player);
         } catch (NullPointerException e) {
             player.sendMessage(Text.of("You're not in any session."));
+            return CommandResult.empty();
         }
 
         player.sendMessage(Text.of("You quit the session."));
