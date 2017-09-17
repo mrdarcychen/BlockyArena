@@ -133,25 +133,18 @@ public class Arena {
         }
     }
 
-    public void setSpawn(String type, Location<World> spawn) throws ObjectMappingException {
+    public void setWorld(World world) {
 
-        String worldName = spawn.getExtent().getName();
-
-        try  {
+        try {
             rootNode = loader.load();
-            rootNode.getNode("World-Name").setValue(worldName);
+            rootNode.getNode("World-Name").setValue(world.getName());
             loader.save(rootNode);
         } catch (IOException e) {
             plugin.getLogger().warn("Error saving spawn world extent.");
         }
-        switch (type) {
-            case "lobby": setLobbySpawn(spawn); break;
-            case "red": setRedTeamSPawn(spawn); break;
-            case "blue": setBlueTeamSpawn(spawn); break;
-        }
     }
 
-    private void setLobbySpawn(Location<World> spawn) {
+    public void setLobbySpawn(Location<World> spawn) {
         this.lobbySpawn = spawn;
 
         double lobbySpawnX = spawn.getX();
@@ -169,7 +162,7 @@ public class Arena {
         }
     }
 
-    private void setRedTeamSPawn(Location<World> spawn) {
+    public void setRedTeamSPawn(Location<World> spawn) {
         this.redTeamSpawn = spawn;
 
         double redTeamSpawnX = spawn.getX();
@@ -187,7 +180,7 @@ public class Arena {
         }
     }
 
-    private void setBlueTeamSpawn(Location<World> spawn) {
+    public void setBlueTeamSpawn(Location<World> spawn) {
         this.blueTeamSpawn = spawn;
 
         double blueTeamSpawnX = spawn.getX();

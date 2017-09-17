@@ -4,6 +4,7 @@ import net.huskycraft.huskyarena.HuskyArena;
 import net.huskycraft.huskyarena.Session;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 public class EntityListener {
@@ -24,7 +25,7 @@ public class EntityListener {
                 } else if (event.willCauseDeath()) {
                     event.setCancelled(true);
                     Session session = plugin.getSessionManager().playerSession.get(player);
-                    session.eliminate(player);
+                    session.onPlayerDeath(player);
                 }
             }
         }

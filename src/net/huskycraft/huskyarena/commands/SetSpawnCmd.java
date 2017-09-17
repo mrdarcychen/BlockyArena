@@ -12,6 +12,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
+import org.spongepowered.api.world.extent.Extent;
 
 public class SetSpawnCmd implements CommandExecutor{
 
@@ -33,15 +34,20 @@ public class SetSpawnCmd implements CommandExecutor{
 
         Arena arena = plugin.getArenaManager().arenaCreators.get(player.getUniqueId());
         Location<World> spawn = player.getLocation();
-        String type = args.getOne("type").get().toString();
 
-        try {
-            arena.setSpawn(type, spawn);
-        } catch (ObjectMappingException e) {
-            e.printStackTrace();
+        World world = spawn.getExtent();
+        arena.setWorld(world);
+
+        String type = args.getOne("type").get().toString();
+        switch (type) {
+            case "lobby": arena.setLobbySpawn(spawn); break;
+            case "red": arena.setRedTeamSPawn(spawn); break;
+            case "blue": arena.setBlueTeamSpawn(spawn); break;
+            default:
+                player.sendMessage(Text.of("Invalid spawn type."));
+                return CommandResult.empty();
         }
-        player.sendMessage(Text.of("Successfully set " + type + " spawn at " +
-                spawn.getPosition().round().toInt()));
+        player.sendMessage(Text.of("Successfully set " + type + " spawn at " + spawn.getPosition().round().toInt()));
 
         return CommandResult.success();
     }
