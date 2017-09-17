@@ -127,6 +127,7 @@ public class Session {
         } else if (players.size() < minPlayer) {
             try {
                 lobbyTimer.cancel();
+                lobbyTimer = null;
             } catch (NullPointerException e) {
             }
         }
