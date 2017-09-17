@@ -1,5 +1,6 @@
 package net.huskycraft.huskyarena;
 
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -88,8 +89,9 @@ public class Session {
         gameTimer.cancel();
         for (Player player : players) {
             player.setLocation(onJoinLocations.get(player));
-            player.sendMessage(Text.of("Session is over."));
+            player.sendMessage(Text.of("Session is over. "));
             plugin.getSessionManager().playerSession.remove(player);
+            player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
         }
         sessionStopped();
     }
@@ -98,6 +100,8 @@ public class Session {
         teamBlue.clear();
         teamRed.clear();
         players.clear();
+        lobbyTimer = null;
+        gameTimer = null;
         onJoinLocations.clear();
         canJoin = true;
     }
@@ -107,16 +111,18 @@ public class Session {
             for (Player player : players) {
                 player.sendMessage(Text.of("Team blue won!"));
             }
+            sessionStopping();
         } else if (teamRed.size() != 0 && teamBlue.size() == 0) {
             for (Player player : players) {
                 player.sendMessage(Text.of("Team red won!"));
             }
+            sessionStopping();
         }
-        sessionStopping();
+
     }
 
     private void checkStartingPreCond() {
-        if (players.size() == minPlayer) {
+        if (players.size() == minPlayer && lobbyTimer == null) {
             countdown(arena.getLobbyCountdown());
         } else if (players.size() < minPlayer) {
             try {
@@ -129,11 +135,12 @@ public class Session {
     public void add(Player player) {
         if (canJoin) {
             onJoinLocations.put(player, player.getLocation());
+            player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
             players.add(player);
             plugin.getSessionManager().playerSession.put(player, this);
-            player.gameMode().set(GameModes.ADVENTURE);
+            player.offer(player.gameMode().set(GameModes.ADVENTURE));
             player.setLocation(arena.getLobbySpawn());
-            player.sendMessage(Text.of("You're in session."));
+            player.sendMessage(Text.of("Waiting for the game to start..."));
             checkStartingPreCond();
         }
     }
@@ -145,6 +152,7 @@ public class Session {
         plugin.getSessionManager().playerSession.remove(player);
         player.setLocation(onJoinLocations.get(player));
         player.sendMessage(Text.of("You've left the session."));
+        player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
         if (canJoin) {
             checkStartingPreCond();
         } else {
@@ -152,14 +160,14 @@ public class Session {
         }
     }
 
-    public void eliminate(Player player) {
+    public void onPlayerDeath(Player player) {
         if (teamRed.contains(player)) {
             teamRed.remove(player);
         } else if (teamBlue.contains(player)) {
             teamBlue.remove(player);
         }
         player.sendMessage(Text.of("You were killed."));
-        //player.health().set(player.getHealthData().maxHealth().getMaxValue());
+        player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
         player.setLocation(arena.getLobbySpawn());
         checkSessionCondition();
     }

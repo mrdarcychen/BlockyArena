@@ -35,6 +35,7 @@ public class JoinCmd implements CommandExecutor{
                 player.sendMessage(Text.of("No available arena."));
             }
         }
+
         return CommandResult.success();
     }
 }
