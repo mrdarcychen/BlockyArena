@@ -135,6 +135,7 @@ public class Session {
 
     public void add(Player player) {
         if (canJoin) {
+            player.getHealthData().health();
             onJoinLocations.put(player, player.getLocation());
             player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
             players.add(player);
