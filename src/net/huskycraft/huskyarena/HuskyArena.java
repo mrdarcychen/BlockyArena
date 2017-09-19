@@ -69,14 +69,8 @@ public class HuskyArena {
         Sponge.getEventManager().registerListeners(this, new EntityListener(this));
         arenaManager = new ArenaManager(this);
         sessionManager = new SessionManager(this);
-    }
-
-    @Listener
-    public void onServerStarted(GameStartedServerEvent event) {
 
     }
-
-
 
     private void createArenaDir() {
 

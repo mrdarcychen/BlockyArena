@@ -19,13 +19,13 @@
 #### Player commands
 ```
 /arena join  #To join an active session
-/arena quit  #To quit the current sess
+/arena quit  #To quit the current session
 ```
 
 
 ## Permissions 
 ```
-Permissions should be here 
+Work in progress...
 ```
 
 ## Developer notes
