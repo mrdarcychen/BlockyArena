@@ -6,15 +6,6 @@ group = 'net.huskycraft'
 version = '0.1.0'
 description = ''
 
-repositories {
-    maven {
-        name = "worldedit"
-        url = "http://maven.sk89q.com/repo/"
-    }
-}
-
 dependencies {
     compile 'org.spongepowered:spongeapi:6.0.0'
-    compile 'com.sk89q.worldedit:worldedit-core:6.1'
-
 }
