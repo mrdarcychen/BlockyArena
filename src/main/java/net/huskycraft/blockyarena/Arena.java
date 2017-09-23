@@ -1,10 +1,9 @@
-package net.huskycraft.huskyarena;
+package net.huskycraft.blockyarena;
 
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -17,7 +16,7 @@ import java.nio.file.Paths;
 
 public class Arena {
 
-    HuskyArena plugin;
+    BlockyArena plugin;
 
     private Path arenaConfig;
     private ConfigurationLoader<CommentedConfigurationNode> loader;
@@ -42,7 +41,7 @@ public class Arena {
     private int redTeamSize;
     private int blueTeamSize;
 
-    public Arena(HuskyArena plugin, String name) {
+    public Arena(BlockyArena plugin, String name) {
 
         this.plugin = plugin;
         this.arenaName = name;
@@ -55,7 +54,7 @@ public class Arena {
         initConfig();
     }
 
-    public Arena(HuskyArena plugin, Path arenaConfig) {
+    public Arena(BlockyArena plugin, Path arenaConfig) {
 
         this.plugin = plugin;
         this.arenaConfig = arenaConfig;

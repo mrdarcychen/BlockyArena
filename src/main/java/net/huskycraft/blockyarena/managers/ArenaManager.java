@@ -1,7 +1,7 @@
-package net.huskycraft.huskyarena.managers;
+package net.huskycraft.blockyarena.managers;
 
-import net.huskycraft.huskyarena.Arena;
-import net.huskycraft.huskyarena.HuskyArena;
+import net.huskycraft.blockyarena.Arena;
+import net.huskycraft.blockyarena.BlockyArena;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -13,7 +13,7 @@ import java.util.UUID;
 
 public class ArenaManager {
 
-    private HuskyArena plugin;
+    private BlockyArena plugin;
 
     public HashMap<Path, Boolean> arenaFiles;   //false represents file not loaded
 
@@ -21,7 +21,7 @@ public class ArenaManager {
 
     public HashMap<UUID, Arena> arenaCreators;
 
-    public ArenaManager(HuskyArena plugin) {
+    public ArenaManager(BlockyArena plugin) {
         this.plugin = plugin;
         arenaFiles = new HashMap<>();
         arenaCreators = new HashMap<>();

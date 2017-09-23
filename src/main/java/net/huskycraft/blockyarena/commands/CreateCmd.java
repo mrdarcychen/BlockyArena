@@ -1,8 +1,7 @@
-package net.huskycraft.huskyarena.commands;
+package net.huskycraft.blockyarena.commands;
 
-
-import net.huskycraft.huskyarena.Arena;
-import net.huskycraft.huskyarena.HuskyArena;
+import net.huskycraft.blockyarena.Arena;
+import net.huskycraft.blockyarena.BlockyArena;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -15,9 +14,9 @@ import java.util.UUID;
 
 public class CreateCmd implements CommandExecutor {
 
-    private HuskyArena plugin;
+    private BlockyArena plugin;
 
-    public CreateCmd(HuskyArena plugin) {
+    public CreateCmd(BlockyArena plugin) {
         this.plugin = plugin;
     }
 

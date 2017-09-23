@@ -1,7 +1,7 @@
-package net.huskycraft.huskyarena.commands;
+package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.huskyarena.HuskyArena;
-import net.huskycraft.huskyarena.Session;
+import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.Session;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -12,9 +12,9 @@ import org.spongepowered.api.text.Text;
 
 public class JoinCmd implements CommandExecutor{
 
-    HuskyArena plugin;
+    BlockyArena plugin;
 
-    public JoinCmd(HuskyArena plugin) {
+    public JoinCmd(BlockyArena plugin) {
         this.plugin = plugin;
     }
 

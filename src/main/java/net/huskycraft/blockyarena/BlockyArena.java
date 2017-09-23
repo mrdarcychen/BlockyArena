@@ -1,9 +1,9 @@
-package net.huskycraft.huskyarena;
+package net.huskycraft.blockyarena;
 
-import net.huskycraft.huskyarena.commands.*;
-import net.huskycraft.huskyarena.managers.ArenaManager;
-import net.huskycraft.huskyarena.managers.SessionManager;
-import net.huskycraft.huskyarena.listeners.EntityListener;
+import net.huskycraft.blockyarena.commands.*;
+import net.huskycraft.blockyarena.listeners.EntityListener;
+import net.huskycraft.blockyarena.managers.ArenaManager;
+import net.huskycraft.blockyarena.managers.SessionManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -12,7 +12,6 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
-import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -23,8 +22,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
-@Plugin(id = "huskyarena", name = "HuskyArena")
-public class HuskyArena {
+@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.1.0")
+public class BlockyArena {
 
     @Inject
     public Logger logger;
@@ -89,18 +88,18 @@ public class HuskyArena {
         CommandSpec createCmd = CommandSpec.builder()
                 .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
                 .executor(new CreateCmd(this))
-                .permission("huskyarena.admin")
+                .permission("net.huskycraft.blockyarena.admin")
                 .build();
 
         CommandSpec setSpawnCmd = CommandSpec.builder()
                 .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))))
                 .executor(new SetSpawnCmd(this))
-                .permission("huskyarena.admin")
+                .permission("net.huskycraft.blockyarena.admin")
                 .build();
 
         CommandSpec doneCmd = CommandSpec.builder()
                 .executor(new DoneCmd(this))
-                .permission("huskyarena.admin")
+                .permission("net.huskycraft.blockyarena.admin")
                 .build();
 
         CommandSpec joinCmd = CommandSpec.builder()
@@ -119,7 +118,7 @@ public class HuskyArena {
                 .child(quitCmd, "quit")
                 .build();
 
-        Sponge.getCommandManager().register(this, arenaCommandSpec, "huskyarena", "arena");
+        Sponge.getCommandManager().register(this, arenaCommandSpec, "net.huskycraft/blockyarena", "arena");
 
     }
 }

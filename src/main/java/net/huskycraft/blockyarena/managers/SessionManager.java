@@ -1,8 +1,8 @@
-package net.huskycraft.huskyarena.managers;
+package net.huskycraft.blockyarena.managers;
 
-import net.huskycraft.huskyarena.Arena;
-import net.huskycraft.huskyarena.HuskyArena;
-import net.huskycraft.huskyarena.Session;
+import net.huskycraft.blockyarena.Arena;
+import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.Session;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.ArrayList;
@@ -10,13 +10,13 @@ import java.util.HashMap;
 
 public class SessionManager {
 
-    HuskyArena plugin;
+    BlockyArena plugin;
 
     public ArrayList<Session> sessions;
 
     public HashMap<Player, Session> playerSession;
 
-    public SessionManager(HuskyArena plugin) {
+    public SessionManager(BlockyArena plugin) {
         this.plugin = plugin;
         sessions = new ArrayList<>();
         playerSession = new HashMap<>();

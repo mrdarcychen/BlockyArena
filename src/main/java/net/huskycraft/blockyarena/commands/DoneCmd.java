@@ -1,7 +1,7 @@
-package net.huskycraft.huskyarena.commands;
+package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.huskyarena.Arena;
-import net.huskycraft.huskyarena.HuskyArena;
+import net.huskycraft.blockyarena.Arena;
+import net.huskycraft.blockyarena.BlockyArena;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -12,9 +12,9 @@ import org.spongepowered.api.text.Text;
 
 public class DoneCmd implements CommandExecutor{
 
-    HuskyArena plugin;
+    BlockyArena plugin;
 
-    public DoneCmd(HuskyArena plugin) {
+    public DoneCmd(BlockyArena plugin) {
         this.plugin = plugin;
     }
 
