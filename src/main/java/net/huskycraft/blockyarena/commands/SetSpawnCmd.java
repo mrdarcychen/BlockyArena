@@ -1,8 +1,7 @@
-package net.huskycraft.huskyarena.commands;
+package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.huskyarena.Arena;
-import net.huskycraft.huskyarena.HuskyArena;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import net.huskycraft.blockyarena.Arena;
+import net.huskycraft.blockyarena.BlockyArena;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -12,13 +11,12 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
-import org.spongepowered.api.world.extent.Extent;
 
 public class SetSpawnCmd implements CommandExecutor{
 
-    HuskyArena plugin;
+    BlockyArena plugin;
 
-    public SetSpawnCmd(HuskyArena plugin) {
+    public SetSpawnCmd(BlockyArena plugin) {
         this.plugin = plugin;
     }
 

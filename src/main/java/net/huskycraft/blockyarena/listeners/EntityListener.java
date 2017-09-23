@@ -1,17 +1,16 @@
-package net.huskycraft.huskyarena.listeners;
+package net.huskycraft.blockyarena.listeners;
 
-import net.huskycraft.huskyarena.HuskyArena;
-import net.huskycraft.huskyarena.Session;
+import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.Session;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 public class EntityListener {
 
-    HuskyArena plugin;
+    BlockyArena plugin;
 
-    public EntityListener(HuskyArena plugin) {
+    public EntityListener(BlockyArena plugin) {
         this.plugin = plugin;
     }
 

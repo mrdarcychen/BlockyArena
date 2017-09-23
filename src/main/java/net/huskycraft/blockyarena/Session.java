@@ -1,11 +1,9 @@
-package net.huskycraft.huskyarena;
+package net.huskycraft.blockyarena;
 
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
-import org.spongepowered.api.event.Event;
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
@@ -19,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class Session {
 
-    private HuskyArena plugin;
+    private BlockyArena plugin;
 
     private Arena arena;
 
@@ -34,7 +32,7 @@ public class Session {
     private int minPlayer;
     public boolean canJoin; //canJoin is true when in lobby wait period, false when the game starts
 
-    public Session(HuskyArena plugin, Arena arena) {
+    public Session(BlockyArena plugin, Arena arena) {
 
         this.plugin = plugin;
         this.arena = arena;

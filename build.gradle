@@ -4,8 +4,8 @@ plugins {
 
 group = 'net.huskycraft'
 version = '0.1.0'
-description = ''
+description = 'HuskyArena is a simple PvP plugin that allows your server to host multiple deathmatches in some defined zones.'
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:6.0.0'
+    compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
 }
