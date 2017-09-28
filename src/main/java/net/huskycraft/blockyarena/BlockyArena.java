@@ -1,5 +1,6 @@
 package net.huskycraft.blockyarena;
 
+import com.google.inject.Inject;
 import net.huskycraft.blockyarena.commands.*;
 import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
@@ -15,7 +16,6 @@ import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
-import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
