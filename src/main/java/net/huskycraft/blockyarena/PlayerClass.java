@@ -12,7 +12,6 @@ import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
-import org.spongepowered.api.item.inventory.type.GridInventory;
 
 import java.io.File;
 import java.io.IOException;
@@ -58,12 +57,10 @@ public class PlayerClass {
             className = rootNode.getNode("Name").getString();
 
             HashMap<String, Object> itemProperties;
-            plugin.getLogger().info(Boolean.toString(rootNode.getNode("Inventory").hasListChildren()));
-            for (ConfigurationNode index : rootNode.getNode("Inventory").getChildrenList()) {
-                itemProperties = index.getValue(TypeToken.of(HashMap.class));
+            for (ConfigurationNode index : rootNode.getNode("Inventory").getChildrenMap().values()) {
                 ItemStack itemStack = ItemStack.builder()
-                        .itemType((ItemType) itemProperties.get("ItemType"))
-                        .quantity((int) itemProperties.get("Quantity"))
+                        .itemType(index.getNode("ItemType").getValue(TypeToken.of(ItemType.class)))
+                        .quantity(index.getNode("Quantity").getInt())
                         .build();
                 //itemStack = setEnchantmentData(itemStack, itemProperties);
                 plugin.getLogger().info("TYPE: " + itemStack.getType().getName());
