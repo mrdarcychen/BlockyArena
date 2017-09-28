@@ -51,6 +51,12 @@ public class BlockyArena {
         return arenaDir;
     }
 
+    private Path classDir;
+
+    public Path getClassDir() {
+        return classDir;
+    }
+
     public ArenaManager arenaManager;
     public SessionManager sessionManager;
     public PlayerClassManager playerClassManager;
@@ -70,6 +76,7 @@ public class BlockyArena {
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         createArenaDir();
+        createClassDir();
         registerCommands();
         Sponge.getEventManager().registerListeners(this, new EntityListener(this));
         arenaManager = new ArenaManager(this);
@@ -87,6 +94,17 @@ public class BlockyArena {
             }
         } catch (IOException e) {
             logger.warn("Error creating arenas directory");
+        }
+    }
+
+    private void createClassDir() {
+        arenaDir = Paths.get(getConfigDir().toString() + "/classes");
+        try {
+            if (!arenaDir.toFile().exists()) {
+                Files.createDirectory(arenaDir);
+            }
+        } catch (IOException e) {
+            logger.warn("Error creating classes directory");
         }
     }
 
