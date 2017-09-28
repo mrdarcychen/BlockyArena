@@ -23,6 +23,7 @@ public class GetClassCmd implements CommandExecutor{
         String className = args.<String>getOne(Text.of("name")).get();
         PlayerClass playerClass = plugin.getPlayerClassManager().getPlayerClass(className);
         playerClass.offerItemStacksTo(player);
+        player.sendMessage(Text.of("You are now " + className));
         return CommandResult.success();
     }
 }
