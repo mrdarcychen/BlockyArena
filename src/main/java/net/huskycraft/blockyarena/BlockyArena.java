@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import net.huskycraft.blockyarena.commands.*;
 import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
+import net.huskycraft.blockyarena.managers.PlayerClassManager;
 import net.huskycraft.blockyarena.managers.SessionManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -52,6 +53,7 @@ public class BlockyArena {
 
     public ArenaManager arenaManager;
     public SessionManager sessionManager;
+    public PlayerClassManager playerClassManager;
 
     public ArenaManager getArenaManager() {
         return arenaManager;
@@ -61,6 +63,10 @@ public class BlockyArena {
         return sessionManager;
     }
 
+    public PlayerClassManager getPlayerClassManager() {
+        return playerClassManager;
+    }
+
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         createArenaDir();
@@ -68,6 +74,7 @@ public class BlockyArena {
         Sponge.getEventManager().registerListeners(this, new EntityListener(this));
         arenaManager = new ArenaManager(this);
         sessionManager = new SessionManager(this);
+        playerClassManager = new PlayerClassManager(this);
 
     }
 
@@ -86,9 +93,16 @@ public class BlockyArena {
     private void registerCommands() {
 
         CommandSpec createCmd = CommandSpec.builder()
-                .arguments(GenericArguments.remainingJoinedStrings(Text.of("name")))
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("object"))),
+                        GenericArguments.remainingJoinedStrings(Text.of("name")))
                 .executor(new CreateCmd(this))
                 .permission("net.huskycraft.blockyarena.admin")
+                .build();
+
+        CommandSpec getClassCmd = CommandSpec.builder()
+                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("name"))))
+                .executor(new GetClassCmd(this))
                 .build();
 
         CommandSpec setSpawnCmd = CommandSpec.builder()
@@ -116,6 +130,7 @@ public class BlockyArena {
                 .child(doneCmd, "done")
                 .child(joinCmd, "join")
                 .child(quitCmd, "quit")
+                .child(getClassCmd, "getclass")
                 .build();
 
         Sponge.getCommandManager().register(this, arenaCommandSpec, "net.huskycraft/blockyarena", "arena");
