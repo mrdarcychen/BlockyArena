@@ -12,6 +12,7 @@ public class PlayerClassManager {
 
     public PlayerClassManager(BlockyArena plugin) {
         this.plugin = plugin;
+        playerClasses = new ArrayList<>();
     }
 
     public void addPlayerClass(PlayerClass playerClass) {

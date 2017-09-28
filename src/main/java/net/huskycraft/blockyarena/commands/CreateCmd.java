@@ -41,9 +41,11 @@ public class CreateCmd implements CommandExecutor {
                 break;
             case "class":
                 PlayerClass playerClass = new PlayerClass(plugin, name, player.getInventory().query(GridInventory.class));
+                plugin.getPlayerClassManager().addPlayerClass(playerClass);
                 break;
             default:
                 player.sendMessage(Text.of("Invalid type of object."));
+                return CommandResult.empty();
         }
         return CommandResult.success();
     }
