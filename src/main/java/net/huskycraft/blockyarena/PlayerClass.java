@@ -13,4 +13,8 @@ public class PlayerClass {
         this.className = className;
         this.classInventory = classInventory;
     }
+
+    public String getClassName() {
+        return className;
+    }
 }
