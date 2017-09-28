@@ -98,10 +98,10 @@ public class BlockyArena {
     }
 
     private void createClassDir() {
-        arenaDir = Paths.get(getConfigDir().toString() + "/classes");
+        classDir = Paths.get(getConfigDir().toString() + "/classes");
         try {
-            if (!arenaDir.toFile().exists()) {
-                Files.createDirectory(arenaDir);
+            if (!classDir.toFile().exists()) {
+                Files.createDirectory(classDir);
             }
         } catch (IOException e) {
             logger.warn("Error creating classes directory");
