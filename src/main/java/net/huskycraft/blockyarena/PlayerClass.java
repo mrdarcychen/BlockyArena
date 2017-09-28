@@ -46,6 +46,7 @@ public class PlayerClass {
         this.classConfig = classConfig;
         this.playerClassSerializer = new PlayerClassSerializer(plugin);
         loader = HoconConfigurationLoader.builder().setPath(classConfig).build();
+        itemStacks = new ArrayList<>();
 
         loadConfig();
     }
@@ -53,19 +54,19 @@ public class PlayerClass {
     private void loadConfig() {
         try {
             rootNode = loader.load();
-            ArrayList<ItemStack> itemStacks = new ArrayList<>();
 
             className = rootNode.getNode("Name").getString();
 
             HashMap<String, Object> itemProperties;
-            ItemStack itemStack;
+            plugin.getLogger().info(Boolean.toString(rootNode.getNode("Inventory").hasListChildren()));
             for (ConfigurationNode index : rootNode.getNode("Inventory").getChildrenList()) {
                 itemProperties = index.getValue(TypeToken.of(HashMap.class));
-                itemStack = ItemStack.builder()
+                ItemStack itemStack = ItemStack.builder()
                         .itemType((ItemType) itemProperties.get("ItemType"))
                         .quantity((int) itemProperties.get("Quantity"))
                         .build();
                 //itemStack = setEnchantmentData(itemStack, itemProperties);
+                plugin.getLogger().info("TYPE: " + itemStack.getType().getName());
                 itemStacks.add(itemStack);
             }
         } catch (IOException e) {
