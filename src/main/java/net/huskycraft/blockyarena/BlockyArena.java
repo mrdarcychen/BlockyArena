@@ -23,7 +23,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 
 
-@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.1.0")
+@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.2.0")
 public class BlockyArena {
 
     @Inject
