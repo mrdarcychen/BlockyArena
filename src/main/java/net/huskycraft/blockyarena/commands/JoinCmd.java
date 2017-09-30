@@ -36,6 +36,7 @@ public class JoinCmd implements CommandExecutor{
             }
         }
 
+        player.getInventory().clear();
         return CommandResult.success();
     }
 }
