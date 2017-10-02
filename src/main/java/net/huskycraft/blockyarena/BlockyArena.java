@@ -21,117 +21,101 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
+import java.util.Arrays;
+import java.util.List;
 
 @Plugin(id = "blockyarena", name = "BlockyArena", version = "0.2.0")
 public class BlockyArena {
-
     @Inject
-    public Logger logger;
-
-    public Logger getLogger() {
-        return logger;
-    }
-
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path configDir;
+    private Logger logger;
 
     @Inject
     @DefaultConfig(sharedRoot = false)
     private Path defaultConfig;
 
-    public Path getConfigDir() {
-        return configDir;
-    }
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    private Path configDir;
 
-    private Path arenaDir;
+    private Path arenaDir, classDir;
 
-    public Path getArenaDir() {
-        return arenaDir;
-    }
-
-    private Path classDir;
-
-    public Path getClassDir() {
-        return classDir;
-    }
-
-    public ArenaManager arenaManager;
-    public SessionManager sessionManager;
-    public PlayerClassManager playerClassManager;
-
-    public ArenaManager getArenaManager() {
-        return arenaManager;
-    }
-
-    public SessionManager getSessionManager() {
-        return sessionManager;
-    }
-
-    public PlayerClassManager getPlayerClassManager() {
-        return playerClassManager;
-    }
+    private ArenaManager arenaManager;
+    private SessionManager sessionManager;
+    private PlayerClassManager playerClassManager;
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
-        createArenaDir();
-        createClassDir();
+        createDirectories();
+        createManagers();
         registerCommands();
-        Sponge.getEventManager().registerListeners(this, new EntityListener(this));
+        registerListeners();
+    }
+
+    /*
+    creates managers for the plugin
+     */
+    private void createManagers() {
         arenaManager = new ArenaManager(this);
         sessionManager = new SessionManager(this);
         playerClassManager = new PlayerClassManager(this);
-
     }
 
-    private void createArenaDir() {
-
+    /*
+    creates directories for arenas and classes if they do not exist
+    pre: plugin config directory exists (throws IOException if not)
+     */
+    private void createDirectories() {
         arenaDir = Paths.get(getConfigDir().toString() + "/arenas");
-        try {
-            if (!arenaDir.toFile().exists()) {
-                Files.createDirectory(arenaDir);
-            }
-        } catch (IOException e) {
-            logger.warn("Error creating arenas directory");
-        }
-    }
-
-    private void createClassDir() {
         classDir = Paths.get(getConfigDir().toString() + "/classes");
-        try {
-            if (!classDir.toFile().exists()) {
-                Files.createDirectory(classDir);
+
+        List<Path> directories = Arrays.asList(arenaDir, classDir);
+        for (Path dir : directories) {
+            try {
+                if (!dir.toFile().exists()) {
+                    Files.createDirectory(dir);
+                }
+            } catch (IOException e) {
+                logger.warn("Error creating directory for " + dir.getFileName().toString());
             }
-        } catch (IOException e) {
-            logger.warn("Error creating classes directory");
         }
     }
 
-    private void registerCommands() {
+    /*
+    registers event listeners to EventManager
+     */
+    private void registerListeners() {
+        Sponge.getEventManager().registerListeners(this, new EntityListener(this));
+    }
 
+    /*
+    registers user commands to CommandManager
+     */
+    private void registerCommands() {
         CommandSpec createCmd = CommandSpec.builder()
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("object"))),
                         GenericArguments.remainingJoinedStrings(Text.of("name")))
                 .executor(new CreateCmd(this))
-                .permission("net.huskycraft.blockyarena.admin")
+                .permission("blockyarena.create")
                 .build();
 
         CommandSpec getClassCmd = CommandSpec.builder()
-                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("name"))))
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("name"))))
                 .executor(new GetClassCmd(this))
+                .permission("blockyarena.getclass")
                 .build();
 
         CommandSpec setSpawnCmd = CommandSpec.builder()
-                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))))
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))))
                 .executor(new SetSpawnCmd(this))
-                .permission("net.huskycraft.blockyarena.admin")
+                .permission("blockyarena.setspawn")
                 .build();
 
         CommandSpec doneCmd = CommandSpec.builder()
                 .executor(new DoneCmd(this))
-                .permission("net.huskycraft.blockyarena.admin")
+                .permission("blockyarena.done")
                 .build();
 
         CommandSpec joinCmd = CommandSpec.builder()
@@ -151,7 +135,39 @@ public class BlockyArena {
                 .child(getClassCmd, "getclass")
                 .build();
 
-        Sponge.getCommandManager().register(this, arenaCommandSpec, "net.huskycraft/blockyarena", "arena");
+        Sponge.getCommandManager()
+                .register(this, arenaCommandSpec, "blockyarena", "arena");
+    }
 
+    public Logger getLogger() {
+        return logger;
+    }
+
+    public Path getDefaultConfig() {
+        return defaultConfig;
+    }
+
+    public Path getConfigDir() {
+        return configDir;
+    }
+
+    public Path getArenaDir() {
+        return arenaDir;
+    }
+
+    public Path getClassDir() {
+        return classDir;
+    }
+
+    public ArenaManager getArenaManager() {
+        return arenaManager;
+    }
+
+    public SessionManager getSessionManager() {
+        return sessionManager;
+    }
+
+    public PlayerClassManager getPlayerClassManager() {
+        return playerClassManager;
     }
 }
