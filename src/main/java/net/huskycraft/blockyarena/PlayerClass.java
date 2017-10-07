@@ -1,12 +1,14 @@
 package net.huskycraft.blockyarena;
 
 import com.google.common.reflect.TypeToken;
-import net.huskycraft.blockyarena.serializer.PlayerClassSerializer;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
+import org.spongepowered.api.data.meta.ItemEnchantment;
+import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
@@ -98,11 +100,17 @@ public class PlayerClass {
 
         try {
             rootNode = loader.load();
-            playerClassSerializer.serialize(TypeToken.of(PlayerClass.class), this, rootNode);
+            rootNode.getNode("Name").setValue(className);
+            for (int i = 0; i < itemStacks.size(); i++) {
+                ItemStack itemStack = itemStacks.get(i);
+                rootNode.getNode("Inventory", i, "ItemType")
+                        .setValue(itemStack.getType().getName());
+                rootNode.getNode("Inventory", i, "Quantity")
+                        .setValue(itemStack.getQuantity());
+                rootNode.getNode("Inventory", i, "Enchantments")
+                        .setValue(getItemEnchantments(itemStack));
+            }
             loader.save(rootNode);
-
-        } catch (ObjectMappingException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -121,5 +129,18 @@ public class PlayerClass {
         for (ItemStack itemStack : itemStacks) {
             player.getInventory().offer(itemStack.copy());
         }
+    }
+
+    private HashMap<String, Integer> getItemEnchantments(ItemStack itemStack) {
+        HashMap<String, Integer> enchantments = new HashMap<>();
+
+        if (!itemStack.get(EnchantmentData.class).isPresent()) return null;
+
+        ListValue<ItemEnchantment> data = itemStack.getOrCreate(EnchantmentData.class).get().enchantments();
+        for (ItemEnchantment e : data) {
+            enchantments.put(e.getEnchantment().getName(), e.getLevel());
+        }
+
+        return enchantments;
     }
 }
