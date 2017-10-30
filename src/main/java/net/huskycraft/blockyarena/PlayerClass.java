@@ -6,10 +6,12 @@ import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.manipulator.mutable.item.EnchantmentData;
 import org.spongepowered.api.data.meta.ItemEnchantment;
 import org.spongepowered.api.data.value.mutable.ListValue;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.item.Enchantment;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -22,6 +24,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlayerClass {
 
@@ -30,13 +35,12 @@ public class PlayerClass {
     private Path classConfig;
     private ConfigurationNode rootNode;
     private ConfigurationLoader<CommentedConfigurationNode> loader;
-    private PlayerClassSerializer playerClassSerializer;
+
     private ArrayList<ItemStack> itemStacks;
 
     public PlayerClass(BlockyArena plugin, String className, Inventory inventory) {
         this.plugin = plugin;
         this.className = className;
-        this.playerClassSerializer = new PlayerClassSerializer(plugin);
         decodeInventory(inventory);
 
         initConfig();
@@ -45,7 +49,6 @@ public class PlayerClass {
     public PlayerClass(BlockyArena plugin, Path classConfig) {
         this.plugin = plugin;
         this.classConfig = classConfig;
-        this.playerClassSerializer = new PlayerClassSerializer(plugin);
         loader = HoconConfigurationLoader.builder().setPath(classConfig).build();
         itemStacks = new ArrayList<>();
 
@@ -58,14 +61,22 @@ public class PlayerClass {
 
             className = rootNode.getNode("Name").getString();
 
-            HashMap<String, Object> itemProperties;
             for (ConfigurationNode index : rootNode.getNode("Inventory").getChildrenMap().values()) {
                 ItemStack itemStack = ItemStack.builder()
                         .itemType(index.getNode("ItemType").getValue(TypeToken.of(ItemType.class)))
                         .quantity(index.getNode("Quantity").getInt())
                         .build();
-                //itemStack = setEnchantmentData(itemStack, itemProperties);
-                plugin.getLogger().info("TYPE: " + itemStack.getType().getName());
+                EnchantmentData enchantmentData = itemStack.getOrCreate(EnchantmentData.class)
+                        .get();
+                for (ConfigurationNode itemEnch : index.getNode("Enchantments", "ItemEnchantments")
+                             .getChildrenList()) {
+                    Enchantment e = itemEnch.getNode("Enchantment").getValue(TypeToken.of
+                            (Enchantment.class));
+                    int level = itemEnch.getNode("Level").getInt();
+                    enchantmentData.set(enchantmentData.enchantments().add(new ItemEnchantment
+                            (e, level)));
+                }
+                itemStack.offer(enchantmentData);
                 itemStacks.add(itemStack);
             }
         } catch (IOException e) {
@@ -103,15 +114,21 @@ public class PlayerClass {
             rootNode.getNode("Name").setValue(className);
             for (int i = 0; i < itemStacks.size(); i++) {
                 ItemStack itemStack = itemStacks.get(i);
-                rootNode.getNode("Inventory", i, "ItemType")
+                EnchantmentData enchantmentData = itemStack.getOrCreate(EnchantmentData.class).get();
+                rootNode.getNode("Inventory", Integer.toString(i), "ItemType")
                         .setValue(itemStack.getType().getName());
-                rootNode.getNode("Inventory", i, "Quantity")
+                rootNode.getNode("Inventory", Integer.toString(i), "Quantity")
                         .setValue(itemStack.getQuantity());
-                rootNode.getNode("Inventory", i, "Enchantments")
-                        .setValue(getItemEnchantments(itemStack));
+
+                rootNode.getNode("Inventory", Integer.toString(i), "Enchantments")
+                        .setValue(TypeToken.of(EnchantmentData.class), enchantmentData);
+//                        .setValue(getItemEnchantments(itemStack));
+
             }
             loader.save(rootNode);
         } catch (IOException e) {
+            e.printStackTrace();
+        } catch (ObjectMappingException e) {
             e.printStackTrace();
         }
     }
@@ -143,4 +160,19 @@ public class PlayerClass {
 
         return enchantments;
     }
+
+//    private ItemStack setEnchantmentData(ItemStack itemStack, Map<String, Integer>
+//            itemProperties) {
+//        EnchantmentData enchantmentData = itemStack.getOrCreate(EnchantmentData.class).get();
+//        for (String s : itemProperties.keySet()) {
+//            for (Enchantment enchantment : enchantments) {
+//                if (enchantment.getName().equals(s)) {
+//                    enchantmentData.set(enchantmentData.enchantments().add(new ItemEnchantment
+//                            (enchantment, itemProperties.get(s))));
+//                }
+//            }
+//        }
+//        itemStack.offer(enchantmentData);
+//        return itemStack;
+//    }
 }
