@@ -2,6 +2,8 @@ package net.huskycraft.blockyarena.managers;
 
 import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.PlayerClass;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.item.Enchantment;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -9,17 +11,21 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class PlayerClassManager {
 
     private BlockyArena plugin;
     private ArrayList<PlayerClass> playerClasses;
     private HashMap<Path, Boolean> playerClassFiles;
+    private List<Enchantment> enchantments;
 
     public PlayerClassManager(BlockyArena plugin) {
         this.plugin = plugin;
         playerClasses = new ArrayList<>();
         playerClassFiles = new HashMap<>();
+        enchantments = Sponge.getRegistry().getAllOf(Enchantment.class).stream().collect(Collectors.toList());
         loadPlayerClasses();
     }
 
