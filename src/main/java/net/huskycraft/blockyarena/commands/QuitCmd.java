@@ -27,8 +27,6 @@ public class QuitCmd implements CommandExecutor{
             player.sendMessage(Text.of("You're not in any session."));
             return CommandResult.empty();
         }
-
-        player.getInventory().clear();
         player.sendMessage(Text.of("You quit the session."));
         return CommandResult.success();
     }

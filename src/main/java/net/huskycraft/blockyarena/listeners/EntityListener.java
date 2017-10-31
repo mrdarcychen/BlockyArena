@@ -5,6 +5,7 @@ import net.huskycraft.blockyarena.Session;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 public class EntityListener {
 
@@ -27,6 +28,15 @@ public class EntityListener {
                     session.onPlayerDeath(player);
                 }
             }
+        }
+    }
+
+    @Listener
+    public void onPlayerQuit(ClientConnectionEvent.Disconnect event) {
+        Player player = (Player) event.getTargetEntity();
+        if (plugin.getSessionManager().playerSession.containsKey(player)) {
+            Session session = plugin.getSessionManager().playerSession.get(player);
+            session.remove(player);
         }
     }
 }
