@@ -66,15 +66,14 @@ public class PlayerClass {
                         .itemType(index.getNode("ItemType").getValue(TypeToken.of(ItemType.class)))
                         .quantity(index.getNode("Quantity").getInt())
                         .build();
-                EnchantmentData enchantmentData = itemStack.getOrCreate(EnchantmentData.class)
-                        .get();
+                EnchantmentData enchantmentData = itemStack.getOrCreate(EnchantmentData.class).get();
                 for (ConfigurationNode itemEnch : index.getNode("Enchantments", "ItemEnchantments")
                         .getChildrenList()) {
-                    Enchantment e = itemEnch.getNode("Enchantment").getValue(TypeToken.of
-                            (Enchantment.class));
+                    Enchantment e = itemEnch.getNode("Enchantment")
+                            .getValue(TypeToken.of(Enchantment.class));
                     int level = itemEnch.getNode("Level").getInt();
-                    enchantmentData.set(enchantmentData.enchantments().add(new ItemEnchantment
-                            (e, level)));
+                    enchantmentData.set(enchantmentData.enchantments()
+                            .add(new ItemEnchantment(e, level)));
                 }
                 itemStack.offer(enchantmentData);
                 itemStacks.add(itemStack);
@@ -143,18 +142,5 @@ public class PlayerClass {
         for (ItemStack itemStack : itemStacks) {
             player.getInventory().offer(itemStack.copy());
         }
-    }
-
-    private HashMap<String, Integer> getItemEnchantments(ItemStack itemStack) {
-        HashMap<String, Integer> enchantments = new HashMap<>();
-
-        if (!itemStack.get(EnchantmentData.class).isPresent()) return null;
-
-        ListValue<ItemEnchantment> data = itemStack.getOrCreate(EnchantmentData.class).get().enchantments();
-        for (ItemEnchantment e : data) {
-            enchantments.put(e.getEnchantment().getName(), e.getLevel());
-        }
-
-        return enchantments;
     }
 }
