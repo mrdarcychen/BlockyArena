@@ -90,6 +90,7 @@ public class Session {
             player.sendMessage(Text.of("Session is over. "));
             plugin.getSessionManager().playerSession.remove(player);
             player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
+            player.getInventory().clear();
         }
         sessionStopped();
     }
@@ -151,6 +152,7 @@ public class Session {
         if (teamRed.contains(player)) teamRed.remove(player);
         plugin.getSessionManager().playerSession.remove(player);
         player.setLocation(onJoinLocations.get(player));
+        player.getInventory().clear();
         player.sendMessage(Text.of("You've left the session."));
         player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
         if (canJoin) {
@@ -169,6 +171,7 @@ public class Session {
         player.sendMessage(Text.of("You were killed."));
         player.offer(player.getHealthData().set(Keys.HEALTH, 20.0));
         player.setLocation(arena.getLobbySpawn());
+        player.getInventory().clear();
         checkSessionCondition();
     }
 }
