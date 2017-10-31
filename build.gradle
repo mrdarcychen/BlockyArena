@@ -3,8 +3,8 @@ plugins {
 }
 
 group = 'net.huskycraft'
-version = '0.2.0'
-description = 'Admins are able to set multiple classes for players to choose from.'
+version = '0.3.0'
+description = 'Players are able to retrieve items with enchantments.'
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
