@@ -69,7 +69,7 @@ public class PlayerClass {
                 EnchantmentData enchantmentData = itemStack.getOrCreate(EnchantmentData.class)
                         .get();
                 for (ConfigurationNode itemEnch : index.getNode("Enchantments", "ItemEnchantments")
-                             .getChildrenList()) {
+                        .getChildrenList()) {
                     Enchantment e = itemEnch.getNode("Enchantment").getValue(TypeToken.of
                             (Enchantment.class));
                     int level = itemEnch.getNode("Level").getInt();
@@ -88,7 +88,7 @@ public class PlayerClass {
 
     public void decodeInventory(Inventory inventory) {
         itemStacks = new ArrayList<>();
-        Iterable<Slot> slotIterable= inventory.slots();
+        Iterable<Slot> slotIterable = inventory.slots();
         for (Slot slot : slotIterable) {
             if (slot.peek().isPresent()) {
                 itemStacks.add(slot.peek().get());
@@ -122,8 +122,6 @@ public class PlayerClass {
 
                 rootNode.getNode("Inventory", Integer.toString(i), "Enchantments")
                         .setValue(TypeToken.of(EnchantmentData.class), enchantmentData);
-//                        .setValue(getItemEnchantments(itemStack));
-
             }
             loader.save(rootNode);
         } catch (IOException e) {
@@ -142,7 +140,6 @@ public class PlayerClass {
     }
 
     public void offerItemStacksTo(Player player) {
-        plugin.getLogger().info("Size: " + itemStacks.size());
         for (ItemStack itemStack : itemStacks) {
             player.getInventory().offer(itemStack.copy());
         }
@@ -160,19 +157,4 @@ public class PlayerClass {
 
         return enchantments;
     }
-
-//    private ItemStack setEnchantmentData(ItemStack itemStack, Map<String, Integer>
-//            itemProperties) {
-//        EnchantmentData enchantmentData = itemStack.getOrCreate(EnchantmentData.class).get();
-//        for (String s : itemProperties.keySet()) {
-//            for (Enchantment enchantment : enchantments) {
-//                if (enchantment.getName().equals(s)) {
-//                    enchantmentData.set(enchantmentData.enchantments().add(new ItemEnchantment
-//                            (enchantment, itemProperties.get(s))));
-//                }
-//            }
-//        }
-//        itemStack.offer(enchantmentData);
-//        return itemStack;
-//    }
 }
