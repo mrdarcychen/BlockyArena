@@ -4,6 +4,7 @@ import com.google.inject.Inject;
 import net.huskycraft.blockyarena.commands.*;
 import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
+import net.huskycraft.blockyarena.managers.GamerManager;
 import net.huskycraft.blockyarena.managers.PlayerClassManager;
 import net.huskycraft.blockyarena.managers.SessionManager;
 import org.slf4j.Logger;
@@ -42,6 +43,7 @@ public class BlockyArena {
     private ArenaManager arenaManager;
     private SessionManager sessionManager;
     private PlayerClassManager playerClassManager;
+    private GamerManager gamerManager;
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
@@ -58,6 +60,7 @@ public class BlockyArena {
         arenaManager = new ArenaManager(this);
         sessionManager = new SessionManager(this);
         playerClassManager = new PlayerClassManager(this);
+        gamerManager = new GamerManager(this);
     }
 
     /*
@@ -169,5 +172,9 @@ public class BlockyArena {
 
     public PlayerClassManager getPlayerClassManager() {
         return playerClassManager;
+    }
+
+    public GamerManager getGamerManager() {
+        return gamerManager;
     }
 }

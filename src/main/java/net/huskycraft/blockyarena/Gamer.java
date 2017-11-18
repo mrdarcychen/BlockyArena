@@ -1,6 +1,5 @@
 package net.huskycraft.blockyarena;
 
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 
 /**
