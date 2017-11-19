@@ -21,13 +21,11 @@ public class DoneCmd implements CommandExecutor{
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
-        if (!plugin.getArenaManager().arenaCreators.containsKey(player.getUniqueId())) {
+        if (plugin.getArenaManager().getPendingArena(player) == null) {
             player.sendMessage(Text.of("You're not currently creating an arena."));
             return CommandResult.empty();
         }
-        Arena arena = plugin.getArenaManager().arenaCreators.get(player.getUniqueId());
-        plugin.getArenaManager().loadedArenas.add(arena);
-        plugin.getArenaManager().arenaCreators.remove(player.getUniqueId());
+        plugin.getArenaManager().removePendingArena(player);
         player.sendMessage(Text.of("Done creating arena."));
 
         return CommandResult.success();
