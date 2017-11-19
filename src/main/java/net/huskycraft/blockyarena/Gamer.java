@@ -10,6 +10,8 @@ public class Gamer {
 
     private User user;
 
+    private Session session;
+
     /**
      * Constructs a unique Gamer profile for the given user.
      */
@@ -19,5 +21,20 @@ public class Gamer {
 
     public Player getPlayer() {
         return user.getPlayer().get();
+    }
+
+    /**
+     * Sets the session the player is currently in.
+     */
+    public void setSession(Session session) {
+        this.session = session;
+    }
+
+    /**
+     * Gets the session the player is currently in, if there is one.
+     * @return null if the player is not in any session
+     */
+    public Session getSession() {
+        return session;
     }
 }

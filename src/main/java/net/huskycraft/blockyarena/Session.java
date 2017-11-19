@@ -10,9 +10,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
-public abstract class Session {
+public class Session {
 
     public static BlockyArena plugin;
+
+    private Arena arena;
 
     private Set<Gamer> gamers;      // the set of gamers in the session
 
@@ -22,8 +24,9 @@ public abstract class Session {
 
     private int minPlayer, maxPlayer;
 
-    public Session(BlockyArena plugin) {
+    public Session(BlockyArena plugin, Arena arena) {
         this.plugin = plugin;
+        this.arena = arena;
         gamers = new HashSet();
     }
 
@@ -83,5 +86,12 @@ public abstract class Session {
         }
         timer = Task.builder()
                 .execute(() -> countdown(second - 1)).delay(1, TimeUnit.SECONDS).submit(plugin);
+    }
+
+    /**
+     * Returns true if the session allows more gamers to join, false otherwise.
+     */
+    public boolean canJoin() {
+        return canJoin;
     }
 }
