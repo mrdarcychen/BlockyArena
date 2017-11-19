@@ -94,4 +94,8 @@ public class Session {
     public boolean canJoin() {
         return canJoin;
     }
+
+    public Arena getArena() {
+        return arena;
+    }
 }
