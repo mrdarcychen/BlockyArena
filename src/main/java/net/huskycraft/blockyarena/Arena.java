@@ -37,7 +37,7 @@ public class Arena {
 
     // dynamic configurations
 
-    private boolean status; //true if arena is paired with session, false otherwise
+    private boolean isOccupied; //true if arena is paired with session, false otherwise
     private int redTeamSize;
     private int blueTeamSize;
 
@@ -45,7 +45,7 @@ public class Arena {
 
         this.plugin = plugin;
         this.arenaName = name;
-        this.status = false;
+        this.isOccupied = false;
 
         lobbyCountdown = 10;
         gameCountdown = 60;
@@ -59,7 +59,7 @@ public class Arena {
         this.plugin = plugin;
         this.arenaConfig = arenaConfig;
         loader = HoconConfigurationLoader.builder().setPath(arenaConfig).build();
-        this.status = false;
+        this.isOccupied = false;
 
         loadConfig();
     }
@@ -197,12 +197,12 @@ public class Arena {
         }
     }
 
-    public void setStatus(boolean status) {
-        this.status = status;
+    public void setIsOccupied(boolean isOccupied) {
+        this.isOccupied = isOccupied;
     }
 
-    public boolean getStatus() {
-        return status;
+    public boolean isOccupied() {
+        return isOccupied;
     }
 
     public Location getLobbySpawn() {

@@ -19,7 +19,7 @@ public class SessionManager {
     }
 
     /**
-     * Returns an available session.
+     * Gets an available session.
      * @return null if no session is available
      */
     public Session getAvailableSession() {

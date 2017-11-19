@@ -34,7 +34,7 @@ public class CreateCmd implements CommandExecutor {
             case "arena":
                 UUID uuid = player.getUniqueId();
                 Arena arena = new Arena(plugin, name);
-                plugin.getArenaManager().arenaCreators.put(uuid, arena);
+                plugin.getArenaManager().addPendingArena(player, arena);
                 player.sendMessage(Text.of("Start creating arena " + name + ".\n" +
                         "Use `/arena setspawn <type>` to set spawn points. \n" +
                         "Use `/arena done` to save."));
