@@ -6,28 +6,30 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * The Session class represents a specific block of time dedicated to the pre-game, post-game,
+ * and the game itself.
+ */
 public class Session {
 
     public static BlockyArena plugin;
 
     private Arena arena;
 
-    private Set<Gamer> gamers;      // the set of gamers in the session
+    private List<Gamer> gamers;      // the set of gamers in the session
 
     private Task timer;     // the countdown timer before the start of the game
 
     private boolean canJoin;
 
-    private int minPlayer, maxPlayer;
-
     public Session(BlockyArena plugin, Arena arena) {
         this.plugin = plugin;
         this.arena = arena;
-        gamers = new HashSet();
+        gamers = new ArrayList<>();
     }
 
     /**
@@ -57,10 +59,10 @@ public class Session {
      * Starts the countdown if the precondition is met, cancels the countdown otherwise.
      */
     public void checkPreCond() {
-        if (gamers.size() < minPlayer && timer != null) {
+        if (gamers.size() < 2 && timer != null || gamers.size() % 2 != 0) {
             canJoin = true;
             timer.cancel();
-        } else if (gamers.size() >= minPlayer) {
+        } else if (gamers.size() == 4) {
             canJoin = false;
             countdown(10);  // TODO: to be customized
         }
