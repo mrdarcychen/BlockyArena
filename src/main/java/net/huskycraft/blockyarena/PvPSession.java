@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-public class PvPSession {
+public class PvPSession extends Session{
 
     private BlockyArena plugin;
 

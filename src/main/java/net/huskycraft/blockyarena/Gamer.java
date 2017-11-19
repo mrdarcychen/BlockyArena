@@ -1,5 +1,6 @@
 package net.huskycraft.blockyarena;
 
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 
 /**
@@ -14,5 +15,9 @@ public class Gamer {
      */
     public Gamer(User user) {
         this.user = user;
+    }
+
+    public Player getPlayer() {
+        return user.getPlayer().get();
     }
 }
