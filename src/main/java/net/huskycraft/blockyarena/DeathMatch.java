@@ -1,18 +1,21 @@
 package net.huskycraft.blockyarena;
 
-
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import java.util.Collections;
-import java.util.HashSet;
+import java.util.*;
 
-public class DeathMatch extends Game {
+public class DeathMatch {
+
+    private Arena arena;
+
+    private List<Gamer> gamers;
+    private List<Gamer> teamA;
+    private List<Gamer> teamB;
 
     public DeathMatch(Session session) {
-        super(session);
-        teamA = new HashSet<>();
-        teamB = new HashSet<>();
+        arena = session.getArena();
+        teamA = new ArrayList<>();
+        teamB = new ArrayList<>();
         drawTeams();
     }
 
@@ -32,6 +35,14 @@ public class DeathMatch extends Game {
                 gamer.getPlayer().setLocation(arena.getRedSpawn());
             }
         }
+    }
+
+    /**
+     * Eliminates the gamer from the game.
+     */
+    public void eliminate(Gamer gamer) {
+        gamers.remove(gamer);
+        // TODO: send gamer to lobby / spectator spawn
     }
 
 
