@@ -14,7 +14,7 @@ import java.util.concurrent.TimeUnit;
  * The Session class represents a specific block of time dedicated to the pre-game, post-game,
  * and the game itself.
  */
-public class Session {
+public abstract class Session {
 
     public static BlockyArena plugin;
 
@@ -58,15 +58,7 @@ public class Session {
      * Checks the precondition of the game.
      * Starts the countdown if the precondition is met, cancels the countdown otherwise.
      */
-    public void checkPreCond() {
-        if (gamers.size() < 2 && timer != null || gamers.size() % 2 != 0) {
-            canJoin = true;
-            timer.cancel();
-        } else if (gamers.size() == 4) {
-            canJoin = false;
-            countdown(10);  // TODO: to be customized
-        }
-    }
+    public abstract void checkPreCond();
 
     /**
      * Displays the countdown title in seconds to all gamers. Starts the game when countdown is 0.
