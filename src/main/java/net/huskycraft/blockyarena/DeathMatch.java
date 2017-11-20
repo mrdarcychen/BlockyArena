@@ -9,13 +9,15 @@ public class DeathMatch {
     private Arena arena;
 
     private List<Gamer> gamers;
-    private List<Gamer> teamA;
-    private List<Gamer> teamB;
+    private Queue<Team> teams;
 
-    public DeathMatch(Session session) {
+    public DeathMatch(Session session, int team) {
         arena = session.getArena();
-        teamA = new ArrayList<>();
-        teamB = new ArrayList<>();
+        gamers = session.getGamers();
+        teams = new ArrayList<>();
+        for (int i = 0; i < team; i++) {
+            teams.add(new Team());
+        }
         drawTeams();
     }
 
