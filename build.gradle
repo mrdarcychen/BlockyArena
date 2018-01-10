@@ -7,5 +7,5 @@ version = '0.3.0'
 description = 'Players are able to retrieve items with enchantments.'
 
 dependencies {
-    compile 'org.spongepowered:spongeapi:7.0.0-SNAPSHOT'
+    compile 'org.spongepowered:spongeapi:7.0.0'
 }
