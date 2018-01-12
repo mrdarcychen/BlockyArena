@@ -16,50 +16,32 @@ import java.nio.file.Paths;
 
 public class Arena {
 
-    BlockyArena plugin;
+    public static BlockyArena plugin;
 
-    private Path arenaConfig;
+    private Path arenaConfig; // the config file of this Arena
     private ConfigurationLoader<CommentedConfigurationNode> loader;
     private ConfigurationNode rootNode;
 
-    // fixed configurations
+    private String ID;
+    private TeamSpawn teamSpawnA; // the TeamSpawn data for team A
+    private TeamSpawn teamSpawnB; // the TeamSpawn data for team B
 
-    private String arenaName;
-    private int lobbyCountdown;
-    private int gameCountdown;
-
-    private int maxDeaths;
-    private int minPlayer;
-    private Location<World> lobbySpawn;
-    private Location<World> redTeamSpawn;
-    private Location<World> blueTeamSpawn;
-    private World extent;
-
-    // dynamic configurations
-
-    private boolean isOccupied; //true if arena is paired with session, false otherwise
-    private int redTeamSize;
-    private int blueTeamSize;
-
-    public Arena(BlockyArena plugin, String name) {
-
-        this.plugin = plugin;
-        this.arenaName = name;
-        this.isOccupied = false;
-
-        lobbyCountdown = 10;
-        gameCountdown = 60;
-        maxDeaths = 1;
-        minPlayer = 2;
+    /**
+     * Constructs an Arena with a new ID and two TeamSpawns.
+     */
+    public Arena(String ID, TeamSpawn teamSpawnA, TeamSpawn teamSpawnB) {
+        this.ID = ID;
+        this.teamSpawnA = teamSpawnA;
+        this.teamSpawnB = teamSpawnB;
         initConfig();
     }
 
-    public Arena(BlockyArena plugin, Path arenaConfig) {
-
-        this.plugin = plugin;
+    /**
+     * Reconstructs an Arena from an existing arena config file.
+     */
+    public Arena(Path arenaConfig) {
         this.arenaConfig = arenaConfig;
         loader = HoconConfigurationLoader.builder().setPath(arenaConfig).build();
-        this.isOccupied = false;
 
         loadConfig();
     }
