@@ -6,39 +6,44 @@ import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The Session class represents a specific block of time dedicated to the pre-game, post-game,
- * and the game itself.
+ * The Session class represents a specific block of time dedicated to the preparation of a Game, the Game itself, and
+ * the aftermath of a Game.
  */
 public abstract class Session {
 
     public static BlockyArena plugin;
 
-    private Arena arena;
-
-    private List<Gamer> gamers;      // the set of gamers in the session
-
-    private Task timer;     // the countdown timer before the start of the game
+    private Arena arena; // an Arena associated with this Session
+    private Set<Gamer> gamers; // a set of gamers currently in this session
+    private List<Closet> closets; // a list of closets that store the inventories of the gamers
+    private Task timer; // a countdown timer before the start of the game
 
     private boolean canJoin;
 
-    public Session(BlockyArena plugin, Arena arena) {
-        this.plugin = plugin;
+    /**
+     * Constructs a Session with an Arena.
+     * @param arena an Arena that has not been assigned to any other Session
+     */
+    public Session(Arena arena) {
         this.arena = arena;
-        gamers = new ArrayList<>();
+        gamers = new HashSet<>();
+        closets = new ArrayList<>();
     }
 
     /**
-     * Adds the given gamer to the session.
+     * Adds the given gamer to this session.
      */
     public void add(Gamer gamer) {
         gamers.add(gamer);
-        // TODO: backups the gamer's inventory and clear it
+        // backups the gamer's inventory and clear it
+        closets.add(new Closet(gamer.getPlayer()));
+        gamer.getPlayer().getInventory().clear();
         // TODO: sends the gamer to the waiting area
+        gamer.getPlayer().setLocationAndRotation();
         checkPreCond();
     }
 
