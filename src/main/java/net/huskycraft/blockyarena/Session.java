@@ -43,7 +43,6 @@ public abstract class Session {
         closets.add(new Closet(gamer.getPlayer()));
         gamer.getPlayer().getInventory().clear();
         // TODO: sends the gamer to the waiting area
-        gamer.getPlayer().setLocationAndRotation();
         checkPreCond();
     }
 
