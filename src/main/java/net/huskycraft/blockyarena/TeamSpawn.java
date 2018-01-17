@@ -4,11 +4,8 @@ import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 /**
- * The Team class represents a group of gamers in a Game that share the same spawn point.
+ * A TeamSpawn object represents a specific spawn location with head rotation for a Team.
  */
 public class TeamSpawn {
 

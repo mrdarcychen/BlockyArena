@@ -33,7 +33,15 @@ public class Arena {
         this.ID = ID;
         this.teamSpawnA = teamSpawnA;
         this.teamSpawnB = teamSpawnB;
-        initConfig();
+
+        arenaConfig = Paths.get(plugin.getArenaDir().toString() + File.separator + ID + ".conf");
+        try {
+            if (!arenaConfig.toFile().exists()) {
+                Files.createFile(arenaConfig);
+            }
+        } catch (IOException e) {
+            plugin.getLogger().warn("Error creating arena config file for " + ID);
+        }
     }
 
     /**
@@ -46,37 +54,24 @@ public class Arena {
         loadConfig();
     }
 
-    private void initConfig() {
 
-        // creates a new config file in arenas directory
-
-        arenaConfig = Paths.get(plugin.getArenaDir().toString() + File.separator + arenaName + ".conf");
-
-        try {
-            if (!arenaConfig.toFile().exists()) {
-                Files.createFile(arenaConfig);
-            }
-        } catch (IOException e) {
-            plugin.getLogger().warn("Error creating arena config.");
-        }
-
-        // initializes configuration nodes for the new config file
-
-        loader = HoconConfigurationLoader.builder().setPath(arenaConfig).build();
+    /**
+     * Updates the given arena config file based on the object's data fields.
+     * @param arenaConfig
+     */
+    public void writeConfig(Path arenaConfig) {
+        ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
+                .builder().setPath(arenaConfig).build();
 
         try {
-
-            rootNode = loader.load();
-            rootNode.getNode("Arena-Name").setValue(arenaName);
-            rootNode.getNode("Lobby-Countdown").setValue(lobbyCountdown);
-            rootNode.getNode("Game-Countdown").setValue(gameCountdown);
-            rootNode.getNode("Max-Deaths").setValue(maxDeaths);
-            rootNode.getNode("Min-Player").setValue(minPlayer);
+            ConfigurationNode rootNode = loader.load();
+            rootNode.getNode("id").setValue(ID);
+            // write teamspawns to config
             loader.save(rootNode);
-
         } catch (IOException e) {
-            plugin.getLogger().warn("Error initializing arena config.");
+            plugin.getLogger().warn("Error writing arena config.");
         }
+
     }
 
     private void loadConfig() {
