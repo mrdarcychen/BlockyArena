@@ -1,9 +1,12 @@
 package net.huskycraft.blockyarena;
 
+import com.flowpowered.math.vector.Vector3d;
+import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
@@ -66,10 +69,13 @@ public class Arena {
         try {
             ConfigurationNode rootNode = loader.load();
             rootNode.getNode("id").setValue(ID);
-            // write teamspawns to config
+            rootNode.getNode("teamSpawnA").setValue(TypeToken.of(TeamSpawn.class), teamSpawnA);
+            rootNode.getNode("teamSpawnB").setValue(TypeToken.of(TeamSpawn.class), teamSpawnB);
             loader.save(rootNode);
         } catch (IOException e) {
             plugin.getLogger().warn("Error writing arena config.");
+        } catch (ObjectMappingException e) {
+
         }
 
     }
