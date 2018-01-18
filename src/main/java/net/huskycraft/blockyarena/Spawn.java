@@ -12,9 +12,9 @@ import org.spongepowered.api.world.World;
 import java.util.UUID;
 
 /**
- * A TeamSpawn object represents a specific spawn location with head rotation for a Team.
+ * A Spawn object represents a specific spawn location with head rotation for a Team.
  */
-public class TeamSpawn implements TypeSerializer<TeamSpawn> {
+public class Spawn implements TypeSerializer<Spawn> {
 
     public static BlockyArena plugin;
 
@@ -26,7 +26,7 @@ public class TeamSpawn implements TypeSerializer<TeamSpawn> {
      * @param spawnLocation the location that a player spawns
      * @param spawnRotation the heading of a player who spawns at the spawn location
      */
-    public TeamSpawn(Location<World> spawnLocation, Vector3d spawnRotation) {
+    public Spawn(Location<World> spawnLocation, Vector3d spawnRotation) {
         this.spawnLocation = spawnLocation;
         this.spawnRotation = spawnRotation;
     }
@@ -39,7 +39,7 @@ public class TeamSpawn implements TypeSerializer<TeamSpawn> {
     }
 
     @Override
-    public TeamSpawn deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+    public Spawn deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
         if (!Sponge.getServer().getWorld(extentUUID).isPresent()) return null;
         World extent = Sponge.getServer().getWorld(extentUUID).get();
@@ -47,11 +47,11 @@ public class TeamSpawn implements TypeSerializer<TeamSpawn> {
                 extent,
                 new Vector3d(value.getNode("location").getValue(TypeToken.of(Vector3d.class))));
         Vector3d spawnRotation = value.getNode("rotation").getValue(TypeToken.of(Vector3d.class));
-        return new TeamSpawn(spawnLocation, spawnRotation);
+        return new Spawn(spawnLocation, spawnRotation);
     }
 
     @Override
-    public void serialize(TypeToken<?> type, TeamSpawn obj, ConfigurationNode value) throws ObjectMappingException {
+    public void serialize(TypeToken<?> type, Spawn obj, ConfigurationNode value) throws ObjectMappingException {
         value.getNode("extent").setValue(TypeToken.of(UUID.class), obj.getSpawnLocation().getExtent().getUniqueId());
         value.getNode("location").setValue(TypeToken.of(Vector3d.class), obj.getSpawnLocation().getPosition());
         value.getNode("rotation").setValue(TypeToken.of(Vector3d.class), obj.getSpawnRotation());
