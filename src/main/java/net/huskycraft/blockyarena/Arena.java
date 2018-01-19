@@ -27,6 +27,8 @@ public class Arena {
     private Spawn teamSpawnB; // the spawn point for team B
     private Spawn lobbySpawn; // the optional common spawn point for all players
 
+    private ArenaState state;
+
     /**
      * Constructs an arena with only an ID.
      * @param ID a unique identification code of the Arena
@@ -34,6 +36,7 @@ public class Arena {
      */
     public Arena(String ID) {
         this(ID, null, null, null);
+        state = ArenaState.INCOMPLETE;
     }
 
     /**
