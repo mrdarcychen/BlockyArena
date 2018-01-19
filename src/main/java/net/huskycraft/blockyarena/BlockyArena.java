@@ -96,9 +96,8 @@ public class BlockyArena {
     private void registerCommands() {
         CommandSpec createCmd = CommandSpec.builder()
                 .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("object"))),
-                        GenericArguments.remainingJoinedStrings(Text.of("name")))
-                .executor(new CreateCmd(this))
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+                .executor(new CmdCreate())
                 .permission("blockyarena.create")
                 .build();
 
