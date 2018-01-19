@@ -28,6 +28,15 @@ public class Arena {
     private Spawn lobbySpawn; // the optional common spawn point for all players
 
     /**
+     * Constructs an arena with only an ID.
+     * @param ID a unique identification code of the Arena
+     *           assuming that no existing arena has the same ID
+     */
+    public Arena(String ID) {
+        this(ID, null, null, null);
+    }
+
+    /**
      * Constructs an arena with an ID and two team spawns.
      * @param ID a unique identification code of the Arena
      *           assuming that no existing arena has the same ID
