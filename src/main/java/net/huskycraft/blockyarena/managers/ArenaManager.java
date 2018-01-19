@@ -1,8 +1,10 @@
 package net.huskycraft.blockyarena.managers;
 
 import net.huskycraft.blockyarena.Arena;
+import net.huskycraft.blockyarena.ArenaState;
 import net.huskycraft.blockyarena.BlockyArena;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -10,46 +12,28 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.*;
 
+/**
+ * An ArenaManager keeps track of the available Arenas in the server.
+ */
 public class ArenaManager {
 
-    private BlockyArena plugin;
+    public static BlockyArena plugin;
 
-//    private Map<Path, Boolean> arenaFiles;   //false represents file not loaded
-//
-//    private List<Arena> loadedArenas;   //arenas loaded from the config files in arenaConfig
-//    // directory
+    private Set<Arena> arenas; // the set of Arenas available in the server
 
-    private List<Arena> arenas;
-
-    private Map<Player, Arena> pendingArenas;
-
-    public ArenaManager(BlockyArena plugin) {
-        this.plugin = plugin;
-//        arenaFiles = new HashMap<>();
-        pendingArenas = new HashMap<>();
-//        loadedArenas = new ArrayList<>();
-        arenas = new ArrayList<>();
-        registerArenas();
+    public ArenaManager() {
+        arenas = new HashSet<>();
+        loadArenas();
     }
 
     /**
-     * Registers the given arena.
+     * Reconstructs arenas from all arena config files in standard format.
      */
-    public void registerArena(Arena arena) {
-        arenas.add(arena);
-    }
-
-    /**
-     * Registers all arenas stored in the arena directory, if there is one.
-     */
-    private void registerArenas() {
+    private void loadArenas() {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getArenaDir(), "*.conf");
             for (Path path : stream) {
-                arenas.add(new Arena(plugin, path));
-//                if (!arenaFiles.containsKey(path)) {
-//                    arenaFiles.put(path, false);
-//                }
+                arenas.add(new Arena(path));
             }
         } catch (IOException e) {
             plugin.getLogger().warn("Error loading existing arena configs.");
@@ -91,7 +75,8 @@ public class ArenaManager {
      */
     public Arena getAvailableArena() {
         for (Arena arena : arenas) {
-            if (!arena.isOccupied()) {
+            // TODO: need to verfiy
+            if (!arena.getState().equals(ArenaState.ENABLE)) {
                 return arena;
             }
         }
@@ -123,5 +108,13 @@ public class ArenaManager {
      */
     public void removePendingArena(Player creator) {
         pendingArenas.remove(creator);
+    }
+
+    /**
+     * Adds the given Arena to the tracking list.
+     * @param arena an Arena with any given state
+     */
+    public void add(Arena arena) {
+        arenas.add(arena);
     }
 }
