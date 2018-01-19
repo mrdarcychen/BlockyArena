@@ -28,7 +28,7 @@ public class CmdCreate implements CommandExecutor {
         String id = args.<String>getOne("id").get();
 
         Arena arena = new Arena(id);
-        plugin.getArenaManager().addPendingArena(arena);
+        plugin.getArenaManager().add(arena);
 
         return CommandResult.success();
     }

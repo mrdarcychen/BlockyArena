@@ -127,4 +127,8 @@ public class Arena {
 
         }
     }
+
+    public ArenaState getState() {
+        return state;
+    }
 }
