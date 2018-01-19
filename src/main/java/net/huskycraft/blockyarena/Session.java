@@ -10,28 +10,40 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 /**
- * The Session class represents a specific block of time dedicated to the preparation of a Game, the Game itself, and
- * the aftermath of a Game.
+ * A Session represents a specific block of time dedicated to the time before, during, and after the Game.
+ * Each Session has a designated TeamType and GameType, and keeps track of all players' inventories.
  */
-public abstract class Session {
+public class Session {
 
     public static BlockyArena plugin;
 
-    private Arena arena; // an Arena associated with this Session
-    private Set<Gamer> gamers; // a set of gamers currently in this session
-    private List<Closet> closets; // a list of closets that store the inventories of the gamers
-    private Task timer; // a countdown timer before the start of the game
+    private Arena arena; // the Arena associated with this Session
+    private Set<Gamer> gamers; // the set of gamers currently in this session
+    private Map<Gamer, Closet> closets; // the map of closets that store the inventories of the gamers
+
+    private TeamType teamType; // the type of the team designated for this session
 
     private boolean canJoin;
 
     /**
-     * Constructs a Session with an Arena.
+     * Constructs a default Session with an Arena. TeamType is set to default.
      * @param arena an Arena that has not been assigned to any other Session
      */
     public Session(Arena arena) {
+        this(arena, TeamType.SOLO);
+    }
+
+    /**
+     * Constructs a regular Session with the given Arena and TeamType.
+     * @param arena an Arena that has not been assigned to any other Session
+     * @param teamType a type of the team
+     */
+    public Session(Arena arena, TeamType teamType) {
         this.arena = arena;
+        this.teamType = teamType;
+        // TODO: GAMETYPE
         gamers = new HashSet<>();
-        closets = new ArrayList<>();
+        closets = new HashMap<>();
     }
 
     /**
@@ -57,12 +69,6 @@ public abstract class Session {
             checkPreCond();
         }
     }
-
-    /**
-     * Checks the precondition of the game.
-     * Starts the countdown if the precondition is met, cancels the countdown otherwise.
-     */
-    public abstract void checkPreCond();
 
     /**
      * Displays the countdown title in seconds to all gamers. Starts the game when countdown is 0.
