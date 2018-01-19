@@ -40,74 +40,17 @@ public class ArenaManager {
         }
     }
 
-    /*
-    returns a registered, loaded, and unpaired arena.
-    returns null if no arena presents
-     */
-//    public Arena getAvailableArena() {
-//        //loops through all loaded arenas, returns the first unpaired arena
-//        if (loadedArenas.size() != 0) {
-//            for (Arena arena : loadedArenas) {
-//                if (!arena.getStatus()) {
-//                    return arena;
-//                }
-//            }
-//        }
-//
-//        //if no arena is loaded or all loaded arenas are paired, loads and returns a new arena
-//        for (Path path : arenaFiles.keySet()) {
-//            if (!arenaFiles.get(path)) {
-//                Arena arena = new Arena(plugin, path);
-//                arenaFiles.replace(path, true);
-//                loadedArenas.add(arena);
-//                return arena;
-//            }
-//        }
-//
-//        registerArenas();
-//        return null;
-//    }
-
     /**
      * Gets an available arena.
-     *
      * @return null if no arena is available
      */
     public Arena getAvailableArena() {
         for (Arena arena : arenas) {
-            // TODO: need to verfiy
-            if (!arena.getState().equals(ArenaState.ENABLE)) {
+            if (arena.getState() == ArenaState.ENABLE) {
                 return arena;
             }
         }
         return null;
-    }
-
-    /**
-     * Marks the given arena as a work in progress and links its creator.
-     * @param creator the player created the arena
-     * @param arena the arena that is still work-in-progress
-     */
-    public void addPendingArena(Player creator, Arena arena) {
-        pendingArenas.put(creator, arena);
-    }
-
-    /**
-     * Gets the work-in-progress arena created by the given creator.
-     * @param creator a creator who has a work-in-progress arena
-     * @return null if the given player has no work-in-progress arena
-     */
-    public Arena getPendingArena(Player creator) {
-        return pendingArenas.get(creator);
-    }
-
-    /**
-     * Sets the creator's arena as completed and removes it from the pending list.
-     * @param creator a creator who has a work-in-progress arena
-     * @return null if the given payer has no work-in-progress arena
-     */
-    public void removePendingArena(Player creator) {
-        pendingArenas.remove(creator);
     }
 
     /**
