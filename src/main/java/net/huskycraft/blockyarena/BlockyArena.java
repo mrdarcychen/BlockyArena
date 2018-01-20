@@ -128,7 +128,17 @@ public class BlockyArena {
                 .executor(new QuitCmd(this))
                 .build();
 
+        CommandSpec cmdEdit = CommandSpec.builder()
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))),
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("param")))
+                )
+                .executor(new CmdEdit())
+                .build();
+
         CommandSpec arenaCommandSpec = CommandSpec.builder()
+                .child(cmdEdit, "edit")
                 .child(createCmd, "create")
                 .child(setSpawnCmd, "setspawn")
                 .child(doneCmd, "done")

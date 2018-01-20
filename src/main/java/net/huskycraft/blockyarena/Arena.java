@@ -1,11 +1,13 @@
 package net.huskycraft.blockyarena;
 
+import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.world.Location;
 
 import java.io.File;
 import java.io.IOException;
@@ -128,7 +130,23 @@ public class Arena {
         }
     }
 
+    public String getID() {
+        return ID;
+    }
+
     public ArenaState getState() {
         return state;
+    }
+
+    public void setTeamSpawnA(Location location, Vector3d rotation) {
+        teamSpawnA = new Spawn(location, rotation);
+    }
+
+    public void setTeamSpawnB(Location location, Vector3d rotation) {
+        teamSpawnB = new Spawn(location, rotation);
+    }
+
+    public void setLobbySpawn(Location location, Vector3d rotation) {
+        lobbySpawn = new Spawn(location, rotation);
     }
 }

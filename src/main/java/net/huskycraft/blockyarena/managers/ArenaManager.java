@@ -3,8 +3,6 @@ package net.huskycraft.blockyarena.managers;
 import net.huskycraft.blockyarena.Arena;
 import net.huskycraft.blockyarena.ArenaState;
 import net.huskycraft.blockyarena.BlockyArena;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.text.Text;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -19,10 +17,10 @@ public class ArenaManager {
 
     public static BlockyArena plugin;
 
-    private Set<Arena> arenas; // the set of Arenas available in the server
+    private Map<String, Arena> arenas; // the list of Arenas available in the server
 
     public ArenaManager() {
-        arenas = new HashSet<>();
+        arenas = new HashMap<>();
         loadArenas();
     }
 
@@ -33,7 +31,8 @@ public class ArenaManager {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getArenaDir(), "*.conf");
             for (Path path : stream) {
-                arenas.add(new Arena(path));
+                Arena arena = new Arena(path);
+                arenas.put(arena.getID(), arena);
             }
         } catch (IOException e) {
             plugin.getLogger().warn("Error loading existing arena configs.");
@@ -45,7 +44,7 @@ public class ArenaManager {
      * @return null if no arena is available
      */
     public Arena getAvailableArena() {
-        for (Arena arena : arenas) {
+        for (Arena arena : arenas.values()) {
             if (arena.getState() == ArenaState.ENABLE) {
                 return arena;
             }
@@ -58,6 +57,10 @@ public class ArenaManager {
      * @param arena an Arena with any given state
      */
     public void add(Arena arena) {
-        arenas.add(arena);
+        arenas.put(arena.getID(), arena);
+    }
+
+    public Arena getArena(String id) {
+        return arenas.get(id);
     }
 }
