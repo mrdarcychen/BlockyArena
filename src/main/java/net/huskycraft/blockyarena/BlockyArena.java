@@ -121,7 +121,10 @@ public class BlockyArena {
                 .build();
 
         CommandSpec joinCmd = CommandSpec.builder()
-                .executor(new JoinCmd(this))
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type")))
+                )
+                .executor(new CmdJoin())
                 .build();
 
         CommandSpec quitCmd = CommandSpec.builder()
