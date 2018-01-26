@@ -40,16 +40,25 @@ public class ArenaManager {
     }
 
     /**
-     * Gets an available arena.
-     * @return null if no arena is available
+     * Gets an available arena from the list.
+     * @return an enabled arena from the list, null if no arena is available
      */
-    public Arena getAvailableArena() {
+    public Arena getArena() {
         for (Arena arena : arenas.values()) {
             if (arena.getState() == ArenaState.ENABLE) {
                 return arena;
             }
         }
         return null;
+    }
+
+    /**
+     * Gets the Arena with the given id.
+     * @param id the identifier of the Arena
+     * @return the Arena with the given id
+     */
+    public Arena getArena(String id) {
+        return arenas.get(id);
     }
 
     /**
@@ -60,7 +69,5 @@ public class ArenaManager {
         arenas.put(arena.getID(), arena);
     }
 
-    public Arena getArena(String id) {
-        return arenas.get(id);
-    }
+
 }
