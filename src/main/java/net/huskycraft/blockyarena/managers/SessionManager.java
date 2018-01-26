@@ -19,7 +19,7 @@ public class SessionManager {
      * Gets an available active session from the list.
      * @return null if no session is available
      */
-    public Session getActiveSession(TeamType teamType) {
+    public Session getSession(TeamType teamType) {
         for (Session session : sessions) {
             boolean isActive = session.getState() == SessionState.ACTIVE;
             boolean isGivenType = session.getTeamType() == teamType;
@@ -29,7 +29,7 @@ public class SessionManager {
         }
 
         // if no session is active
-        Arena arena = plugin.getArenaManager().getAvailableArena();
+        Arena arena = plugin.getArenaManager().getArena();
         if (arena == null) return null;
         Session session = new Session(arena, teamType);
         sessions.add(session);
