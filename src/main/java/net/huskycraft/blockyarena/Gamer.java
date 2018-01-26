@@ -11,6 +11,7 @@ public class Gamer {
     private User user;
 
     private Session session;
+    private GamerStatus status;
 
     /**
      * Constructs a unique Gamer profile for the given user.
@@ -28,6 +29,7 @@ public class Gamer {
      */
     public void setSession(Session session) {
         this.session = session;
+        setStatus(GamerStatus.INGAME);
     }
 
     /**
@@ -36,5 +38,13 @@ public class Gamer {
      */
     public Session getSession() {
         return session;
+    }
+
+    public void setStatus(GamerStatus status) {
+        this.status = status;
+    }
+
+    public GamerStatus getStatus() {
+        return status;
     }
 }
