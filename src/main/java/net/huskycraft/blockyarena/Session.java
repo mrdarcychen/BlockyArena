@@ -22,6 +22,7 @@ public class Session {
     private Map<Gamer, Closet> closets; // the map of closets that store the inventories of the gamers
 
     private TeamType teamType; // the type of the team designated for this session
+    private SessionState state; // the current state of the session
 
     private boolean canJoin;
 
@@ -101,5 +102,13 @@ public class Session {
 
     public Arena getArena() {
         return arena;
+    }
+
+    public TeamType getTeamType() {
+        return teamType;
+    }
+
+    public SessionState getState() {
+        return state;
     }
 }
