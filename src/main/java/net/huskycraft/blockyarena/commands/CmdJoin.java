@@ -1,9 +1,6 @@
 package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.Gamer;
-import net.huskycraft.blockyarena.Session;
-import net.huskycraft.blockyarena.TeamType;
+import net.huskycraft.blockyarena.*;
 import net.huskycraft.blockyarena.managers.GamerManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -30,7 +27,7 @@ public class CmdJoin implements CommandExecutor{
         if (teamType == null) {
             player.sendMessage(Text.of("You've entered an invalid team type!"));
         }
-        if (plugin.getGamerManager().getGamer(player).isInGame()) {
+        if (plugin.getGamerManager().getGamer(player).getStatus() == GamerStatus.INGAME) {
             player.sendMessage(Text.of("You've already joined a session!"));
             return CommandResult.empty();
         } else {
@@ -41,7 +38,6 @@ public class CmdJoin implements CommandExecutor{
                 player.sendMessage(Text.of("No available arena."));
             }
         }
-
         return CommandResult.success();
     }
 }
