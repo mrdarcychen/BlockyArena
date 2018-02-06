@@ -24,6 +24,8 @@ public class Session {
     private TeamType teamType; // the type of the team designated for this session
     private SessionState state; // the current state of the sessions
 
+    private Task timer;
+
     /**
      * Constructs a default Session with an Arena. TeamType is set to default.
      * @param arena an Arena that has not been assigned to any other Session
@@ -76,7 +78,7 @@ public class Session {
      */
     private void countdown(int second) {
         if (second == 0) {
-            timer = null;
+            timer.cancel();
             // TODO: start the game
         } else {
             Title title = Title.builder()
@@ -91,13 +93,6 @@ public class Session {
                 .execute(() -> countdown(second - 1)).delay(1, TimeUnit.SECONDS).submit(plugin);
     }
 
-    /**
-     * Returns true if the session allows more gamers to join, false otherwise.
-     */
-    public boolean canJoin() {
-        return canJoin;
-    }
-
     public Arena getArena() {
         return arena;
     }
@@ -110,10 +105,16 @@ public class Session {
         return state;
     }
 
+    /**
+     * Checks the precondition of the session. If criterion is met, countdown starts.
+     */
     private void checkPreCond() {
-        if (teamType == TeamType.SOLO && gamers.size() == 2) {
+        boolean canSolo = teamType == TeamType.SOLO && gamers.size() == 2;
+        boolean canDouble = teamType == TeamType.DOUBLE && gamers.size() == 4;
+        if (canSolo || canDouble) {
             countdown(10);
-
+        } else {
+            timer.cancel();
         }
     }
 }
