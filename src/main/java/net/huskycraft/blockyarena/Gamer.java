@@ -2,6 +2,7 @@ package net.huskycraft.blockyarena;
 
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
+import org.spongepowered.api.world.Location;
 
 /**
  * The Gamer class represents a player's gaming profile.
@@ -9,19 +10,23 @@ import org.spongepowered.api.entity.living.player.User;
 public class Gamer {
 
     private User user;
+    private Player player;
 
     private Session session;
     private GamerStatus status;
+
+    private Location lastLocation;
 
     /**
      * Constructs a unique Gamer profile for the given user.
      */
     public Gamer(User user) {
         this.user = user;
+        this.player = user.getPlayer().get();
     }
 
     public Player getPlayer() {
-        return user.getPlayer().get();
+        return player;
     }
 
     /**
@@ -46,5 +51,20 @@ public class Gamer {
 
     public GamerStatus getStatus() {
         return status;
+    }
+
+    /**
+     * Spawns the gamer at the given spawn point.
+     */
+    public void setLocation(Spawn spawn) {
+        player.setLocationAndRotation(spawn.getSpawnLocation(), spawn.getSpawnRotation());
+    }
+
+    public void setLastLocation(Location lastLocation) {
+        this.lastLocation = lastLocation;
+    }
+
+    public Location getLastLocation() {
+        return lastLocation;
     }
 }

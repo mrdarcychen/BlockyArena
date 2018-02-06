@@ -22,9 +22,7 @@ public class Session {
     private Map<Gamer, Closet> closets; // the map of closets that store the inventories of the gamers
 
     private TeamType teamType; // the type of the team designated for this session
-    private SessionState state; // the current state of the session
-
-    private boolean canJoin;
+    private SessionState state; // the current state of the sessions
 
     /**
      * Constructs a default Session with an Arena. TeamType is set to default.
@@ -53,9 +51,9 @@ public class Session {
     public void add(Gamer gamer) {
         gamers.add(gamer);
         // backups the gamer's inventory and clear it
-        closets.add(new Closet(gamer.getPlayer()));
+        closets.put(gamer, new Closet(gamer.getPlayer()));
         gamer.getPlayer().getInventory().clear();
-        // TODO: sends the gamer to the waiting area
+        gamer.setLocation(arena.getLobbySpawn());
         checkPreCond();
     }
 
@@ -64,9 +62,9 @@ public class Session {
      */
     public void remove(Gamer gamer) {
         gamers.remove(gamer);
-        // TODO: send the gamer to his join location / main lobby
-        // TODO: give back the player's inventory
-        if (canJoin) {
+        closets.get(gamer).equip(gamer.getPlayer());
+        gamer.getPlayer().setLocation(gamer.getLastLocation());
+        if (state == SessionState.ACTIVE) {
             checkPreCond();
         }
     }
@@ -110,5 +108,12 @@ public class Session {
 
     public SessionState getState() {
         return state;
+    }
+
+    private void checkPreCond() {
+        if (teamType == TeamType.SOLO && gamers.size() == 2) {
+            countdown(10);
+
+        }
     }
 }
