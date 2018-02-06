@@ -149,4 +149,16 @@ public class Arena {
     public void setLobbySpawn(Location location, Vector3d rotation) {
         lobbySpawn = new Spawn(location, rotation);
     }
+
+    public Spawn getTeamSpawnA() {
+        return teamSpawnA;
+    }
+
+    public Spawn getTeamSpawnB() {
+        return teamSpawnB;
+    }
+
+    public Spawn getLobbySpawn() {
+        return lobbySpawn;
+    }
 }
