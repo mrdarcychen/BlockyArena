@@ -15,7 +15,7 @@ public class Gamer {
     private Session session;
     private GamerStatus status;
 
-    private Location lastLocation;
+    private Spawn lastLocation;
     private Closet closet;
 
     /**
@@ -47,6 +47,8 @@ public class Gamer {
         player.setLocationAndRotation(spawn.getSpawnLocation(), spawn.getSpawnRotation());
     }
 
+    public void spawnAt(Location location) {}
+
     public Player getPlayer() {
         return player;
     }
@@ -75,18 +77,11 @@ public class Gamer {
         return status;
     }
 
-    /**
-     * Spawns the gamer at the given spawn point.
-     */
-    public void setLocation(Spawn spawn) {
-        player.setLocationAndRotation(spawn.getSpawnLocation(), spawn.getSpawnRotation());
+    public void setLastLocation() {
+        this.lastLocation = new Spawn(player.getLocation(), player.getHeadRotation());
     }
 
-    public void setLastLocation(Location lastLocation) {
-        this.lastLocation = lastLocation;
-    }
-
-    public Location getLastLocation() {
+    public Spawn getLastLocation() {
         return lastLocation;
     }
 }
