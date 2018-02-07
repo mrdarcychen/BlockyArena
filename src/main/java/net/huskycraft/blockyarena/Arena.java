@@ -27,7 +27,8 @@ public class Arena {
     private String ID; // the unique identification code of the Arena
     private Spawn teamSpawnA; // the spawn point for team A
     private Spawn teamSpawnB; // the spawn point for team B
-    private Spawn lobbySpawn; // the optional common spawn point for all players
+    private Spawn lobbySpawn; // the spawn point for all players waiting in the queue
+    private Spawn spectatorSpawn; // the spawn point for eliminated players
 
     private ArenaState state;
 
@@ -37,19 +38,8 @@ public class Arena {
      *           assuming that no existing arena has the same ID
      */
     public Arena(String ID) {
-        this(ID, null, null, null);
+        this(ID, null, null, null, null);
         state = ArenaState.INCOMPLETE;
-    }
-
-    /**
-     * Constructs an arena with an ID and two team spawns.
-     * @param ID a unique identification code of the Arena
-     *           assuming that no existing arena has the same ID
-     * @param teamSpawnA a spawn point for team A
-     * @param teamSpawnB a spawn point for team B
-     */
-    public Arena(String ID, Spawn teamSpawnA, Spawn teamSpawnB) {
-        this(ID, teamSpawnA, teamSpawnB, null);
     }
 
     /**
@@ -60,11 +50,12 @@ public class Arena {
      * @param teamSpawnB a spawn point for team B
      * @param lobbySpawn an optional common spawn point for all players
      */
-    public Arena(String ID, Spawn teamSpawnA, Spawn teamSpawnB, Spawn lobbySpawn) {
+    public Arena(String ID, Spawn teamSpawnA, Spawn teamSpawnB, Spawn lobbySpawn, Spawn spectatorSpawn) {
         this.ID = ID;
         this.teamSpawnA = teamSpawnA;
         this.teamSpawnB = teamSpawnB;
         this.lobbySpawn = lobbySpawn;
+        this.spectatorSpawn = spectatorSpawn;
 
         config = Paths.get(plugin.getArenaDir().toString() + File.separator + ID + ".conf");
         try {
@@ -100,6 +91,7 @@ public class Arena {
             rootNode.getNode("teamSpawnA").setValue(TypeToken.of(Spawn.class), teamSpawnA);
             rootNode.getNode("teamSpawnB").setValue(TypeToken.of(Spawn.class), teamSpawnB);
             rootNode.getNode("lobbySpawn").setValue(TypeToken.of(Spawn.class), lobbySpawn);
+            rootNode.getNode("spectatorSpawn").setValue(TypeToken.of(Spawn.class), spectatorSpawn);
             loader.save(rootNode);
         } catch (IOException e) {
             plugin.getLogger().warn("Error writing arena config.");
@@ -122,6 +114,7 @@ public class Arena {
             teamSpawnA = rootNode.getNode("teamSpawnA").getValue(TypeToken.of(Spawn.class));
             teamSpawnB = rootNode.getNode("teamSpawnB").getValue(TypeToken.of(Spawn.class));
             lobbySpawn = rootNode.getNode("lobbySpawn").getValue(TypeToken.of(Spawn.class));
+            spectatorSpawn = rootNode.getNode("spectatorSpawn").getValue(TypeToken.of(Spawn.class));
             loader.save(rootNode);
         } catch (IOException e) {
             plugin.getLogger().warn("Error reading arena config.");
@@ -150,6 +143,10 @@ public class Arena {
         lobbySpawn = new Spawn(location, rotation);
     }
 
+    public void setSpectatorSpawn(Location location, Vector3d rotation) {
+        spectatorSpawn = new Spawn(location, rotation);
+    }
+
     public Spawn getTeamSpawnA() {
         return teamSpawnA;
     }
@@ -160,5 +157,9 @@ public class Arena {
 
     public Spawn getLobbySpawn() {
         return lobbySpawn;
+    }
+
+    public Spawn getSpectatorSpawn() {
+        return spectatorSpawn;
     }
 }

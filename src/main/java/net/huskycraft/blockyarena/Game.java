@@ -33,6 +33,7 @@ public abstract class Game {
     public void add(Gamer gamer) {
         gamers.add(gamer);
         gamer.saveInventory(); // TODO: saves the inventory of the gamer and clear it
+        gamer.setLastLocation();
         gamer.spawnAt(arena.getLobbySpawn()); // TODO: spawns the gamer at the lobby spawn
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
     }
@@ -43,7 +44,7 @@ public abstract class Game {
     public void remove(Gamer gamer) {
         gamers.remove(gamer);
         gamer.retrieveInventory(); // TODO: gives the original inventory back to the gamer
-        gamer.spawnAt(gamer.getLastLocation()); // TODO: spawns the gamer at the location before joining the game
+        gamer.setLocation(gamer.getLastLocation()); // TODO: spawns the gamer at the location before joining the game
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
     }
 
