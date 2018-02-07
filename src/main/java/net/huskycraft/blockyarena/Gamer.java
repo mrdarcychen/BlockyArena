@@ -12,7 +12,7 @@ public class Gamer {
     private User user;
     private Player player;
 
-    private Session session;
+    private Game game;
     private GamerStatus status;
 
     private Location lastLocation;
@@ -66,8 +66,8 @@ public class Gamer {
     /**
      * Sets the session the player is currently in.
      */
-    public void setSession(Session session) {
-        this.session = session;
+    public void setGame(Game game) {
+        this.game = game;
         setStatus(GamerStatus.INGAME);
     }
 
@@ -75,8 +75,8 @@ public class Gamer {
      * Gets the session the player is currently in, if there is one.
      * @return null if the player is not in any session
      */
-    public Session getSession() {
-        return session;
+    public Game getGame() {
+        return game;
     }
 
     public void setStatus(GamerStatus status) {
