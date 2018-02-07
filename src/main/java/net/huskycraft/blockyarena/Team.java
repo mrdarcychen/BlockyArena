@@ -7,12 +7,10 @@ public class Team {
 
     public static BlockyArena plugin;
 
-    private TeamType teamType;
     private Set<Gamer> gamers;
     private Spawn teamSpawn;
 
-    public Team(TeamType teamType, Spawn teamSpawn) {
-        this.teamType = teamType;
+    public Team(Spawn teamSpawn) {
         this.teamSpawn = teamSpawn;
         gamers = new TreeSet<>();
     }
