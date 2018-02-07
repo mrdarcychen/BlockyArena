@@ -16,6 +16,7 @@ public class Gamer {
     private GamerStatus status;
 
     private Location lastLocation;
+    private Closet closet;
 
     /**
      * Constructs a unique Gamer profile for the given user.
@@ -23,6 +24,27 @@ public class Gamer {
     public Gamer(User user) {
         this.user = user;
         this.player = user.getPlayer().get();
+    }
+
+    /**
+     * Saves and then clear the inventory of this Gamer.
+     */
+    public void saveInventory() {
+        closet = new Closet(player);
+    }
+
+    /**
+     * Retrieves the most recently saved inventory of this Gamer.
+     */
+    public void retrieveInventory() {
+        closet.equip(player);
+    }
+
+    /**
+     * Spawns this Gamer at the given Spawn point.
+     */
+    public void spawnAt(Spawn spawn) {
+        player.setLocationAndRotation(spawn.getSpawnLocation(), spawn.getSpawnRotation());
     }
 
     public Player getPlayer() {
