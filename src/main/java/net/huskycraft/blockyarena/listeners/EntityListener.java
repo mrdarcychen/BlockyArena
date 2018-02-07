@@ -1,7 +1,6 @@
 package net.huskycraft.blockyarena.listeners;
 
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.Session;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
