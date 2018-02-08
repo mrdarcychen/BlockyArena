@@ -72,8 +72,8 @@ public class Gamer {
     }
 
     /**
-     * Gets the session the player is currently in, if there is one.
-     * @return null if the player is not in any session
+     * Gets the Game this gamer is currently in.
+     * @return the game this gamer is currently in, null if not in any Game
      */
     public Game getGame() {
         return game;
