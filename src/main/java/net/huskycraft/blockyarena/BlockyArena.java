@@ -6,7 +6,6 @@ import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
 import net.huskycraft.blockyarena.managers.GameManager;
 import net.huskycraft.blockyarena.managers.GamerManager;
-import net.huskycraft.blockyarena.managers.PlayerClassManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -42,7 +41,7 @@ public class BlockyArena {
 
     private ArenaManager arenaManager;
     private GameManager gameManager;
-    private PlayerClassManager playerClassManager;
+    //private PlayerClassManager playerClassManager;
     private GamerManager gamerManager;
 
     @Listener
@@ -59,7 +58,7 @@ public class BlockyArena {
     private void createManagers() {
         arenaManager = new ArenaManager();
         gameManager = new GameManager();
-        playerClassManager = new PlayerClassManager(this);
+        //playerClassManager = new PlayerClassManager(this);
         gamerManager = new GamerManager(this);
     }
 
@@ -168,9 +167,9 @@ public class BlockyArena {
         return gameManager;
     }
 
-    public PlayerClassManager getPlayerClassManager() {
-        return playerClassManager;
-    }
+//    public PlayerClassManager getPlayerClassManager() {
+//        return playerClassManager;
+//    }
 
     public GamerManager getGamerManager() {
         return gamerManager;
