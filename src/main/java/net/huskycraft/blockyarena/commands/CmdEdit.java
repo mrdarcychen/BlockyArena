@@ -31,6 +31,8 @@ public class CmdEdit implements CommandExecutor{
                             arena.setTeamSpawnB(player.getLocation(), player.getHeadRotation());
                         case "lobby":
                             arena.setLobbySpawn(player.getLocation(), player.getHeadRotation());
+                        case "spectator":
+                            arena.setSpectatorSpawn(player.getLocation(), player.getHeadRotation());
                     }
             }
         }

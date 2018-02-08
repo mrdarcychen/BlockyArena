@@ -42,6 +42,7 @@ public class Game {
         gamers.add(gamer);
         gamer.saveInventory(); // TODO: saves the inventory of the gamer and clear it
         gamer.setLastLocation();
+        gamer.setStatus(GamerStatus.INGAME);
         gamer.spawnAt(arena.getLobbySpawn()); // TODO: spawns the gamer at the lobby spawn
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
         checkPreCond();
@@ -54,6 +55,7 @@ public class Game {
         gamers.remove(gamer);
         gamer.retrieveInventory();
         gamer.setLocation(gamer.getLastLocation());
+        gamer.setStatus(GamerStatus.AVAILABLE);
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
         checkPreCond();
     }
@@ -117,5 +119,13 @@ public class Game {
      */
     public TeamMode getTeamMode() {
         return teamMode;
+    }
+
+    /**
+     * Checks if the gamer is in this Game.
+     * @return true if the gamer is in this game, false otherwise
+     */
+    public boolean hasGamer(Gamer gamer) {
+        return gamers.contains(gamer);
     }
 }

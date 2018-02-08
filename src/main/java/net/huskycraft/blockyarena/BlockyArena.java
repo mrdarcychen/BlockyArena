@@ -94,41 +94,29 @@ public class BlockyArena {
     registers user commands to CommandManager
      */
     private void registerCommands() {
-        CommandSpec createCmd = CommandSpec.builder()
+        CommandSpec cmdCreate = CommandSpec.builder()
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
                 .executor(new CmdCreate())
                 .permission("blockyarena.create")
                 .build();
 
-        CommandSpec getClassCmd = CommandSpec.builder()
-                .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("name"))))
-                .executor(new GetClassCmd(this))
-                .permission("blockyarena.getclass")
-                .build();
+//        CommandSpec cmdGetClass = CommandSpec.builder()
+//                .arguments(
+//                        GenericArguments.onlyOne(GenericArguments.string(Text.of("name"))))
+//                .executor(new GetClassCmd(this))
+//                .permission("blockyarena.getclass")
+//                .build();
 
-        CommandSpec setSpawnCmd = CommandSpec.builder()
-                .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))))
-                .executor(new SetSpawnCmd(this))
-                .permission("blockyarena.setspawn")
-                .build();
-
-        CommandSpec doneCmd = CommandSpec.builder()
-                .executor(new DoneCmd(this))
-                .permission("blockyarena.done")
-                .build();
-
-        CommandSpec joinCmd = CommandSpec.builder()
+        CommandSpec cmdJoin = CommandSpec.builder()
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("mode")))
                 )
                 .executor(new CmdJoin())
                 .build();
 
-        CommandSpec quitCmd = CommandSpec.builder()
-                .executor(new QuitCmd(this))
+        CommandSpec cmdQuit = CommandSpec.builder()
+                .executor(new CmdQuit(this))
                 .build();
 
         CommandSpec cmdEdit = CommandSpec.builder()
@@ -142,12 +130,10 @@ public class BlockyArena {
 
         CommandSpec arenaCommandSpec = CommandSpec.builder()
                 .child(cmdEdit, "edit")
-                .child(createCmd, "create")
-                .child(setSpawnCmd, "setspawn")
-                .child(doneCmd, "done")
-                .child(joinCmd, "join")
-                .child(quitCmd, "quit")
-                .child(getClassCmd, "getclass")
+                .child(cmdCreate, "create")
+                .child(cmdJoin, "join")
+                .child(cmdQuit, "quit")
+                //.child(cmdGetClass, "getclass")
                 .build();
 
         Sponge.getCommandManager()
