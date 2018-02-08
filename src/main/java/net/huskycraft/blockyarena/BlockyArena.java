@@ -4,9 +4,9 @@ import com.google.inject.Inject;
 import net.huskycraft.blockyarena.commands.*;
 import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
+import net.huskycraft.blockyarena.managers.GameManager;
 import net.huskycraft.blockyarena.managers.GamerManager;
 import net.huskycraft.blockyarena.managers.PlayerClassManager;
-import net.huskycraft.blockyarena.managers.SessionManager;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -41,7 +41,7 @@ public class BlockyArena {
     private Path arenaDir, classDir;
 
     private ArenaManager arenaManager;
-    private SessionManager sessionManager;
+    private GameManager gameManager;
     private PlayerClassManager playerClassManager;
     private GamerManager gamerManager;
 
@@ -57,8 +57,8 @@ public class BlockyArena {
     creates managers for the plugin
      */
     private void createManagers() {
-        arenaManager = new ArenaManager(this);
-        sessionManager = new SessionManager(this);
+        arenaManager = new ArenaManager();
+        gameManager = new GameManager();
         playerClassManager = new PlayerClassManager(this);
         gamerManager = new GamerManager(this);
     }
@@ -122,7 +122,7 @@ public class BlockyArena {
 
         CommandSpec joinCmd = CommandSpec.builder()
                 .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type")))
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("mode")))
                 )
                 .executor(new CmdJoin())
                 .build();
@@ -178,8 +178,8 @@ public class BlockyArena {
         return arenaManager;
     }
 
-    public SessionManager getSessionManager() {
-        return sessionManager;
+    public GameManager getGameManager() {
+        return gameManager;
     }
 
     public PlayerClassManager getPlayerClassManager() {

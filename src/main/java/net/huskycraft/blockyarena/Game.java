@@ -104,4 +104,18 @@ public class Game {
             timer.cancel();
         }
     }
+
+    /**
+     * Gets the state of the Game.
+     */
+    public GameState getGameState() {
+        return gameState;
+    }
+
+    /**
+     * Gets the mode of the team.
+     */
+    public TeamMode getTeamMode() {
+        return teamMode;
+    }
 }

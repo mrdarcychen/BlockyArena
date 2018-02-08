@@ -17,23 +17,23 @@ public class CmdJoin implements CommandExecutor{
     public CmdJoin() {}
 
     /**
-     * Sends the given player to an active Session.
+     * Sends the given player to an active Game.
      */
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
         Gamer gamer = plugin.getGamerManager().getGamer(player);
-        TeamType teamType = TeamType.valueOf(args.<String>getOne("type").get());
-        if (teamType == null) {
-            player.sendMessage(Text.of("You've entered an invalid team type!"));
+        TeamMode teamMode = TeamMode.valueOf(args.<String>getOne("mode").get());
+        if (teamMode == null) {
+            player.sendMessage(Text.of("You've entered an invalid team mode!"));
         }
         if (plugin.getGamerManager().getGamer(player).getStatus() == GamerStatus.INGAME) {
             player.sendMessage(Text.of("You've already joined a session!"));
             return CommandResult.empty();
         } else {
             try {
-                Session session = plugin.getSessionManager().getSession(teamType);
-                session.add(gamer);
+                Game game = plugin.getGameManager().getGame(teamMode);
+                game.add(gamer);
             } catch (NullPointerException e) {
                 player.sendMessage(Text.of("No available arena."));
             }
