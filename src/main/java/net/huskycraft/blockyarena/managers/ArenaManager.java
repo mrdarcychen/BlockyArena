@@ -1,8 +1,9 @@
 package net.huskycraft.blockyarena.managers;
 
-import net.huskycraft.blockyarena.Arena;
-import net.huskycraft.blockyarena.ArenaState;
+import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.arenas.ArenaState;
 import net.huskycraft.blockyarena.BlockyArena;
+import org.spongepowered.api.Sponge;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -19,8 +20,11 @@ public class ArenaManager {
 
     private Map<String, Arena> arenas; // the list of Arenas available in the server
 
-    public ArenaManager() {
+    public ArenaManager(BlockyArena plugin) {
+        this.plugin = plugin;
+        plugin.getLogger().warn("Reach inside of ArenaManager!");
         arenas = new HashMap<>();
+        plugin.getLogger().warn(Sponge.getServer().getWorlds().toString());
         loadArenas();
     }
 
@@ -31,7 +35,7 @@ public class ArenaManager {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getArenaDir(), "*.conf");
             for (Path path : stream) {
-                Arena arena = new Arena(path);
+                Arena arena = new Arena(plugin, path);
                 arenas.put(arena.getID(), arena);
             }
         } catch (IOException e) {
@@ -44,8 +48,11 @@ public class ArenaManager {
      * @return an enabled arena from the list, null if no arena is available
      */
     public Arena getArena() {
+        plugin.getLogger().warn("There are " + arenas.size() + " arenas in the list.");
         for (Arena arena : arenas.values()) {
+            plugin.getLogger().warn("The state of this arena is " + arena.getState().toString());
             if (arena.getState() == ArenaState.ENABLE) {
+                plugin.getLogger().warn("So am I here inside?");
                 return arena;
             }
         }
@@ -68,6 +75,4 @@ public class ArenaManager {
     public void add(Arena arena) {
         arenas.put(arena.getID(), arena);
     }
-
-
 }

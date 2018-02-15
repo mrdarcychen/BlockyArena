@@ -1,7 +1,10 @@
 package net.huskycraft.blockyarena.managers;
 
-import com.google.inject.Inject;
 import net.huskycraft.blockyarena.*;
+import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.GameState;
+import net.huskycraft.blockyarena.games.TeamMode;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -11,12 +14,12 @@ import java.util.List;
  */
 public class GameManager {
 
-    @Inject
     public static BlockyArena plugin;
 
     private List<Game> games; // a list of active games in the server
 
-    public GameManager() {
+    public GameManager(BlockyArena plugin) {
+        this.plugin = plugin;
         games = new ArrayList<>();
     }
 
@@ -36,7 +39,7 @@ public class GameManager {
         Arena arena = plugin.getArenaManager().getArena();
         // if there is no available Arena, no Game can be instantiated and null is returned
         if (arena == null) return null;
-        Game game = new Game(teamMode, arena);
+        Game game = new Game(plugin, teamMode, arena);
         games.add(game);
         return game;
     }

@@ -1,9 +1,8 @@
 package net.huskycraft.blockyarena.commands;
 
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.Game;
-import net.huskycraft.blockyarena.Gamer;
-import net.huskycraft.blockyarena.GamerStatus;
+import net.huskycraft.blockyarena.utils.Gamer;
+import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -14,15 +13,17 @@ import org.spongepowered.api.text.Text;
 
 public class CmdQuit implements CommandExecutor{
 
-    BlockyArena plugin;
+    public static BlockyArena plugin;
 
     public CmdQuit(BlockyArena plugin) {
         this.plugin = plugin;
     }
+
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
         Gamer gamer = plugin.getGamerManager().getGamer(player);
+        player.sendMessage(Text.of("Your status is " + gamer.getStatus().toString()));
         if (gamer.getStatus() != GamerStatus.INGAME) {
             player.sendMessage(Text.of("You're not in any game."));
             return CommandResult.empty();

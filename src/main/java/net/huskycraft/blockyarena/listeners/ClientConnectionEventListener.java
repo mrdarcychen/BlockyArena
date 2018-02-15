@@ -7,7 +7,7 @@ import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 public class ClientConnectionEventListener {
 
-    private BlockyArena plugin;
+    public static BlockyArena plugin;
 
     public ClientConnectionEventListener(BlockyArena plugin) {
         this.plugin = plugin;
@@ -16,8 +16,10 @@ public class ClientConnectionEventListener {
     @Listener
     public void onClientLogin(ClientConnectionEvent.Login event) {
         User user = event.getTargetUser();
-        if (!user.getPlayer().get().hasPlayedBefore()) {
-            plugin.getGamerManager().register(user);
+        plugin.getLogger().warn("Detect a gamer!");
+        if (!plugin.getGamerManager().hasGamer(user.getPlayer().get())) {
+            plugin.getGamerManager().register(user.getPlayer().get());
+            plugin.getLogger().warn("Register the gamer!");
         }
     }
 }

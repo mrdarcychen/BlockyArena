@@ -3,8 +3,8 @@ plugins {
 }
 
 group = 'net.huskycraft'
-version = '0.3.0'
-description = 'Players are able to retrieve items with enchantments.'
+version = '0.4.0'
+description = 'Inventories of all players will be saved upon joining a game.'
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0'
