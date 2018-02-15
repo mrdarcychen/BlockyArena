@@ -1,7 +1,8 @@
-package net.huskycraft.blockyarena;
+package net.huskycraft.blockyarena.arenas;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
+import net.huskycraft.blockyarena.BlockyArena;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -37,8 +38,8 @@ public class Arena {
      * @param ID a unique identification code of the Arena
      *           assuming that no existing arena has the same ID
      */
-    public Arena(String ID) {
-        this(ID, null, null, null, null);
+    public Arena(BlockyArena plugin, String ID) {
+        this(plugin, ID, null, null, null, null);
         state = ArenaState.INCOMPLETE;
     }
 
@@ -50,7 +51,8 @@ public class Arena {
      * @param teamSpawnB a spawn point for team B
      * @param lobbySpawn an optional common spawn point for all players
      */
-    public Arena(String ID, Spawn teamSpawnA, Spawn teamSpawnB, Spawn lobbySpawn, Spawn spectatorSpawn) {
+    public Arena(BlockyArena plugin, String ID, Spawn teamSpawnA, Spawn teamSpawnB, Spawn lobbySpawn, Spawn spectatorSpawn) {
+        this.plugin = plugin;
         this.ID = ID;
         this.teamSpawnA = teamSpawnA;
         this.teamSpawnB = teamSpawnB;
@@ -65,39 +67,45 @@ public class Arena {
         } catch (IOException e) {
             plugin.getLogger().warn("Error creating arena config file for " + ID);
         }
-        writeConfig(config);
+        writeConfig();
     }
 
     /**
      * Reconstructs an arena from an existing arena config file.
      * @param config a config file storing an arena's data in standard format
      */
-    public Arena(Path config) {
+    public Arena(BlockyArena plugin, Path config) {
+        this.plugin = plugin;
         this.config = config;
         readConfig(config);
+        state = ArenaState.ENABLE;
     }
 
     /**
      * Updates the given arena config file based on the object's data fields.
-     * @param config
      */
-    public void writeConfig(Path config) {
-        ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
-                .builder().setPath(config).build();
+    public void writeConfig() {
+        if (state == ArenaState.INCOMPLETE) {
+            plugin.getLogger().warn(ID + " is incomplete. Cancel writing to config.");
+        } else {
+            ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
+                    .builder().setPath(config).build();
 
-        try {
-            ConfigurationNode rootNode = loader.load();
-            rootNode.getNode("id").setValue(ID);
-            rootNode.getNode("teamSpawnA").setValue(TypeToken.of(Spawn.class), teamSpawnA);
-            rootNode.getNode("teamSpawnB").setValue(TypeToken.of(Spawn.class), teamSpawnB);
-            rootNode.getNode("lobbySpawn").setValue(TypeToken.of(Spawn.class), lobbySpawn);
-            rootNode.getNode("spectatorSpawn").setValue(TypeToken.of(Spawn.class), spectatorSpawn);
-            loader.save(rootNode);
-        } catch (IOException e) {
-            plugin.getLogger().warn("Error writing arena config.");
-        } catch (ObjectMappingException e) {
+            try {
+                ConfigurationNode rootNode = loader.load();
+                rootNode.getNode("id").setValue(ID);
+                rootNode.getNode("teamSpawnA").setValue(TypeToken.of(Spawn.class), teamSpawnA);
+                rootNode.getNode("teamSpawnB").setValue(TypeToken.of(Spawn.class), teamSpawnB);
+                rootNode.getNode("lobbySpawn").setValue(TypeToken.of(Spawn.class), lobbySpawn);
+                rootNode.getNode("spectatorSpawn").setValue(TypeToken.of(Spawn.class), spectatorSpawn);
+                loader.save(rootNode);
+            } catch (IOException e) {
+                plugin.getLogger().warn("Error writing arena config.");
+            } catch (ObjectMappingException e) {
 
+            }
         }
+
     }
 
     /**
@@ -111,9 +119,12 @@ public class Arena {
         try {
             ConfigurationNode rootNode = loader.load();
             ID = rootNode.getNode("id").getString();
+            plugin.getLogger().warn("ID is " + ID);
             teamSpawnA = rootNode.getNode("teamSpawnA").getValue(TypeToken.of(Spawn.class));
+            plugin.getLogger().warn("TeamSpawnA: " + String.valueOf(teamSpawnA == null));
             teamSpawnB = rootNode.getNode("teamSpawnB").getValue(TypeToken.of(Spawn.class));
             lobbySpawn = rootNode.getNode("lobbySpawn").getValue(TypeToken.of(Spawn.class));
+            plugin.getLogger().warn("LobbySpawn: " + String.valueOf(lobbySpawn == null));
             spectatorSpawn = rootNode.getNode("spectatorSpawn").getValue(TypeToken.of(Spawn.class));
             loader.save(rootNode);
         } catch (IOException e) {
@@ -133,18 +144,22 @@ public class Arena {
 
     public void setTeamSpawnA(Location location, Vector3d rotation) {
         teamSpawnA = new Spawn(location, rotation);
+        updateArenaState();
     }
 
     public void setTeamSpawnB(Location location, Vector3d rotation) {
         teamSpawnB = new Spawn(location, rotation);
+        updateArenaState();
     }
 
     public void setLobbySpawn(Location location, Vector3d rotation) {
         lobbySpawn = new Spawn(location, rotation);
+        updateArenaState();
     }
 
     public void setSpectatorSpawn(Location location, Vector3d rotation) {
         spectatorSpawn = new Spawn(location, rotation);
+        updateArenaState();
     }
 
     public Spawn getTeamSpawnA() {
@@ -161,5 +176,13 @@ public class Arena {
 
     public Spawn getSpectatorSpawn() {
         return spectatorSpawn;
+    }
+
+    public void updateArenaState() {
+        if (teamSpawnA != null && teamSpawnB != null && lobbySpawn != null && spectatorSpawn != null) {
+            state = ArenaState.ENABLE;
+            writeConfig();
+            plugin.getLogger().warn("Arena is enabled!");
+        }
     }
 }

@@ -1,11 +1,16 @@
 package net.huskycraft.blockyarena;
 
+import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+import net.huskycraft.blockyarena.arenas.Spawn;
+import net.huskycraft.blockyarena.arenas.SpawnSerializer;
 import net.huskycraft.blockyarena.commands.*;
+import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
 import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
 import net.huskycraft.blockyarena.managers.GameManager;
 import net.huskycraft.blockyarena.managers.GamerManager;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -13,7 +18,7 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -24,7 +29,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.3.0")
+@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.4.0")
 public class BlockyArena {
     @Inject
     private Logger logger;
@@ -45,19 +50,21 @@ public class BlockyArena {
     private GamerManager gamerManager;
 
     @Listener
-    public void onPreInit(GamePreInitializationEvent event) {
+    public void onServerStarting(GameStartingServerEvent event) {
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Spawn.class), new SpawnSerializer(this));
         createDirectories();
         createManagers();
         registerCommands();
         registerListeners();
+
     }
 
     /*
     creates managers for the plugin
      */
     private void createManagers() {
-        arenaManager = new ArenaManager();
-        gameManager = new GameManager();
+        arenaManager = new ArenaManager(this);
+        gameManager = new GameManager(this);
         //playerClassManager = new PlayerClassManager(this);
         gamerManager = new GamerManager(this);
     }
@@ -87,6 +94,7 @@ public class BlockyArena {
      */
     private void registerListeners() {
         Sponge.getEventManager().registerListeners(this, new EntityListener(this));
+        Sponge.getEventManager().registerListeners(this, new ClientConnectionEventListener(this));
     }
 
     /*
@@ -96,7 +104,7 @@ public class BlockyArena {
         CommandSpec cmdCreate = CommandSpec.builder()
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
-                .executor(new CmdCreate())
+                .executor(new CmdCreate(this))
                 .permission("blockyarena.create")
                 .build();
 
@@ -111,7 +119,7 @@ public class BlockyArena {
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("mode")))
                 )
-                .executor(new CmdJoin())
+                .executor(new CmdJoin(this))
                 .build();
 
         CommandSpec cmdQuit = CommandSpec.builder()
@@ -124,7 +132,7 @@ public class BlockyArena {
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("param")))
                 )
-                .executor(new CmdEdit())
+                .executor(new CmdEdit(this))
                 .build();
 
         CommandSpec arenaCommandSpec = CommandSpec.builder()
@@ -136,7 +144,7 @@ public class BlockyArena {
                 .build();
 
         Sponge.getCommandManager()
-                .register(this, arenaCommandSpec, "blockyarena", "arena");
+                .register(this, arenaCommandSpec, "blockyarena", "arena", "ba");
     }
 
     public Logger getLogger() {

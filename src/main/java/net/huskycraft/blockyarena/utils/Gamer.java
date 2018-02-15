@@ -1,7 +1,8 @@
-package net.huskycraft.blockyarena;
+package net.huskycraft.blockyarena.utils;
 
+import net.huskycraft.blockyarena.arenas.Spawn;
+import net.huskycraft.blockyarena.games.Game;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.world.Location;
 
 /**
@@ -9,7 +10,6 @@ import org.spongepowered.api.world.Location;
  */
 public class Gamer {
 
-    private User user;
     private Player player;
 
     private Game game;
@@ -21,9 +21,9 @@ public class Gamer {
     /**
      * Constructs a unique Gamer profile for the given user.
      */
-    public Gamer(User user) {
-        this.user = user;
-        this.player = user.getPlayer().get();
+    public Gamer(Player player) {
+        this.player = player;
+        status = GamerStatus.AVAILABLE;
     }
 
     /**

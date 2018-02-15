@@ -1,4 +1,4 @@
-package net.huskycraft.blockyarena;
+package net.huskycraft.blockyarena.utils;
 
 import net.huskycraft.blockyarena.BlockyArena;
 import org.spongepowered.api.entity.living.player.Player;
