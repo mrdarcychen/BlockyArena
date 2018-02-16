@@ -32,7 +32,7 @@ public class CmdJoin implements CommandExecutor{
         if (teamMode == null) {
             player.sendMessage(Text.of("You've entered an invalid team mode!"));
         }
-        if (plugin.getGamerManager().getGamer(player).getStatus() == GamerStatus.INGAME) {
+        if (plugin.getGamerManager().getGamer(player).getStatus() == GamerStatus.PLAYING) {
             player.sendMessage(Text.of("You've already joined a session!"));
             return CommandResult.empty();
         } else {

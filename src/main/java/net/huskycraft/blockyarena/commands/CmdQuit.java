@@ -24,7 +24,7 @@ public class CmdQuit implements CommandExecutor{
         Player player = (Player) src;
         Gamer gamer = plugin.getGamerManager().getGamer(player);
         player.sendMessage(Text.of("Your status is " + gamer.getStatus().toString()));
-        if (gamer.getStatus() != GamerStatus.INGAME) {
+        if (gamer.getStatus() != GamerStatus.PLAYING) {
             player.sendMessage(Text.of("You're not in any game."));
             return CommandResult.empty();
         }

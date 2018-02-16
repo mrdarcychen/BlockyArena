@@ -23,7 +23,7 @@ public class EntityListener {
         if (event.getTargetEntity() instanceof Player) {
             Player player = (Player) event.getTargetEntity();
             Gamer gamer = plugin.getGamerManager().getGamer(player);
-            if (gamer.getStatus() == GamerStatus.INGAME) {
+            if (gamer.getStatus() == GamerStatus.PLAYING) {
                 player.sendMessage(Text.of("Damn!"));
                 player.sendMessage(Text.of(gamer.getGame() == null));
                 player.sendMessage(Text.of(gamer.getGame().getGameState() == null));
