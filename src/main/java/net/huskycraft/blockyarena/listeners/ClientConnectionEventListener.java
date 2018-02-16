@@ -16,10 +16,9 @@ public class ClientConnectionEventListener {
     @Listener
     public void onClientLogin(ClientConnectionEvent.Login event) {
         User user = event.getTargetUser();
-        plugin.getLogger().warn("Detect a gamer!");
         if (!plugin.getGamerManager().hasGamer(user.getPlayer().get())) {
             plugin.getGamerManager().register(user.getPlayer().get());
-            plugin.getLogger().warn("Register the gamer!");
+            plugin.getLogger().info("A new gaming profile is created for player " + user.getName());
         }
     }
 }

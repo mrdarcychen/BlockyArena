@@ -43,12 +43,12 @@ public class Game {
     public void add(Gamer gamer) {
         gamers.add(gamer);
         gamer.saveInventory();
-        gamer.setLastLocation();
-        gamer.setStatus(GamerStatus.INGAME);
+        gamer.saveLocation();
+        gamer.setStatus(GamerStatus.PLAYING);
         gamer.setGame(this);
         gamer.spawnAt(arena.getLobbySpawn());
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
-        gamer.getPlayer().sendMessage(Text.of("Sending you to an active game session ..."));
+        gamer.getPlayer().sendMessage(Text.of("Sending you to " + arena.getID()));
         checkPreCond();
     }
 
@@ -58,7 +58,7 @@ public class Game {
     public void remove(Gamer gamer) {
         gamers.remove(gamer);
         gamer.retrieveInventory();
-        gamer.setLocation(gamer.getLastLocation());
+        gamer.setLocation(gamer.getSavedLocation());
         gamer.setStatus(GamerStatus.AVAILABLE);
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
         checkPreCond();
@@ -70,7 +70,7 @@ public class Game {
     public void eliminate(Gamer gamer) {
         gamer.spawnAt(arena.getSpectatorSpawn());
         gamer.getPlayer().gameMode().set(GameModes.SPECTATOR);
-        gamer.setStatus(GamerStatus.ELIMINATED);
+        gamer.setStatus(GamerStatus.SPECTATING);
         if (!teamA.hasGamerLeft() || !teamB.hasGamerLeft()) {
             broadcast("Game over!");
             for (Gamer g : gamers) {

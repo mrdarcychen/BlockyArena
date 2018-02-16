@@ -5,21 +5,24 @@ import net.huskycraft.blockyarena.games.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 
+// TODO: Refine Gamer class
 /**
- * The Gamer class represents a player's gaming profile.
+ * A Gamer object stores a player's gaming profile.
  */
 public class Gamer {
 
-    private Player player;
+    private Player player; // the player instance in which this Gamer profile is associated with
 
-    private Game game;
-    private GamerStatus status;
+    private Game game; // the Game session this player is currently in
+    private GamerStatus status; // the gaming status of this player
 
-    private Location lastLocation;
-    private Closet closet;
+    private Location savedLocation; // the saved location of the player for record
+    private Closet closet; // the original inventory of the player for record
 
     /**
-     * Constructs a unique Gamer profile for the given user.
+     * Constructs a unique Gamer profile for the given Player.
+     *
+     * @param player the Player instance to be associated with this Gamer profile
      */
     public Gamer(Player player) {
         this.player = player;
@@ -27,62 +30,96 @@ public class Gamer {
     }
 
     /**
-     * Saves and then clear the inventory of this Gamer.
+     * Saves the current inventory of this Gamer.
      */
     public void saveInventory() {
         closet = new Closet(player);
     }
 
     /**
-     * Retrieves the most recently saved inventory of this Gamer.
+     * Retrieves the most recently saved inventory of this Gamer. This will replace the current inventory of the Player.
      */
     public void retrieveInventory() {
+        player.getInventory().clear();
         closet.equip(player);
     }
 
     /**
      * Spawns this Gamer at the given Spawn point.
+     *
+     * @param spawn the Spawn point where this Gamer is going to be at
      */
     public void spawnAt(Spawn spawn) {
         player.setLocationAndRotation(spawn.getSpawnLocation(), spawn.getSpawnRotation());
     }
 
+    /**
+     * Sets the location of this Gamer.
+     *
+     * @param location the location to set
+     */
     public void setLocation(Location location) {
         player.setLocation(location);
     }
 
-    public void setLastLocation() {
-        this.lastLocation = player.getLocation();
+    /**
+     * Saves the current location of this Gamer for record.
+     */
+    public void saveLocation() {
+        this.savedLocation = player.getLocation();
     }
 
-    public Location getLastLocation() {
-        return lastLocation;
+    /**
+     * Gets the most recently saved location of this Gamer.
+     *
+     * @return the most recently saved location of this Gamer
+     */
+    public Location getSavedLocation() {
+        return savedLocation;
     }
 
+    /**
+     * Gets the Player instance associated with this Gamer.
+     *
+     * @return the Player instance of this Gamer
+     */
     public Player getPlayer() {
         return player;
     }
 
     /**
-     * Sets the session the player is currently in.
+     * Sets the game the player is currently in and updates player status to PLAYING.
+     *
+     * @param game the Game session to be filed for this Gamer
      */
     public void setGame(Game game) {
         this.game = game;
-        setStatus(GamerStatus.INGAME);
+        setStatus(GamerStatus.PLAYING);
     }
 
     /**
-     * Gets the Game this gamer is currently in.
-     * @return the game this gamer is currently in, null if not in any Game
+     * Gets the Game this Gamer is currently in.
+     *
+     * @return the Game this Gamer is currently in
      */
     public Game getGame() {
         return game;
     }
 
+    /**
+     * Sets the GamerStatus of this Gamer.
+     *
+     * @param status the GamerStatus of this Gamer
+     */
     public void setStatus(GamerStatus status) {
         this.status = status;
     }
 
+    /**
+     * Gets the GamerStatus of this Gamer.
+     *
+     * @return the GamerStatus of this Gamer
+     */
     public GamerStatus getStatus() {
         return status;
     }

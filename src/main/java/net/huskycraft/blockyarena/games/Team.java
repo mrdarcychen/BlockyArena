@@ -29,7 +29,7 @@ public class Team {
 
     public boolean hasGamerLeft() {
         for (Gamer gamer : gamers) {
-            if (gamer.getStatus() == GamerStatus.INGAME) {
+            if (gamer.getStatus() == GamerStatus.PLAYING) {
                 return true;
             }
         }
