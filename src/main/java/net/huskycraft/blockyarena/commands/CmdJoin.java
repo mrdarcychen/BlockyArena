@@ -38,7 +38,7 @@ public class CmdJoin implements CommandExecutor{
         } else {
 //            try {
                 Game game = plugin.getGameManager().getGame(teamMode);
-                game.add(gamer);
+                gamer.join(game);
 //            } catch (NullPointerException e) {
 //                player.sendMessage(Text.of("No available arena."));
 //            }
