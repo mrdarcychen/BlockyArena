@@ -24,15 +24,10 @@ public class EntityListener {
             Player player = (Player) event.getTargetEntity();
             Gamer gamer = plugin.getGamerManager().getGamer(player);
             if (gamer.getStatus() == GamerStatus.PLAYING) {
-                player.sendMessage(Text.of("Damn!"));
-                player.sendMessage(Text.of(gamer.getGame() == null));
-                player.sendMessage(Text.of(gamer.getGame().getGameState() == null));
                 if (gamer.getGame().getGameState() != GameState.IN_PROGRESS) {
-                    player.sendMessage(Text.of("Reach 1"));
                     event.setCancelled(true);
                 }
                 if (event.willCauseDeath()) {
-                    player.sendMessage(Text.of("Reach 2"));
                     event.setCancelled(true);
                     gamer.getGame().eliminate(gamer);
                 }

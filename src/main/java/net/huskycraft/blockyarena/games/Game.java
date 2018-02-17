@@ -14,11 +14,14 @@ import org.spongepowered.api.text.title.Title;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * A Game represents a specific session dedicated to a single duel.
+ */
 public class Game {
 
     public static BlockyArena plugin;
-    protected Arena arena;
-    protected List<Gamer> gamers;
+    protected Arena arena; // the Arena associated with this Game
+    protected Map<Gamer, Boolean> gamers; // the list of Gamers in this Game with corresponding connection status
     protected TeamMode teamMode;
     protected GameState gameState;
     protected Team teamA, teamB;
@@ -33,7 +36,7 @@ public class Game {
         this.plugin = plugin;
         this.teamMode = teamMode;
         this.arena = arena;
-        gamers = new ArrayList<>();
+        gamers = new HashMap<>();
         gameState = GameState.RECRUITING;
     }
 
@@ -41,7 +44,8 @@ public class Game {
      * Adds the given gamer to this Game.
      */
     public void add(Gamer gamer) {
-        gamers.add(gamer);
+        broadcast(Text.of(gamer.getName() + " joined the game."));
+        gamers.put(gamer, true);
         gamer.saveInventory();
         gamer.saveLocation();
         gamer.setStatus(GamerStatus.PLAYING);
@@ -49,38 +53,78 @@ public class Game {
         gamer.spawnAt(arena.getLobbySpawn());
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
         gamer.getPlayer().sendMessage(Text.of("Sending you to " + arena.getID()));
-        checkPreCond();
+        if (gameState == GameState.RECRUITING || gameState == GameState.STARTING) {
+            checkStartingCondition();
+        }
     }
 
     /**
      * Removes the given gamer from this Game.
+     *
+     * @param gamer the gamer to be removed from this Game
      */
     public void remove(Gamer gamer) {
-        gamers.remove(gamer);
+        // if the game is in progress, eliminate before removing the player
+        if (gameState == GameState.IN_PROGRESS) {
+            eliminate(gamer, Text.of(gamer.getPlayer().getName() + " disconnected."));
+        }
+        broadcast(Text.of(gamer.getName() + " left the game."));
+        gamer.setGame(null);
         gamer.retrieveInventory();
         gamer.setLocation(gamer.getSavedLocation());
+        gamer.getPlayer().sendMessage(Text.of("You are sent to the saved location."));
         gamer.setStatus(GamerStatus.AVAILABLE);
         gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
-        checkPreCond();
+        if (gameState == GameState.RECRUITING || gameState == GameState.STARTING) {
+            gamers.remove(gamer);
+            checkStartingCondition();
+        }
     }
 
     /**
      * Eliminates the given gamer from this Game.
+     *
+     * @param gamer the Gamer to be eliminated
+     * @param cause the reason of elimination
      */
-    public void eliminate(Gamer gamer) {
+    public void eliminate(Gamer gamer, Text cause) {
+        broadcast(cause);
         gamer.spawnAt(arena.getSpectatorSpawn());
         gamer.getPlayer().gameMode().set(GameModes.SPECTATOR);
         gamer.setStatus(GamerStatus.SPECTATING);
+        checkStoppingCondition();
+
+    }
+
+    /**
+     * Checks to see if this Game should stop based on the current condition.
+     *
+     * A Game should stop when either one of the Team has no player alive.
+     */
+    private void checkStoppingCondition() {
         if (!teamA.hasGamerLeft() || !teamB.hasGamerLeft()) {
-            broadcast("Game over!");
-            for (Gamer g : gamers) {
-                remove(g);
+            if (teamA.hasGamerLeft()) {
+                broadcast(Text.of("Team A won the game!"));
+            } else if (teamB.hasGamerLeft()) {
+                broadcast(Text.of("Team B won the game!"));
+            }
+            onGameStopping();
+        }
+    }
+
+
+    public void onGameStopping() {
+        // TODO: broadcast results
+        // TODO: remove
+        for (Gamer gamer : gamers.keySet()) {
+            // if the gamer still has connection, remove
+            if (gamers.get(gamer)) {
+                gamer.setGame(null);
             }
         }
     }
 
     private void startingCountdown(int second) {
-        plugin.getLogger().warn("Reach timer");
         if (second == 0) {
             timer.cancel();
             teamA.sendAllToSpawn();
@@ -100,10 +144,11 @@ public class Game {
     }
 
     /**
-     * Checks the precondition of the Game.
+     * Checks to see if this Game should start based on the current condition.
+     *
      * Starts the starting timer if the precondition is met, otherwise cancels the timer.
      */
-    private void checkPreCond() {
+    private void checkStartingCondition() {
         plugin.getLogger().warn("Check precond.");
         boolean canSolo = teamMode == TeamMode.SOLO && gamers.size() == 2;
         boolean canDoubles = teamMode == TeamMode.DOUBLES && gamers.size() == 4;
@@ -119,6 +164,7 @@ public class Game {
             startingCountdown(10);
         } else if (timer != null) {
             timer.cancel();
+            gameState = GameState.RECRUITING;
         }
     }
 
@@ -144,9 +190,16 @@ public class Game {
         return gamers.contains(gamer);
     }
 
-    public void broadcast(String msg) {
-        for (Gamer gamer : gamers) {
-            gamer.getPlayer().sendMessage(Text.of(msg));
+    /**
+     * Broadcasts the given message to all connected Gamers in this Game.
+     *
+     * @param msg the message to be delivered
+     */
+    public void broadcast(Text msg) {
+        for (Gamer gamer : gamers.keySet()) {
+            if (gamers.get(gamer)) {
+                gamer.getPlayer().sendMessage(msg);
+            }
         }
     }
 }

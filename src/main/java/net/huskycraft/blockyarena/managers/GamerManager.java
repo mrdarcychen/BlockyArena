@@ -2,6 +2,7 @@ package net.huskycraft.blockyarena.managers;
 
 import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.SortedMap;

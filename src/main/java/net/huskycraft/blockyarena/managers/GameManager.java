@@ -43,4 +43,13 @@ public class GameManager {
         games.add(game);
         return game;
     }
+
+    /**
+     * Removes the given Game from the database.
+     *
+     * @param game the Game to be removed
+     */
+    public void remove(Game game) {
+        games.remove(game);
+    }
 }
