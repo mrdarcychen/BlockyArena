@@ -123,4 +123,13 @@ public class Gamer {
     public GamerStatus getStatus() {
         return status;
     }
+
+    /**
+     * Gets the name of this Gamer.
+     *
+     * @return the name of this Gamer
+     */
+    public String getName() {
+        return player.getName();
+    }
 }
