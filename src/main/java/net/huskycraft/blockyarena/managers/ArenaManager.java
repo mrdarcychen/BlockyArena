@@ -22,7 +22,6 @@ public class ArenaManager {
 
     public ArenaManager(BlockyArena plugin) {
         this.plugin = plugin;
-        plugin.getLogger().warn("Reach inside of ArenaManager!");
         arenas = new HashMap<>();
         plugin.getLogger().warn(Sponge.getServer().getWorlds().toString());
         loadArenas();
@@ -48,11 +47,8 @@ public class ArenaManager {
      * @return an enabled arena from the list, null if no arena is available
      */
     public Arena getArena() {
-        plugin.getLogger().warn("There are " + arenas.size() + " arenas in the list.");
         for (Arena arena : arenas.values()) {
-            plugin.getLogger().warn("The state of this arena is " + arena.getState().toString());
             if (arena.getState() == ArenaState.ENABLE) {
-                plugin.getLogger().warn("So am I here inside?");
                 return arena;
             }
         }

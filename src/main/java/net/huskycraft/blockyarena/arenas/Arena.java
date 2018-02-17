@@ -105,7 +105,6 @@ public class Arena {
 
             }
         }
-
     }
 
     /**
@@ -182,7 +181,6 @@ public class Arena {
         if (teamSpawnA != null && teamSpawnB != null && lobbySpawn != null && spectatorSpawn != null) {
             state = ArenaState.ENABLE;
             writeConfig();
-            plugin.getLogger().warn("Arena is enabled!");
         }
     }
 }

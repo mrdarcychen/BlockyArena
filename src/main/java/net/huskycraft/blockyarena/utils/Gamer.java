@@ -132,4 +132,28 @@ public class Gamer {
     public String getName() {
         return player.getName();
     }
+
+    /**
+     * Joins this Gamer to the given Game.
+     *
+     * @param game the Game in which the Gamer is about to join
+     */
+    public void join(Game game) {
+        game.add(this);
+        this.game = game;
+        setStatus(GamerStatus.PLAYING);
+        saveLocation();
+        saveInventory();
+    }
+
+    /**
+     * Quits from the Game in which the Gamer is currently in.
+     */
+    public void quit() {
+        game.remove(this);
+        this.game = null;
+        setStatus(GamerStatus.AVAILABLE);
+        retrieveInventory();
+        setLocation(getSavedLocation());
+    }
 }

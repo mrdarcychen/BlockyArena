@@ -23,13 +23,12 @@ public class CmdQuit implements CommandExecutor{
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
         Gamer gamer = plugin.getGamerManager().getGamer(player);
-        player.sendMessage(Text.of("Your status is " + gamer.getStatus().toString()));
         if (gamer.getStatus() != GamerStatus.PLAYING) {
             player.sendMessage(Text.of("You're not in any game."));
             return CommandResult.empty();
         }
         try {
-            gamer.getGame().remove(gamer);
+            gamer.quit();
         } catch (NullPointerException e) {
             player.sendMessage(Text.of("You're not in any game."));
             return CommandResult.empty();
