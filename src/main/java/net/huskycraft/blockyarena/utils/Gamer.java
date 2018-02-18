@@ -5,7 +5,6 @@ import net.huskycraft.blockyarena.games.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 
-// TODO: Refine Gamer class
 /**
  * A Gamer object stores a player's gaming profile.
  */
@@ -17,7 +16,7 @@ public class Gamer {
     private GamerStatus status; // the gaming status of this player
 
     private Location savedLocation; // the saved location of the player for record
-    private Closet closet; // the original inventory of the player for record
+    private Kit kit; // the original inventory of the player for record
 
     /**
      * Constructs a unique Gamer profile for the given Player.
@@ -33,7 +32,7 @@ public class Gamer {
      * Saves the current inventory of this Gamer.
      */
     public void saveInventory() {
-        closet = new Closet(player);
+        kit = new Kit(player);
     }
 
     /**
@@ -41,7 +40,7 @@ public class Gamer {
      */
     public void retrieveInventory() {
         player.getInventory().clear();
-        closet.equip(player);
+        kit.equip(player);
     }
 
     /**

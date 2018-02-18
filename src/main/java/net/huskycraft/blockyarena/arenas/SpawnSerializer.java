@@ -24,16 +24,13 @@ public class SpawnSerializer implements TypeSerializer<Spawn> {
 
     @Override
     public Spawn deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
-        plugin.getLogger().warn("Reach deserialize.");
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
-        plugin.getLogger().warn("Reach A");
         if (!Sponge.getServer().getWorld(extentUUID).isPresent()) {
             plugin.getLogger().warn("Cannot find " + extentUUID.toString());
         }
-        plugin.getLogger().warn("Reach B");
         Extent extent = Sponge.getServer().getWorld(extentUUID).get();
         Location<World> spawnLocation = new Location(
-                extent,
+                 extent,
                 new Vector3d(value.getNode("location").getValue(TypeToken.of(Vector3d.class))));
         Vector3d spawnRotation = value.getNode("rotation").getValue(TypeToken.of(Vector3d.class));
         return new Spawn(spawnLocation, spawnRotation);
