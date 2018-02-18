@@ -6,7 +6,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
-import org.spongepowered.api.item.inventory.property.SlotPos;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
 
 import java.util.*;
 
@@ -17,7 +17,7 @@ public class Kit {
 
     public static BlockyArena plugin;
 
-    private Map<SlotPos, ItemStack> main;
+    private Map<SlotIndex, ItemStack> main;
     private Optional<ItemStack> headwear, chestplate, leggings, boots, offHand;
 
     /**
@@ -29,16 +29,18 @@ public class Kit {
         main = new TreeMap<>();
         PlayerInventory inventory = (PlayerInventory)player.getInventory();
         Iterable<Slot> mainSlots = inventory.getMain().slots();
+        int index = 0;
         for (Slot slot : mainSlots) {
             if (slot.peek().isPresent()) {
-                main.put(slot.getInventoryProperty(SlotPos.class).get(), slot.peek().get());
+                main.put(SlotIndex.of(index), slot.peek().get());
             }
+            index++;
         }
         headwear = inventory.getEquipment().getSlot(EquipmentTypes.HEADWEAR).get().peek();
         chestplate = inventory.getEquipment().getSlot(EquipmentTypes.CHESTPLATE).get().peek();
         leggings = inventory.getEquipment().getSlot(EquipmentTypes.LEGGINGS).get().peek();
         boots = inventory.getEquipment().getSlot(EquipmentTypes.BOOTS).get().peek();
-        offHand = inventory.getEquipment().getSlot(EquipmentTypes.OFF_HAND).get().peek();
+        offHand = inventory.getOffhand().peek();
     }
 
     /**
@@ -49,23 +51,23 @@ public class Kit {
      */
     public void equip(Player player) {
         PlayerInventory inventory = (PlayerInventory)player.getInventory();
-        for (SlotPos slotPos : main.keySet()) {
-            inventory.getMain().set(slotPos, main.get(slotPos));
+        for (SlotIndex slotIndex : main.keySet()) {
+            inventory.getMain().set(slotIndex, main.get(slotIndex));
         }
         if (headwear.isPresent()) {
-            inventory.getEquipment().set(EquipmentTypes.HEADWEAR, headwear.get().copy());
+            player.setHelmet(headwear.get());
         }
         if (chestplate.isPresent()) {
-            inventory.getEquipment().set(EquipmentTypes.CHESTPLATE, chestplate.get().copy());
+            player.setChestplate(chestplate.get());
         }
         if (leggings.isPresent()) {
-            inventory.getEquipment().set(EquipmentTypes.LEGGINGS, leggings.get().copy());
+            player.setLeggings(leggings.get());
         }
         if (boots.isPresent()) {
-            inventory.getEquipment().set(EquipmentTypes.BOOTS, boots.get().copy());
+            player.setBoots(boots.get());
         }
         if (offHand.isPresent()) {
-            inventory.getEquipment().set(EquipmentTypes.OFF_HAND, offHand.get().copy());
+            inventory.getOffhand().set(offHand.get());
         }
     }
 }

@@ -2,6 +2,7 @@ package net.huskycraft.blockyarena.commands;
 
 import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.utils.Kit;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -21,11 +22,22 @@ public class CmdCreate implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
+        String type = args.<String>getOne("type").get();
         String id = args.<String>getOne("id").get();
-        Arena arena = new Arena(plugin, id);
-        plugin.getArenaManager().add(arena);
-        player.sendMessage(Text.of(id + " is added on file. Start configuring it by typing /ba edit"));
-
-        return CommandResult.success();
+        switch (type) {
+            case "arena":
+                Arena arena = new Arena(plugin, id);
+                plugin.getArenaManager().add(arena);
+                player.sendMessage(Text.of(id + " is added on file. Start configuring it by typing /ba edit"));
+                return CommandResult.success();
+            case "kit":
+                Kit kit = new Kit(player);
+                plugin.getKitManager().add(kit, id);
+                player.sendMessage(Text.of(id + " is added on file."));
+                return CommandResult.success();
+            default:
+                player.sendMessage(Text.of("Invalid argument."));
+        }
+        return CommandResult.empty();
     }
 }

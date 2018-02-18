@@ -10,6 +10,7 @@ import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
 import net.huskycraft.blockyarena.managers.GameManager;
 import net.huskycraft.blockyarena.managers.GamerManager;
+import net.huskycraft.blockyarena.managers.KitManager;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -48,6 +49,7 @@ public class BlockyArena {
     private GameManager gameManager;
     //private PlayerClassManager playerClassManager;
     private GamerManager gamerManager;
+    private KitManager kitManager;
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
@@ -67,6 +69,7 @@ public class BlockyArena {
         gameManager = new GameManager(this);
         //playerClassManager = new PlayerClassManager(this);
         gamerManager = new GamerManager(this);
+        kitManager = new KitManager(this);
     }
 
     /*
@@ -103,6 +106,7 @@ public class BlockyArena {
     private void registerCommands() {
         CommandSpec cmdCreate = CommandSpec.builder()
                 .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
                 .executor(new CmdCreate(this))
                 .permission("blockyarena.create")
@@ -135,11 +139,17 @@ public class BlockyArena {
                 .executor(new CmdEdit(this))
                 .build();
 
+        CommandSpec cmdKit = CommandSpec.builder()
+                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+                .executor(new CmdKit(this))
+                .build();
+
         CommandSpec arenaCommandSpec = CommandSpec.builder()
                 .child(cmdEdit, "edit")
                 .child(cmdCreate, "create")
                 .child(cmdJoin, "join")
                 .child(cmdQuit, "quit")
+                .child(cmdKit, "kit")
                 //.child(cmdGetClass, "getclass")
                 .build();
 
@@ -181,5 +191,9 @@ public class BlockyArena {
 
     public GamerManager getGamerManager() {
         return gamerManager;
+    }
+
+    public KitManager getKitManager() {
+        return kitManager;
     }
 }
