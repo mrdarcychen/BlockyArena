@@ -31,7 +31,7 @@ public class CmdCreate implements CommandExecutor {
                 player.sendMessage(Text.of(id + " is added on file. Start configuring it by typing /ba edit"));
                 return CommandResult.success();
             case "kit":
-                Kit kit = new Kit(player);
+                Kit kit = new Kit(player, id);
                 plugin.getKitManager().add(kit, id);
                 player.sendMessage(Text.of(id + " is added on file."));
                 return CommandResult.success();

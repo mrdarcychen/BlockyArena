@@ -17,6 +17,7 @@ public class Kit {
 
     public static BlockyArena plugin;
 
+    private String id;
     private Map<SlotIndex, ItemStack> main;
     private Optional<ItemStack> headwear, chestplate, leggings, boots, offHand;
 
@@ -25,7 +26,8 @@ public class Kit {
      *
      * @param player the player whose inventory is referenced by this Kit
      */
-    public Kit(Player player) {
+    public Kit(Player player, String id) {
+        this.id = id;
         main = new TreeMap<>();
         PlayerInventory inventory = (PlayerInventory)player.getInventory();
         Iterable<Slot> mainSlots = inventory.getMain().slots();
@@ -41,6 +43,17 @@ public class Kit {
         leggings = inventory.getEquipment().getSlot(EquipmentTypes.LEGGINGS).get().peek();
         boots = inventory.getEquipment().getSlot(EquipmentTypes.BOOTS).get().peek();
         offHand = inventory.getOffhand().peek();
+    }
+
+    public Kit(String id, Map<SlotIndex, ItemStack> main, Optional<ItemStack> headwear, Optional<ItemStack> chestplate,
+               Optional<ItemStack> leggings, Optional<ItemStack> boots, Optional<ItemStack> offHand) {
+        this.id = id;
+        this.main = main;
+        this.headwear = headwear;
+        this.chestplate = chestplate;
+        this.leggings = leggings;
+        this.boots = boots;
+        this.offHand = offHand;
     }
 
     /**
@@ -69,5 +82,33 @@ public class Kit {
         if (offHand.isPresent()) {
             inventory.getOffhand().set(offHand.get());
         }
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public Map<SlotIndex, ItemStack> getMain() {
+        return main;
+    }
+
+    public Optional<ItemStack> getHeadwear() {
+        return headwear;
+    }
+
+    public Optional<ItemStack> getChestplate() {
+        return chestplate;
+    }
+
+    public Optional<ItemStack> getLeggings() {
+        return leggings;
+    }
+
+    public Optional<ItemStack> getBoots() {
+        return boots;
+    }
+
+    public Optional<ItemStack> getOffHand() {
+        return offHand;
     }
 }

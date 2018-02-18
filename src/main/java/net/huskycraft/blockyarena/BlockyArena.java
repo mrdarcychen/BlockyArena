@@ -11,6 +11,8 @@ import net.huskycraft.blockyarena.managers.ArenaManager;
 import net.huskycraft.blockyarena.managers.GameManager;
 import net.huskycraft.blockyarena.managers.GamerManager;
 import net.huskycraft.blockyarena.managers.KitManager;
+import net.huskycraft.blockyarena.utils.Kit;
+import net.huskycraft.blockyarena.utils.KitSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -43,22 +45,21 @@ public class BlockyArena {
     @ConfigDir(sharedRoot = false)
     private Path configDir;
 
-    private Path arenaDir, classDir;
+    private Path arenaDir, kitDir;
 
     private ArenaManager arenaManager;
     private GameManager gameManager;
-    //private PlayerClassManager playerClassManager;
     private GamerManager gamerManager;
     private KitManager kitManager;
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Spawn.class), new SpawnSerializer(this));
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer(this));
         createDirectories();
         createManagers();
         registerCommands();
         registerListeners();
-
     }
 
     /*
@@ -67,7 +68,6 @@ public class BlockyArena {
     private void createManagers() {
         arenaManager = new ArenaManager(this);
         gameManager = new GameManager(this);
-        //playerClassManager = new PlayerClassManager(this);
         gamerManager = new GamerManager(this);
         kitManager = new KitManager(this);
     }
@@ -78,9 +78,9 @@ public class BlockyArena {
      */
     private void createDirectories() {
         arenaDir = Paths.get(getConfigDir().toString() + "/arenas");
-        classDir = Paths.get(getConfigDir().toString() + "/classes");
+        kitDir = Paths.get(getConfigDir().toString() + "/kits");
 
-        List<Path> directories = Arrays.asList(arenaDir, classDir);
+        List<Path> directories = Arrays.asList(arenaDir, kitDir);
         for (Path dir : directories) {
             try {
                 if (!dir.toFile().exists()) {
@@ -111,13 +111,6 @@ public class BlockyArena {
                 .executor(new CmdCreate(this))
                 .permission("blockyarena.create")
                 .build();
-
-//        CommandSpec cmdGetClass = CommandSpec.builder()
-//                .arguments(
-//                        GenericArguments.onlyOne(GenericArguments.string(Text.of("name"))))
-//                .executor(new GetClassCmd(this))
-//                .permission("blockyarena.getclass")
-//                .build();
 
         CommandSpec cmdJoin = CommandSpec.builder()
                 .arguments(
@@ -150,7 +143,6 @@ public class BlockyArena {
                 .child(cmdJoin, "join")
                 .child(cmdQuit, "quit")
                 .child(cmdKit, "kit")
-                //.child(cmdGetClass, "getclass")
                 .build();
 
         Sponge.getCommandManager()
@@ -173,8 +165,8 @@ public class BlockyArena {
         return arenaDir;
     }
 
-    public Path getClassDir() {
-        return classDir;
+    public Path getKitDir() {
+        return kitDir;
     }
 
     public ArenaManager getArenaManager() {
@@ -184,10 +176,6 @@ public class BlockyArena {
     public GameManager getGameManager() {
         return gameManager;
     }
-
-//    public PlayerClassManager getPlayerClassManager() {
-//        return playerClassManager;
-//    }
 
     public GamerManager getGamerManager() {
         return gamerManager;

@@ -32,7 +32,7 @@ public class Gamer {
      * Saves the current inventory of this Gamer.
      */
     public void saveInventory() {
-        kit = new Kit(player);
+        kit = new Kit(player, null);
     }
 
     /**
