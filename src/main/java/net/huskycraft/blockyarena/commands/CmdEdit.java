@@ -26,28 +26,33 @@ public class CmdEdit implements CommandExecutor{
         String param = args.<String>getOne("param").get();
 
         Arena arena = plugin.getArenaManager().getArena(id);
-        if (arena != null) {
-            switch (type) {
-                case "spawn":
-                    switch (param) {
-                        case "a":
-                            arena.setTeamSpawnA(player.getLocation(), player.getHeadRotation());
-                            player.sendMessage(Text.of("Spawn point A is set."));
-                            break;
-                        case "b":
-                            arena.setTeamSpawnB(player.getLocation(), player.getHeadRotation());
-                            player.sendMessage(Text.of("Spawn point B is set."));
-                            break;
-                        case "lobby":
-                            arena.setLobbySpawn(player.getLocation(), player.getHeadRotation());
-                            player.sendMessage(Text.of("Lobby spawn point is set."));
-                            break;
-                        case "spectator":
-                            arena.setSpectatorSpawn(player.getLocation(), player.getHeadRotation());
-                            player.sendMessage(Text.of("Spectator spawn point is set."));
-                            break;
-                    }
-            }
+        if (arena == null) {
+            player.sendMessage(Text.of("Arena " + id + " does not exist."));
+            return CommandResult.empty();
+        }
+        switch (type) {
+            case "spawn":
+                switch (param) {
+                    case "a":
+                        arena.setTeamSpawnA(player.getLocation(), player.getHeadRotation());
+                        player.sendMessage(Text.of("Spawn point A is set."));
+                        break;
+                    case "b":
+                        arena.setTeamSpawnB(player.getLocation(), player.getHeadRotation());
+                        player.sendMessage(Text.of("Spawn point B is set."));
+                        break;
+                    case "lobby":
+                        arena.setLobbySpawn(player.getLocation(), player.getHeadRotation());
+                        player.sendMessage(Text.of("Lobby spawn point is set."));
+                        break;
+                    case "spectator":
+                        arena.setSpectatorSpawn(player.getLocation(), player.getHeadRotation());
+                        player.sendMessage(Text.of("Spectator spawn point is set."));
+                        break;
+                    default:
+                        player.sendMessage(Text.of("Incorrect spawn type parameter."));
+                        return CommandResult.empty();
+                }
         }
         return CommandResult.success();
     }
