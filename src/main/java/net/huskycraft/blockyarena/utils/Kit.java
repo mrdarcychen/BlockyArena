@@ -45,6 +45,17 @@ public class Kit {
         offHand = inventory.getOffhand().peek();
     }
 
+    /**
+     * Constructs a Kit with groups of ItemStacks that may appear in a PlayerInventory.
+     *
+     * @param id the id of this Kit
+     * @param main the main grid of this Kit
+     * @param headwear the headwear of this Kit
+     * @param chestplate the chestplate of this Kit
+     * @param leggings the leggins of this Kit
+     * @param boots the boots of this Kit
+     * @param offHand the offhand ItemStack of this Kit
+     */
     public Kit(String id, Map<SlotIndex, ItemStack> main, Optional<ItemStack> headwear, Optional<ItemStack> chestplate,
                Optional<ItemStack> leggings, Optional<ItemStack> boots, Optional<ItemStack> offHand) {
         this.id = id;
@@ -84,30 +95,65 @@ public class Kit {
         }
     }
 
+    /**
+     * Gets the id of this Kit.
+     *
+     * @return the id of this Kit
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * Gets the main grid of this Kit in Map.
+     *
+     * @return the main grid of this Kit in Map
+     */
     public Map<SlotIndex, ItemStack> getMain() {
         return main;
     }
 
+    /**
+     * Gets the headwear of this Kit.
+     *
+     * @return the headwear of this Kit
+     */
     public Optional<ItemStack> getHeadwear() {
         return headwear;
     }
 
+    /**
+     * Gets the chestplate of this Kit.
+     *
+     * @return the chestplate of this Kit
+     */
     public Optional<ItemStack> getChestplate() {
         return chestplate;
     }
 
+    /**
+     * Gets the leggings of this Kit.
+     *
+     * @return the leggings of this Kit
+     */
     public Optional<ItemStack> getLeggings() {
         return leggings;
     }
 
+    /**
+     * Gets the boots of this Kit.
+     *
+     * @return the boots of this Kit
+     */
     public Optional<ItemStack> getBoots() {
         return boots;
     }
 
+    /**
+     * Gets the offhand ItemStack of this Kit.
+     *
+     * @return the offhand ItemStack of this kit
+     */
     public Optional<ItemStack> getOffHand() {
         return offHand;
     }

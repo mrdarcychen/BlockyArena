@@ -6,9 +6,7 @@ import net.huskycraft.blockyarena.arenas.Spawn;
 import org.spongepowered.api.text.Text;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * A Team represents a single Gamer or a group of Gamers who cooperate to win a Game.

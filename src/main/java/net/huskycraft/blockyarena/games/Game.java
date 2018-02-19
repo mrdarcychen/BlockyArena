@@ -4,7 +4,7 @@ import net.huskycraft.blockyarena.*;
 import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
-import org.spongepowered.api.effect.sound.SoundType;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
@@ -49,7 +49,9 @@ public class Game {
      */
     public void add(Gamer gamer) {
         gamers.add(gamer);
-        gamer.getPlayer().gameMode().set(GameModes.SURVIVAL);
+        gamer.getPlayer().offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+        gamer.getPlayer().offer(Keys.HEALTH, gamer.getPlayer().get(Keys.MAX_HEALTH).get());
+        gamer.getPlayer().offer(Keys.FOOD_LEVEL, 20);
         gamer.getPlayer().sendMessage(Text.of("Sending you to " + arena.getID()));
         gamer.spawnAt(arena.getLobbySpawn());
         broadcast(Text.of(gamer.getName() + " joined the game."));
@@ -72,7 +74,7 @@ public class Game {
         } else if (gameState == GameState.STARTED) {
             eliminate(gamer, Text.of(gamer.getPlayer().getName() + " disconnected."));
         }
-        gamer.getPlayer().offer(gamer.getPlayer().gameMode().set(GameModes.SURVIVAL));
+        gamer.getPlayer().offer(Keys.GAME_MODE, GameModes.SURVIVAL);
     }
 
     /**
@@ -84,7 +86,8 @@ public class Game {
     public void eliminate(Gamer gamer, Text cause) {
         broadcast(cause);
         gamer.spawnAt(arena.getSpectatorSpawn());
-        gamer.getPlayer().offer(gamer.getPlayer().gameMode().set(GameModes.SPECTATOR));
+        gamer.getPlayer().offer(Keys.HEALTH, gamer.getPlayer().get(Keys.MAX_HEALTH).get());
+        gamer.getPlayer().offer(Keys.GAME_MODE, GameModes.SPECTATOR);
         gamer.setStatus(GamerStatus.SPECTATING);
         checkStoppingCondition();
     }

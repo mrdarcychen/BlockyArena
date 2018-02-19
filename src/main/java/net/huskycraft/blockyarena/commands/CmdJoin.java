@@ -28,21 +28,24 @@ public class CmdJoin implements CommandExecutor{
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
         Gamer gamer = plugin.getGamerManager().getGamer(player);
-        TeamMode teamMode = TeamMode.valueOf(args.<String>getOne("mode").get());
-        if (teamMode == null) {
-            player.sendMessage(Text.of("You've entered an invalid team mode!"));
-        }
-        if (plugin.getGamerManager().getGamer(player).getStatus() == GamerStatus.PLAYING) {
-            player.sendMessage(Text.of("You've already joined a session!"));
-            return CommandResult.empty();
-        } else {
-//            try {
+        try {
+            TeamMode teamMode = TeamMode.valueOf(args.<String>getOne("mode").get().toUpperCase());
+            plugin.getLogger().warn("status ? " + gamer.getStatus().toString());
+            if (plugin.getGamerManager().getGamer(player).getStatus() == GamerStatus.PLAYING) {
+                player.sendMessage(Text.of("You've already joined a game!"));
+                return CommandResult.empty();
+            } else {
+                plugin.getLogger().warn("Reach A");
                 Game game = plugin.getGameManager().getGame(teamMode);
+                plugin.getLogger().warn("Reach B");
                 gamer.join(game);
-//            } catch (NullPointerException e) {
-//                player.sendMessage(Text.of("No available arena."));
-//            }
+                plugin.getLogger().warn("Reach C");
+            }
+        } catch (IllegalArgumentException e) {
+            player.sendMessage(Text.of("You've entered an invalid team mode!"));
+            return CommandResult.empty();
         }
+
         return CommandResult.success();
     }
 }

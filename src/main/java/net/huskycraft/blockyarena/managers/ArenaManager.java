@@ -3,7 +3,6 @@ package net.huskycraft.blockyarena.managers;
 import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.arenas.ArenaState;
 import net.huskycraft.blockyarena.BlockyArena;
-import org.spongepowered.api.Sponge;
 
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -23,7 +22,6 @@ public class ArenaManager {
     public ArenaManager(BlockyArena plugin) {
         this.plugin = plugin;
         arenas = new HashMap<>();
-        plugin.getLogger().warn(Sponge.getServer().getWorlds().toString());
         loadArenas();
     }
 

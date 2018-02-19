@@ -1,6 +1,7 @@
 package net.huskycraft.blockyarena.commands;
 
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -19,10 +20,13 @@ public class CmdKit implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
-        // TODO: add game check
+        if (plugin.getGamerManager().getGamer(player).getStatus() != GamerStatus.PLAYING) {
+            player.sendMessage(Text.of("You are not allowed to get any kit when you are not in a game."));
+            return CommandResult.empty();
+        }
         String id = args.<String>getOne(Text.of("id")).get();
         if (plugin.getKitManager().get(id) == null) {
-            player.sendMessage(Text.of(id + " does not exist."));
+            player.sendMessage(Text.of("The given kit " + id + " does not exist."));
             return CommandResult.empty();
         }
         plugin.getKitManager().get(id).equip(player);

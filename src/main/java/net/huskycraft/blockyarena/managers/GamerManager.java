@@ -2,7 +2,6 @@ package net.huskycraft.blockyarena.managers;
 
 import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.utils.Gamer;
-import org.spongepowered.api.Game;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.SortedMap;
@@ -22,7 +21,7 @@ public class GamerManager {
 
     /**
      * Registers a first join player by creating a unique Gamer profile for the player.
-     * @param player a user who has not played before
+     * @param player a Player who has not played before
      */
     public void register(Player player) {
         gamers.put(player.getUniqueId(), new Gamer(player));
