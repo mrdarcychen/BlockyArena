@@ -86,7 +86,7 @@ public class Arena {
      */
     public void writeConfig() {
         if (state == ArenaState.INCOMPLETE) {
-            plugin.getLogger().warn(ID + " is incomplete. Cancel writing to config.");
+            plugin.getLogger().warn("Arena " + ID + " is incomplete. Cancel writing to config.");
         } else {
             ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                     .builder().setPath(config).build();
@@ -126,7 +126,7 @@ public class Arena {
         } catch (IOException e) {
             plugin.getLogger().warn("Error reading arena config.");
         } catch (ObjectMappingException e) {
-
+            e.printStackTrace();
         }
     }
 
@@ -177,7 +177,8 @@ public class Arena {
     public void updateArenaState() {
         if (teamSpawnA != null && teamSpawnB != null && lobbySpawn != null && spectatorSpawn != null) {
             state = ArenaState.ENABLE;
-            writeConfig();
+        } else {
+            state = ArenaState.INCOMPLETE;
         }
     }
 }
