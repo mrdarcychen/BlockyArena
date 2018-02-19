@@ -76,22 +76,22 @@ public class Kit {
     public void equip(Player player) {
         PlayerInventory inventory = (PlayerInventory)player.getInventory();
         for (SlotIndex slotIndex : main.keySet()) {
-            inventory.getMain().set(slotIndex, main.get(slotIndex));
+            inventory.getMain().set(slotIndex, main.get(slotIndex).copy());
         }
         if (headwear.isPresent()) {
-            player.setHelmet(headwear.get());
+            player.setHelmet(headwear.get().copy());
         }
         if (chestplate.isPresent()) {
-            player.setChestplate(chestplate.get());
+            player.setChestplate(chestplate.get().copy());
         }
         if (leggings.isPresent()) {
-            player.setLeggings(leggings.get());
+            player.setLeggings(leggings.get().copy());
         }
         if (boots.isPresent()) {
-            player.setBoots(boots.get());
+            player.setBoots(boots.get().copy());
         }
         if (offHand.isPresent()) {
-            inventory.getOffhand().set(offHand.get());
+            inventory.getOffhand().set(offHand.get().copy());
         }
     }
 

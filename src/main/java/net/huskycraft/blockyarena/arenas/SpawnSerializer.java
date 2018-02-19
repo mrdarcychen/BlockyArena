@@ -25,7 +25,8 @@ public class SpawnSerializer implements TypeSerializer<Spawn> {
     public Spawn deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
         if (!Sponge.getServer().getWorld(extentUUID).isPresent()) {
-            plugin.getLogger().warn("Cannot find " + extentUUID.toString());
+            plugin.getLogger().warn("Cannot find extent with UUID " + extentUUID.toString());
+            return null;
         }
         Extent extent = Sponge.getServer().getWorld(extentUUID).get();
         Location<World> spawnLocation = new Location(

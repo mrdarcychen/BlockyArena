@@ -21,7 +21,9 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -53,13 +55,20 @@ public class BlockyArena {
     private KitManager kitManager;
 
     @Listener
-    public void onServerStarting(GameStartingServerEvent event) {
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Spawn.class), new SpawnSerializer(this));
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer(this));
-        createDirectories();
-        createManagers();
+    public void onPreInit(GamePreInitializationEvent event) {
+        registerTypeSerializers();
         registerCommands();
         registerListeners();
+        createDirectories();
+    }
+
+    @Listener
+    public void onServerStarting(GameStartingServerEvent event) {
+        createManagers();
+    }
+
+    public void onServerStopping(GameStoppingServerEvent event) {
+        arenaManager.writeConfigs();
     }
 
     /*
@@ -147,6 +156,14 @@ public class BlockyArena {
 
         Sponge.getCommandManager()
                 .register(this, arenaCommandSpec, "blockyarena", "arena", "ba");
+    }
+
+    /**
+     * Registers all custom TypeSerializers.
+     */
+    private void registerTypeSerializers() {
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Spawn.class), new SpawnSerializer(this));
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer(this));
     }
 
     public Logger getLogger() {

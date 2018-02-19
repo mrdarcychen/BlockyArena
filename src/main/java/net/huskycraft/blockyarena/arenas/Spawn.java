@@ -15,8 +15,6 @@ public class Spawn {
 
     public static BlockyArena plugin;
 
-    @Inject
-    private Logger logger;
     private Location<World> spawnLocation; // the spawn location of the team
     private Vector3d spawnRotation; // the spawn rotation of the team
 
