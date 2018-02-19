@@ -46,7 +46,7 @@ public class ArenaManager {
      */
     public Arena getArena() {
         for (Arena arena : arenas.values()) {
-            if (arena.getState() == ArenaState.ENABLE) {
+            if (arena.getState() == ArenaState.AVAILABLE) {
                 return arena;
             }
         }

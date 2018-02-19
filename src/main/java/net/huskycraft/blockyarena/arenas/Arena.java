@@ -78,7 +78,6 @@ public class Arena {
         this.plugin = plugin;
         this.config = config;
         readConfig(config);
-        state = ArenaState.ENABLE;
     }
 
     /**
@@ -128,6 +127,7 @@ public class Arena {
         } catch (ObjectMappingException e) {
             e.printStackTrace();
         }
+        updateArenaState();
     }
 
     public String getID() {
@@ -176,10 +176,14 @@ public class Arena {
 
     public void updateArenaState() {
         if (teamSpawnA != null && teamSpawnB != null && lobbySpawn != null && spectatorSpawn != null) {
-            state = ArenaState.ENABLE;
+            state = ArenaState.AVAILABLE;
             writeConfig();
         } else {
             state = ArenaState.INCOMPLETE;
         }
+    }
+
+    public void setState(ArenaState state) {
+        this.state = state;
     }
 }

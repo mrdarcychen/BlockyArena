@@ -2,6 +2,7 @@ package net.huskycraft.blockyarena.games;
 
 import net.huskycraft.blockyarena.*;
 import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.arenas.ArenaState;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.data.key.Keys;
@@ -37,6 +38,7 @@ public class Game {
         this.plugin = plugin;
         this.teamMode = teamMode;
         this.arena = arena;
+        arena.setState(ArenaState.OCCUPIED);
         gamers = new ArrayList<>();
         gameState = GameState.RECRUITING;
     }
@@ -155,6 +157,7 @@ public class Game {
                 gamer.quit();
             }
         }
+        onGameStopped();
     }
 
     /**
@@ -162,6 +165,8 @@ public class Game {
      */
     public void onGameStopped() {
         gameState = GameState.STOPPED;
+        arena.setState(ArenaState.AVAILABLE);
+        plugin.getGameManager().remove(this);
         // TODO: logging
     }
 

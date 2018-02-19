@@ -1,5 +1,5 @@
 package net.huskycraft.blockyarena.arenas;
 
 public enum ArenaState {
-    ENABLE, DISABLE, INCOMPLETE
+    AVAILABLE, OCCUPIED, DISABLED, INCOMPLETE
 }
