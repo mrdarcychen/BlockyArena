@@ -118,12 +118,9 @@ public class Arena {
         try {
             ConfigurationNode rootNode = loader.load();
             ID = rootNode.getNode("id").getString();
-            plugin.getLogger().warn("ID is " + ID);
             teamSpawnA = rootNode.getNode("teamSpawnA").getValue(TypeToken.of(Spawn.class));
-            plugin.getLogger().warn("TeamSpawnA: " + String.valueOf(teamSpawnA == null));
             teamSpawnB = rootNode.getNode("teamSpawnB").getValue(TypeToken.of(Spawn.class));
             lobbySpawn = rootNode.getNode("lobbySpawn").getValue(TypeToken.of(Spawn.class));
-            plugin.getLogger().warn("LobbySpawn: " + String.valueOf(lobbySpawn == null));
             spectatorSpawn = rootNode.getNode("spectatorSpawn").getValue(TypeToken.of(Spawn.class));
             loader.save(rootNode);
         } catch (IOException e) {

@@ -3,7 +3,6 @@ package net.huskycraft.blockyarena.arenas;
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.arenas.Spawn;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;

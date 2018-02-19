@@ -5,11 +5,14 @@ import net.huskycraft.blockyarena.games.Game;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.world.Location;
 
+import java.util.UUID;
+
 /**
  * A Gamer object stores a player's gaming profile.
  */
 public class Gamer {
 
+    private final UUID uuid;
     private Player player; // the player instance in which this Gamer profile is associated with
 
     private Game game; // the Game session this player is currently in
@@ -24,6 +27,7 @@ public class Gamer {
      * @param player the Player instance to be associated with this Gamer profile
      */
     public Gamer(Player player) {
+        this.uuid = player.getUniqueId();
         this.player = player;
         status = GamerStatus.AVAILABLE;
     }
@@ -87,16 +91,6 @@ public class Gamer {
     }
 
     /**
-     * Sets the game the player is currently in and updates player status to PLAYING.
-     *
-     * @param game the Game session to be filed for this Gamer
-     */
-    public void setGame(Game game) {
-        this.game = game;
-        setStatus(GamerStatus.PLAYING);
-    }
-
-    /**
      * Gets the Game this Gamer is currently in.
      *
      * @return the Game this Gamer is currently in
@@ -154,5 +148,13 @@ public class Gamer {
         setStatus(GamerStatus.AVAILABLE);
         retrieveInventory();
         setLocation(getSavedLocation());
+    }
+
+    /**
+     * Sets the given Player as the new Player instance associated with this Gamer
+     * @param player the Player instance to be associated with this Gamer
+     */
+    public void setPlayer(Player player) {
+        this.player = player;
     }
 }
