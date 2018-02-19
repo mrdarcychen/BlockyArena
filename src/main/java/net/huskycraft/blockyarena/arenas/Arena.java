@@ -177,6 +177,7 @@ public class Arena {
     public void updateArenaState() {
         if (teamSpawnA != null && teamSpawnB != null && lobbySpawn != null && spectatorSpawn != null) {
             state = ArenaState.ENABLE;
+            writeConfig();
         } else {
             state = ArenaState.INCOMPLETE;
         }

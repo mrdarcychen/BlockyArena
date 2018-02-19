@@ -69,13 +69,4 @@ public class ArenaManager {
     public void add(Arena arena) {
         arenas.put(arena.getID(), arena);
     }
-
-    /**
-     * Writes all Arenas to configs.
-     */
-    public void writeConfigs() {
-        for (Arena arena : arenas.values()) {
-            arena.writeConfig();
-        }
-    }
 }
