@@ -132,11 +132,11 @@ public class Gamer {
      * @param game the Game in which the Gamer is about to join
      */
     public void join(Game game) {
+        saveLocation();
+        saveInventory();
         game.add(this);
         this.game = game;
         setStatus(GamerStatus.PLAYING);
-        saveLocation();
-        saveInventory();
         player.getInventory().clear();  // TODO: allow bringing personal kit
     }
 
