@@ -137,6 +137,7 @@ public class Gamer {
         setStatus(GamerStatus.PLAYING);
         saveLocation();
         saveInventory();
+        player.getInventory().clear();  // TODO: allow bringing personal kit
     }
 
     /**
