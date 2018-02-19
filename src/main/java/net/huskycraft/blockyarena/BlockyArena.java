@@ -66,11 +66,6 @@ public class BlockyArena {
     public void onServerStarting(GameStartingServerEvent event) {
         createManagers();
     }
-
-    public void onServerStopping(GameStoppingServerEvent event) {
-        arenaManager.writeConfigs();
-    }
-
     /*
     creates managers for the plugin
      */

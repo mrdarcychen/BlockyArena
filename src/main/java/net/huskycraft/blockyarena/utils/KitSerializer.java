@@ -46,8 +46,6 @@ public class KitSerializer implements TypeSerializer<Kit> {
         value.getNode("boots").setValue(TypeToken.of(ItemStack.class), obj.getBoots().get());
         value.getNode("offHand").setValue(TypeToken.of(ItemStack.class), obj.getOffHand().get());
         for (SlotIndex index : obj.getMain().keySet()) {
-            plugin.getLogger().warn("index: " + index.getValue().toString());
-            plugin.getLogger().warn("item:" + obj.getMain().get(index).getType().toString());
             ConfigurationNode itemNode = value.getNode("main").getNode(index.getValue().toString());
             itemNode.setValue(TypeToken.of(ItemStack.class), obj.getMain().get(index));
         }
