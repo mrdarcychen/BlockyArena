@@ -4,7 +4,7 @@ plugins {
 
 group = 'net.huskycraft'
 version = '0.4.0'
-description = 'Inventories of all players will be saved upon joining a game.'
+description = 'Major redesign of internal structure and add support of MOD items'
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0'
