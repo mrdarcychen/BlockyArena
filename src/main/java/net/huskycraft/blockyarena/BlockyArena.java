@@ -34,7 +34,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.4.0")
+@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.4.1")
 public class BlockyArena {
     @Inject
     private Logger logger;
