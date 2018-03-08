@@ -30,7 +30,7 @@ public class CmdQuit implements CommandExecutor{
         try {
             gamer.quit();
         } catch (NullPointerException e) {
-            player.sendMessage(Text.of("You're not in any game."));
+            player.sendMessage(Text.of("Unexpected error occurs when quitting you from the game."));
             return CommandResult.empty();
         }
         player.sendMessage(Text.of("You left the game."));

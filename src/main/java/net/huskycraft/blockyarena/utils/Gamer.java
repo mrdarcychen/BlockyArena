@@ -2,7 +2,10 @@ package net.huskycraft.blockyarena.utils;
 
 import net.huskycraft.blockyarena.arenas.Spawn;
 import net.huskycraft.blockyarena.games.Game;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
 import java.util.UUID;
@@ -132,12 +135,18 @@ public class Gamer {
      * @param game the Game in which the Gamer is about to join
      */
     public void join(Game game) {
+        this.game = game;
         saveLocation();
         saveInventory();
-        game.add(this);
-        this.game = game;
-        setStatus(GamerStatus.PLAYING);
         player.getInventory().clear();  // TODO: allow bringing personal kit
+        player.sendMessage(Text.of("Sending you to " + game.getArena().getID() + " ..."));
+        spawnAt(game.getArena().getLobbySpawn());
+        // TODO: refer to game logistics for the following parameters
+        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
+        player.offer(Keys.FOOD_LEVEL, 20);
+        setStatus(GamerStatus.PLAYING);
+        game.add(this);
     }
 
     /**
@@ -146,9 +155,20 @@ public class Gamer {
     public void quit() {
         game.remove(this);
         this.game = null;
+        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
         setStatus(GamerStatus.AVAILABLE);
         retrieveInventory();
         setLocation(getSavedLocation());
+    }
+
+    /**
+     * Spectates the given game. Sets the gamemode to be SPECTATOR and teleports to the spectator spawn of the Game.
+     * @param game the game the gamer about to spectate
+     */
+    public void spectate(Game game) {
+        player.offer(Keys.GAME_MODE, GameModes.SPECTATOR);
+        spawnAt(game.getArena().getSpectatorSpawn());
+        setStatus(GamerStatus.SPECTATING);
     }
 
     /**
