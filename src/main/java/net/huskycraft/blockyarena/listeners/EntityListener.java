@@ -4,6 +4,7 @@ import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.GameState;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -30,6 +31,7 @@ public class EntityListener {
                 if (event.willCauseDeath()) {
                     event.setCancelled(true);
                     gamer.getGame().eliminate(gamer, Text.of(gamer.getName() + " was beaten to death."));
+                    gamer.getPlayer().offer(Keys.HEALTH, gamer.getPlayer().get(Keys.MAX_HEALTH).get());
                 }
             }
         }
