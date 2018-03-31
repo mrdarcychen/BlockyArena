@@ -1,11 +1,15 @@
 package net.huskycraft.blockyarena.listeners;
 
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.managers.GamersManager;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
+
+import java.util.UUID;
 
 public class ClientConnectionEventListener {
 
@@ -16,25 +20,27 @@ public class ClientConnectionEventListener {
     }
 
     @Listener
-    public void onClientLogin(ClientConnectionEvent.Login event) {
-        Player player = event.getTargetUser().getPlayer().get();
-        if (!plugin.getGamerManager().hasGamer(player)) {
-            plugin.getGamerManager().register(player);
-            plugin.getLogger().info("A new gaming profile is created for player " + player.getName());
-        } else {
-            plugin.getGamerManager().getGamer(player).setPlayer(player);
+    public void onGamerLogin(ClientConnectionEvent.Login event) {
+        User user = event.getTargetUser();
+        UUID uniqueId = user.getUniqueId();
+        if (!GamersManager.getGamer(uniqueId).isPresent()) {
+            GamersManager.register(uniqueId);
+
         }
-        plugin.getGamerManager().getGamer(player).setStatus(GamerStatus.AVAILABLE);
+        Gamer gamer = GamersManager.getGamer(uniqueId).get();
+        gamer.setOnline(true);
+        gamer.setName(user.getName());
+        gamer.setPlayer(user.getPlayer().get());
     }
 
     @Listener
-    public void onClientLogout(ClientConnectionEvent.Disconnect event) {
+    public void onGamerLogout(ClientConnectionEvent.Disconnect event) {
         Player player = event.getTargetEntity();
-        Gamer gamer = plugin.getGamerManager().getGamer(player);
+        Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
+        gamer.setOnline(false);
         if (gamer.getGame() != null) {
             gamer.quit();
         }
-        gamer.setStatus(GamerStatus.OFFLINE);
     }
 
 }

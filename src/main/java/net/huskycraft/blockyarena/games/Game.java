@@ -12,6 +12,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
 
 import java.util.*;
@@ -85,6 +86,11 @@ public class Game {
      */
     public void eliminate(Gamer gamer, Text cause) {
         broadcast(cause);
+        Text deathText = Text.builder("YOU DIED!")
+                .color(TextColors.RED).build();
+        Title deathTitle = Title.builder()
+                .title(deathText).fadeOut(2).stay(16).build();
+        gamer.getPlayer().sendTitle(deathTitle);
         gamer.spectate(this);
         checkStoppingCondition();
     }
@@ -144,20 +150,20 @@ public class Game {
      */
     public void onGameStopping() {
         gameState = GameState.STOPPING;
+        Title victory = Title.builder()
+                .title(Text.builder("VICTORY!").color(TextColors.GOLD).build())
+                .build();
+        Title gameOver = Title.builder()
+                .title(Text.builder("GAME OVER!").color(TextColors.RED).build())
+                .build();
         if (teamA.hasGamerLeft()) {
-            teamA.broadcast(Text.of("You won the game!"));
-            teamB.broadcast(Text.of("You lost the game!"));
+            teamA.broadcast(victory);
+            teamB.broadcast(gameOver);
         } else if (teamB.hasGamerLeft()) {
-            teamB.broadcast(Text.of("You won the game!"));
-            teamA.broadcast(Text.of("You lost the game!"));
+            teamB.broadcast(victory);
+            teamA.broadcast(gameOver);
         }
-        for (Gamer gamer : gamers) {
-            // remove if the gamer still has connection
-            if (gamer.getGame() == this) {
-                gamer.quit();
-            }
-        }
-        terminate();
+        Task.builder().execute(() -> terminate()).delay(3, TimeUnit.SECONDS).submit(plugin);
     }
 
     private void startingCountdown(int second) {
@@ -209,11 +215,26 @@ public class Game {
      * Terminates this Game permanently.
      */
     public void terminate() {
+        for (Gamer gamer : gamers) {
+            // remove if the gamer still has connection
+            if (gamer.getGame() == this) {
+                gamer.quit();
+            }
+        }
         arena.setState(ArenaState.AVAILABLE);
         plugin.getGameManager().remove(this);
     }
 
     public Arena getArena() {
         return arena;
+    }
+
+    public Team getTeam(Gamer gamer) {
+        if (teamA.contains(gamer)) {
+            return teamA;
+        } else if (teamB.contains(gamer)) {
+            return teamB;
+        }
+        return null;
     }
 }

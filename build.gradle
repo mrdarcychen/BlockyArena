@@ -3,8 +3,14 @@ plugins {
 }
 
 group = 'net.huskycraft'
-version = '0.4.2'
+version = '0.4.3'
 description = 'BlockyArena is a PvP plugin that allows a server to systematically host multiple duels in designated arenas.'
+
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
 
 dependencies {
     compile 'org.spongepowered:spongeapi:7.0.0'

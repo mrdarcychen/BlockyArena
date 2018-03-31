@@ -1,19 +1,20 @@
 package net.huskycraft.blockyarena.games;
 
+import net.huskycraft.blockyarena.arenas.Spawn;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
-import net.huskycraft.blockyarena.arenas.Spawn;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.title.Title;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * A Team represents a single Gamer or a group of Gamers who cooperate to win a Game.
  */
 public class Team {
 
-    private List<Gamer> gamers;
+    private Set<Gamer> gamers;
     private Spawn teamSpawn;
     private Game game;
 
@@ -25,7 +26,7 @@ public class Team {
     public Team(Spawn teamSpawn, Game game) {
         this.teamSpawn = teamSpawn;
         this.game = game;
-        gamers = new ArrayList<>();
+        gamers = new HashSet<>();
     }
 
     /**
@@ -53,11 +54,29 @@ public class Team {
         return false;
     }
 
-    public void broadcast(Text msg) {
-        for (Gamer gamer : gamers) {
+    public void broadcast(Text text) {
+        gamers.forEach(gamer -> {
             if (gamer.getGame() == game) {
-                gamer.getPlayer().sendMessage(msg);
+                gamer.getPlayer().sendMessage(text);
             }
-        }
+        });
+    }
+
+    public void broadcast(Title title) {
+        gamers.forEach(gamer -> {
+            if (gamer.getGame() == game) {
+                gamer.getPlayer().sendTitle(title);
+            }
+        });
+    }
+
+    /**
+     * Gets if the Game contains the given Gamer.
+     *
+     * @param gamer the Gamer to be inspected
+     * @return true if the Gamer is on this Team, false otherwise
+     */
+    public boolean contains(Gamer gamer) {
+        return gamers.contains(gamer);
     }
 }
