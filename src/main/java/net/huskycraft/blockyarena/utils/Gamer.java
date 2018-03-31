@@ -7,6 +7,7 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import java.util.UUID;
 
@@ -15,7 +16,9 @@ import java.util.UUID;
  */
 public class Gamer {
 
-    private final UUID uuid;
+    private final UUID uniqueId;
+    private boolean isOnline;
+    private String name;
     private Player player; // the player instance in which this Gamer profile is associated with
 
     private Game game; // the Game session this player is currently in
@@ -27,11 +30,10 @@ public class Gamer {
     /**
      * Constructs a unique Gamer profile for the given Player.
      *
-     * @param player the Player instance to be associated with this Gamer profile
+     * @param uniqueId the {@link UUID} of the associated {@link Player}
      */
-    public Gamer(Player player) {
-        this.uuid = player.getUniqueId();
-        this.player = player;
+    public Gamer(UUID uniqueId) {
+        this.uniqueId = uniqueId;
         status = GamerStatus.AVAILABLE;
     }
 
@@ -85,15 +87,6 @@ public class Gamer {
     }
 
     /**
-     * Gets the Player instance associated with this Gamer.
-     *
-     * @return the Player instance of this Gamer
-     */
-    public Player getPlayer() {
-        return player;
-    }
-
-    /**
      * Gets the Game this Gamer is currently in.
      *
      * @return the Game this Gamer is currently in
@@ -118,15 +111,6 @@ public class Gamer {
      */
     public GamerStatus getStatus() {
         return status;
-    }
-
-    /**
-     * Gets the name of this Gamer.
-     *
-     * @return the name of this Gamer
-     */
-    public String getName() {
-        return player.getName();
     }
 
     /**
@@ -155,10 +139,10 @@ public class Gamer {
     public void quit() {
         game.remove(this);
         this.game = null;
-        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
-        setStatus(GamerStatus.AVAILABLE);
         retrieveInventory();
         setLocation(getSavedLocation());
+        setStatus(GamerStatus.AVAILABLE);
+        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
     }
 
     /**
@@ -167,15 +151,70 @@ public class Gamer {
      */
     public void spectate(Game game) {
         player.offer(Keys.GAME_MODE, GameModes.SPECTATOR);
-        spawnAt(game.getArena().getSpectatorSpawn());
         setStatus(GamerStatus.SPECTATING);
+        spawnAt(game.getArena().getSpectatorSpawn());
     }
 
     /**
-     * Sets the given Player as the new Player instance associated with this Gamer
-     * @param player the Player instance to be associated with this Gamer
+     * Gets the {@link UUID} of this Gamer.
+     *
+     * @return the {@link UUID} of this Gamer
+     */
+    public UUID getUniqueId() {
+        return uniqueId;
+    }
+
+    /**
+     * Sets the client connection status of this Gamer.
+     *
+     * @param isOnline the client connection status of this Gamer
+     */
+    public void setOnline(boolean isOnline) {
+        this.isOnline = isOnline;
+    }
+
+    /**
+     * Gets the client connection status of this Gamer
+     *
+     * @return true if this Gamer is online, false otherwise
+     */
+    public boolean isOnline() {
+        return isOnline;
+    }
+
+    /**
+     * Sets the name of this Gamer.
+     *
+     * @param name the name of this Gamer
+     */
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    /**
+     * Gets the name of this Gamer.
+     *
+     * @return the name of this Gamer
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Sets the {@link Player} instance associated with this Gamer.
+     *
+     * @param player the {@link Player} instance to be associated with this Gamer
      */
     public void setPlayer(Player player) {
         this.player = player;
+    }
+
+    /**
+     * Gets the {@link Player} instance associated with this Gamer
+     *
+     * @return {@link Player} or Optional.empty() if not found
+     */
+    public Player getPlayer() {
+        return player;
     }
 }

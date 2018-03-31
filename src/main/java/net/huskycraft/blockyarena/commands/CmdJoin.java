@@ -3,6 +3,7 @@ package net.huskycraft.blockyarena.commands;
 import net.huskycraft.blockyarena.*;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.TeamMode;
+import net.huskycraft.blockyarena.managers.GamersManager;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
@@ -27,10 +28,10 @@ public class CmdJoin implements CommandExecutor{
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
-        Gamer gamer = plugin.getGamerManager().getGamer(player);
+        Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
         try {
             TeamMode teamMode = TeamMode.valueOf(args.<String>getOne("mode").get().toUpperCase());
-            if (plugin.getGamerManager().getGamer(player).getStatus() == GamerStatus.PLAYING) {
+            if (GamersManager.getGamer(player.getUniqueId()).get().getStatus() == GamerStatus.PLAYING) {
                 player.sendMessage(Text.of("You've already joined a game!"));
                 return CommandResult.empty();
             } else {

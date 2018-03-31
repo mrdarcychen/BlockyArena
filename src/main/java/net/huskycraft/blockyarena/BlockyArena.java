@@ -9,7 +9,6 @@ import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
 import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
 import net.huskycraft.blockyarena.managers.GameManager;
-import net.huskycraft.blockyarena.managers.GamerManager;
 import net.huskycraft.blockyarena.managers.KitManager;
 import net.huskycraft.blockyarena.utils.Kit;
 import net.huskycraft.blockyarena.utils.KitSerializer;
@@ -23,7 +22,6 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -34,8 +32,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.4.2")
+@Plugin(id = "blockyarena", name = "BlockyArena")
 public class BlockyArena {
+
+    private static BlockyArena plugin;
+
     @Inject
     private Logger logger;
 
@@ -51,8 +52,11 @@ public class BlockyArena {
 
     private ArenaManager arenaManager;
     private GameManager gameManager;
-    private GamerManager gamerManager;
     private KitManager kitManager;
+
+    public BlockyArena() {
+        this.plugin = this;
+    }
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
@@ -72,7 +76,6 @@ public class BlockyArena {
     private void createManagers() {
         arenaManager = new ArenaManager(this);
         gameManager = new GameManager(this);
-        gamerManager = new GamerManager(this);
         kitManager = new KitManager(this);
     }
 
@@ -189,11 +192,11 @@ public class BlockyArena {
         return gameManager;
     }
 
-    public GamerManager getGamerManager() {
-        return gamerManager;
-    }
-
     public KitManager getKitManager() {
         return kitManager;
+    }
+
+    public static BlockyArena getPlugin() {
+        return plugin;
     }
 }
