@@ -143,6 +143,8 @@ public class Gamer {
         setLocation(getSavedLocation());
         setStatus(GamerStatus.AVAILABLE);
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
+        player.offer(Keys.FOOD_LEVEL, 20);
     }
 
     /**

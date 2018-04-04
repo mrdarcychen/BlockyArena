@@ -13,6 +13,7 @@ import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 
 import java.util.*;
@@ -30,6 +31,8 @@ public class Game {
     protected GameState gameState;
     protected Team teamA, teamB;
     private Task timer;
+
+
 
     /**
      * Constructs a Game with the given team mode and an arena.
@@ -58,7 +61,8 @@ public class Game {
             return;
         }
         gamers.add(gamer);
-        broadcast(Text.of(gamer.getName() + " joined the game."));
+        broadcast(Text.of(gamer.getName() + " joined the game. " +
+                "(" + gamers.size() + "/" + teamMode.getCapacity() * 2 + ")"));
         inspect();
     }
 
@@ -71,7 +75,8 @@ public class Game {
         // if the game is in progress, eliminate before removing the player
         if (gameState == GameState.RECRUITING || gameState == GameState.STARTING) {
             gamers.remove(gamer);
-            broadcast(Text.of(gamer.getName() + " left the game."));
+            broadcast(Text.of(gamer.getName() + " left the game." +
+                    "(" + gamers.size() + "/" + teamMode.getCapacity() * 2 + ")"));
             inspect();
         } else if (gameState == GameState.STARTED) {
             eliminate(gamer, Text.of(gamer.getPlayer().getName() + " disconnected."));
@@ -131,8 +136,10 @@ public class Game {
      * A Game should stop when either one of the Team has no player alive.
      */
     private void checkStoppingCondition() {
-        if (!teamA.hasGamerLeft() || !teamB.hasGamerLeft()) {
-            onGameStopping();            
+        if (teamA.hasGamerLeft() && !teamB.hasGamerLeft()) {
+            onGameStopping(teamA, teamB);
+        } else if (teamB.hasGamerLeft() && !teamA.hasGamerLeft()) {
+            onGameStopping(teamB, teamA);
         }
     }
 
@@ -148,21 +155,28 @@ public class Game {
     /**
      * Executed when the Game is stopping.
      */
-    public void onGameStopping() {
+    public void onGameStopping(Team winner, Team loser) {
         gameState = GameState.STOPPING;
+
         Title victory = Title.builder()
-                .title(Text.builder("VICTORY!").color(TextColors.GOLD).build())
+                .title(Text.builder("VICTORY!")
+                        .color(TextColors.GOLD)
+                        .style(TextStyles.BOLD)
+                        .build())
+                .subtitle(Text.of(winner.toString() + " won the game."))
+                .fadeIn(1).stay(60).fadeOut(2)
                 .build();
         Title gameOver = Title.builder()
-                .title(Text.builder("GAME OVER!").color(TextColors.RED).build())
+                .title(Text.builder("GAME OVER!")
+                        .color(TextColors.RED)
+                        .style(TextStyles.BOLD)
+                        .build())
+                .subtitle(Text.of(winner.toString() + " won the game."))
+                .fadeIn(1).stay(60).fadeOut(2)
                 .build();
-        if (teamA.hasGamerLeft()) {
-            teamA.broadcast(victory);
-            teamB.broadcast(gameOver);
-        } else if (teamB.hasGamerLeft()) {
-            teamB.broadcast(victory);
-            teamA.broadcast(gameOver);
-        }
+
+        winner.broadcast(victory);
+        loser.broadcast(gameOver);
         Task.builder().execute(() -> terminate()).delay(3, TimeUnit.SECONDS).submit(plugin);
     }
 

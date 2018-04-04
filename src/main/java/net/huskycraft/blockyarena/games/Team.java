@@ -7,6 +7,7 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 /**
@@ -78,5 +79,21 @@ public class Team {
      */
     public boolean contains(Gamer gamer) {
         return gamers.contains(gamer);
+    }
+
+    public Set<Gamer> getGamers() {
+        return gamers;
+    }
+
+    public String toString() {
+        String str = "";
+        Iterator<Gamer> gamersItr = gamers.iterator();
+        while (gamersItr.hasNext()) {
+            str += gamersItr.next().getName();
+            if (gamersItr.hasNext()) {
+                str += ", ";
+            }
+        }
+        return str;
     }
 }

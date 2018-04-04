@@ -31,11 +31,11 @@ public class GamersManager {
      * @return {@link Gamer} or Optional.empty() if not found
      */
     public static Optional<Gamer> getGamer(UUID uniqueId) {
-            for (Gamer gamer : gamers) {
-                if (gamer.getUniqueId().equals(uniqueId)) {
-                    return Optional.of(gamer);
-                }
+        for (Gamer gamer : gamers) {
+            if (gamer.getUniqueId().equals(uniqueId)) {
+                return Optional.of(gamer);
             }
-            return Optional.empty();
+        }
+        return Optional.empty();
     }
 }
