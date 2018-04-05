@@ -50,9 +50,9 @@ public class BlockyArena {
 
     private Path arenaDir, kitDir;
 
-    private ArenaManager arenaManager;
-    private GameManager gameManager;
-    private KitManager kitManager;
+    private static ArenaManager arenaManager;
+    private static GameManager gameManager;
+    private static KitManager kitManager;
 
     public BlockyArena() {
         this.plugin = this;
@@ -119,6 +119,14 @@ public class BlockyArena {
                 .permission("blockyarena.create")
                 .build();
 
+        CommandSpec cmdRemove = CommandSpec.builder()
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+                .executor(CmdRemove.getInstance())
+                .permission("blockyarena.remove")
+                .build();
+
         CommandSpec cmdJoin = CommandSpec.builder()
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("mode")))
@@ -137,6 +145,7 @@ public class BlockyArena {
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("param")))
                 )
                 .executor(new CmdEdit(this))
+                .permission("blockyarena.edit")
                 .build();
 
         CommandSpec cmdKit = CommandSpec.builder()
@@ -147,6 +156,7 @@ public class BlockyArena {
         CommandSpec arenaCommandSpec = CommandSpec.builder()
                 .child(cmdEdit, "edit")
                 .child(cmdCreate, "create")
+                .child(cmdRemove, "remove")
                 .child(cmdJoin, "join")
                 .child(cmdQuit, "quit")
                 .child(cmdKit, "kit")
@@ -184,15 +194,15 @@ public class BlockyArena {
         return kitDir;
     }
 
-    public ArenaManager getArenaManager() {
+    public static ArenaManager getArenaManager() {
         return arenaManager;
     }
 
-    public GameManager getGameManager() {
+    public static GameManager getGameManager() {
         return gameManager;
     }
 
-    public KitManager getKitManager() {
+    public static KitManager getKitManager() {
         return kitManager;
     }
 

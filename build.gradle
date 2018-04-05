@@ -3,8 +3,8 @@ plugins {
 }
 
 group = 'net.huskycraft'
-version = '0.4.3'
-description = 'BlockyArena is a PvP plugin that allows a server to systematically host multiple duels in designated arenas.'
+version = '0.5.0'
+description = 'BlockyArena is a PvP plugin that allows Minecraft servers to host multiple duels.'
 
 allprojects {
     repositories {
