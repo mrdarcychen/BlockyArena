@@ -28,13 +28,6 @@ public class Spawn {
         this.spawnRotation = spawnRotation;
     }
 
-    /**
-     * Spawns the given gamer at the spawn location of the team.
-     */
-    public void spawn(Gamer gamer) {
-        gamer.getPlayer().setLocationAndRotation(spawnLocation, spawnRotation);
-    }
-
     public Location getSpawnLocation() {
         return spawnLocation;
     }

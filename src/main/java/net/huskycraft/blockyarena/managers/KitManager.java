@@ -2,6 +2,7 @@ package net.huskycraft.blockyarena.managers;
 
 import com.google.common.reflect.TypeToken;
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.utils.Kit;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -88,5 +89,20 @@ public class KitManager {
      */
     public Kit get(String id) {
         return kits.get(id);
+    }
+
+    /**
+     * Removes the {@link Kit} and its config file if exists.
+     *
+     * @param id the id of the Kit
+     */
+    public void remove(String id) {
+        kits.remove(id);
+        Path path = Paths.get(plugin.getKitDir().toString() + File.separator + id + ".conf");
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(id + " does not exist.");
+        }
     }
 }

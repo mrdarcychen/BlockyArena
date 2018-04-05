@@ -1,5 +1,6 @@
 package net.huskycraft.blockyarena.utils;
 
+import com.flowpowered.math.vector.Vector3d;
 import net.huskycraft.blockyarena.arenas.Spawn;
 import net.huskycraft.blockyarena.games.Game;
 import org.spongepowered.api.data.key.Keys;
@@ -58,6 +59,7 @@ public class Gamer {
      * @param spawn the Spawn point where this Gamer is going to be at
      */
     public void spawnAt(Spawn spawn) {
+        player.setVelocity(new Vector3d(0.0, 0.0, 0.0)); // TODO: doesn't work
         player.setLocationAndRotation(spawn.getSpawnLocation(), spawn.getSpawnRotation());
     }
 
@@ -67,6 +69,7 @@ public class Gamer {
      * @param location the location to set
      */
     public void setLocation(Location location) {
+        player.setVelocity(new Vector3d(0.0, 0.0, 0.0)); // TODO: doesn't work
         player.setLocation(location);
     }
 
