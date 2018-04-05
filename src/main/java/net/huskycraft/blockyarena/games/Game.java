@@ -32,9 +32,12 @@ import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameMode;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 
 import java.util.*;
@@ -53,18 +56,20 @@ public class Game {
     protected Team teamA, teamB;
     private Task timer;
 
+
+
     /**
      * Constructs a Game with the given team mode and an arena.
      * The GameState is set to RECRUITING by default.
      * @param arena an enabled arena
      */
-    public Game(BlockyArena plugin, TeamMode teamMode, Arena arena) {
+    public Game(BlockyArena plugin, TeamMode teamMode, Arena arena, int numTeams) {
         this.plugin = plugin;
         this.teamMode = teamMode;
         this.arena = arena;
-        arena.setState(ArenaState.OCCUPIED);
         gamers = new ArrayList<>();
         gameState = GameState.RECRUITING;
+        arena.setState(ArenaState.OCCUPIED);
     }
 
     /**
@@ -74,16 +79,15 @@ public class Game {
      * @param gamer the Gamer to be added to this Game
      */
     public void add(Gamer gamer) {
-        gamers.add(gamer);
-        gamer.getPlayer().offer(Keys.GAME_MODE, GameModes.SURVIVAL);
-        gamer.getPlayer().offer(Keys.HEALTH, gamer.getPlayer().get(Keys.MAX_HEALTH).get());
-        gamer.getPlayer().offer(Keys.FOOD_LEVEL, 20);
-        gamer.getPlayer().sendMessage(Text.of("Sending you to " + arena.getID()));
-        gamer.spawnAt(arena.getLobbySpawn());
-        broadcast(Text.of(gamer.getName() + " joined the game."));
-        if (gameState == GameState.RECRUITING) {
-            checkStartingCondition();
+        // reject if the game reaches maximum capacity or is currently not recruiting
+        if (gamers.size() == teamMode.getCapacity() * 2 || gameState != GameState.RECRUITING) {
+            gamer.getPlayer().sendMessage(Text.of("Unable to join the game at this time."));
+            return;
         }
+        gamers.add(gamer);
+        broadcast(Text.of(gamer.getName() + " joined the game. " +
+                "(" + gamers.size() + "/" + teamMode.getCapacity() * 2 + ")"));
+        inspect();
     }
 
     /**
@@ -95,12 +99,12 @@ public class Game {
         // if the game is in progress, eliminate before removing the player
         if (gameState == GameState.RECRUITING || gameState == GameState.STARTING) {
             gamers.remove(gamer);
-            broadcast(Text.of(gamer.getName() + " left the game."));
-            checkStartingCondition();
+            broadcast(Text.of(gamer.getName() + " left the game." +
+                    "(" + gamers.size() + "/" + teamMode.getCapacity() * 2 + ")"));
+            inspect();
         } else if (gameState == GameState.STARTED) {
             eliminate(gamer, Text.of(gamer.getPlayer().getName() + " disconnected."));
         }
-        gamer.getPlayer().offer(Keys.GAME_MODE, GameModes.SURVIVAL);
     }
 
     /**
@@ -111,21 +115,28 @@ public class Game {
      */
     public void eliminate(Gamer gamer, Text cause) {
         broadcast(cause);
-        gamer.spawnAt(arena.getSpectatorSpawn());
-        gamer.getPlayer().offer(Keys.HEALTH, gamer.getPlayer().get(Keys.MAX_HEALTH).get());
-        gamer.getPlayer().offer(Keys.GAME_MODE, GameModes.SPECTATOR);
-        gamer.setStatus(GamerStatus.SPECTATING);
+        Text deathText = Text.builder("YOU DIED!")
+                .color(TextColors.RED).build();
+        Title deathTitle = Title.builder()
+                .title(deathText).fadeOut(2).stay(16).build();
+        gamer.getPlayer().sendTitle(deathTitle);
+        gamer.spectate(this);
         checkStoppingCondition();
     }
 
     /**
-     * Checks to see if this Game should start based on the current condition.
-     *
-     * Starts the starting timer if the precondition is met, otherwise cancels the timer.
+     * Inspects the current condition of the Game. The starting countdown of this game is triggered if the number of
+     * players matches the starting condition of the associated game mode, otherwise the countdown will be canceled.
+     * This Game is terminated if there is no player active in the session.
      */
-    private void checkStartingCondition() {
-        boolean canSolo = teamMode == TeamMode.SOLO && gamers.size() == 2;
-        boolean canDoubles = teamMode == TeamMode.DOUBLES && gamers.size() == 4;
+    private void inspect() {
+        // terminate if there is no active gamer
+        if (gamers.isEmpty()) {
+            terminate();
+            return;
+        }
+        boolean canSolo = teamMode.getCapacity() * 2 == gamers.size();
+        boolean canDoubles = teamMode.getCapacity() * 2 == gamers.size();
         if (canSolo || canDoubles) {
             teamA = new Team(arena.getTeamSpawnA(), this);
             teamB = new Team(arena.getTeamSpawnB(), this);
@@ -139,7 +150,7 @@ public class Game {
         } else if (timer != null) {
             timer.cancel();
             gameState = GameState.RECRUITING;
-            broadcast(Text.of("Waiting for more players to join."));
+            broadcast(Text.of("Waiting for more players to join ..."));
         }
     }
     
@@ -149,8 +160,10 @@ public class Game {
      * A Game should stop when either one of the Team has no player alive.
      */
     private void checkStoppingCondition() {
-        if (!teamA.hasGamerLeft() || !teamB.hasGamerLeft()) {
-            onGameStopping();            
+        if (teamA.hasGamerLeft() && !teamB.hasGamerLeft()) {
+            onGameStopping(teamA, teamB);
+        } else if (teamB.hasGamerLeft() && !teamA.hasGamerLeft()) {
+            onGameStopping(teamB, teamA);
         }
     }
 
@@ -166,32 +179,29 @@ public class Game {
     /**
      * Executed when the Game is stopping.
      */
-    public void onGameStopping() {
+    public void onGameStopping(Team winner, Team loser) {
         gameState = GameState.STOPPING;
-        if (teamA.hasGamerLeft()) {
-            teamA.broadcast(Text.of("You won the game!"));
-            teamB.broadcast(Text.of("You lost the game!"));
-        } else if (teamB.hasGamerLeft()) {
-            teamB.broadcast(Text.of("You won the game!"));
-            teamA.broadcast(Text.of("You lost the game!"));
-        }
-        for (Gamer gamer : gamers) {
-            // remove if the gamer still has connection
-            if (gamer.getGame() == this) {
-                gamer.quit();
-            }
-        }
-        onGameStopped();
-    }
 
-    /**
-     * Executed as soon as the Game has stopped.
-     */
-    public void onGameStopped() {
-        gameState = GameState.STOPPED;
-        arena.setState(ArenaState.AVAILABLE);
-        plugin.getGameManager().remove(this);
-        // TODO: logging
+        Title victory = Title.builder()
+                .title(Text.builder("VICTORY!")
+                        .color(TextColors.GOLD)
+                        .style(TextStyles.BOLD)
+                        .build())
+                .subtitle(Text.of(winner.toString() + " won the game."))
+                .fadeIn(1).stay(60).fadeOut(2)
+                .build();
+        Title gameOver = Title.builder()
+                .title(Text.builder("GAME OVER!")
+                        .color(TextColors.RED)
+                        .style(TextStyles.BOLD)
+                        .build())
+                .subtitle(Text.of(winner.toString() + " won the game."))
+                .fadeIn(1).stay(60).fadeOut(2)
+                .build();
+
+        winner.broadcast(victory);
+        loser.broadcast(gameOver);
+        Task.builder().execute(() -> terminate()).delay(3, TimeUnit.SECONDS).submit(plugin);
     }
 
     private void startingCountdown(int second) {
@@ -237,5 +247,32 @@ public class Game {
                 gamer.getPlayer().sendMessage(msg);
             }
         }
+    }
+
+    /**
+     * Terminates this Game permanently.
+     */
+    public void terminate() {
+        for (Gamer gamer : gamers) {
+            // remove if the gamer still has connection
+            if (gamer.getGame() == this) {
+                gamer.quit();
+            }
+        }
+        arena.setState(ArenaState.AVAILABLE);
+        plugin.getGameManager().remove(this);
+    }
+
+    public Arena getArena() {
+        return arena;
+    }
+
+    public Team getTeam(Gamer gamer) {
+        if (teamA.contains(gamer)) {
+            return teamA;
+        } else if (teamB.contains(gamer)) {
+            return teamB;
+        }
+        return null;
     }
 }

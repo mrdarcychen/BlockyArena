@@ -28,10 +28,9 @@ import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.arenas.ArenaState;
 import net.huskycraft.blockyarena.BlockyArena;
 
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.*;
 import java.util.*;
 
 /**
@@ -92,5 +91,20 @@ public class ArenaManager {
      */
     public void add(Arena arena) {
         arenas.put(arena.getID(), arena);
+    }
+
+    /**
+     * Removes the {@link Arena} and its config file if exists.
+     *
+     * @param id the id of the Arena
+     */
+    public void remove(String id) {
+        arenas.remove(id);
+        Path path = Paths.get(plugin.getArenaDir().toString() + File.separator + id + ".conf");
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(id + " does not exist.");
+        }
     }
 }

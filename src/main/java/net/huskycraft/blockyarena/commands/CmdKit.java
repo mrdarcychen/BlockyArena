@@ -25,6 +25,7 @@
 package net.huskycraft.blockyarena.commands;
 
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.managers.GamersManager;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -44,7 +45,7 @@ public class CmdKit implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
-        if (plugin.getGamerManager().getGamer(player).getStatus() != GamerStatus.PLAYING) {
+        if (GamersManager.getGamer(player.getUniqueId()).get().getStatus() != GamerStatus.PLAYING) {
             player.sendMessage(Text.of("You are not allowed to get any kit when you are not in a game."));
             return CommandResult.empty();
         }
