@@ -24,7 +24,7 @@
  */
 package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.blockyarena.*;
+import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.TeamMode;
 import net.huskycraft.blockyarena.managers.GamersManager;

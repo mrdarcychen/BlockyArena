@@ -24,9 +24,8 @@
  */
 package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.managers.GamersManager;
+import net.huskycraft.blockyarena.arenas.Arena;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
