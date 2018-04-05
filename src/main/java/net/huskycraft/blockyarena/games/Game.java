@@ -24,23 +24,21 @@
  */
 package net.huskycraft.blockyarena.games;
 
-import net.huskycraft.blockyarena.*;
+import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.arenas.ArenaState;
 import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.gamemode.GameMode;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
