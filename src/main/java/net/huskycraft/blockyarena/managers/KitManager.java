@@ -26,12 +26,14 @@ package net.huskycraft.blockyarena.managers;
 
 import com.google.common.reflect.TypeToken;
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.utils.Kit;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import org.spongepowered.api.data.persistence.InvalidDataException;
 
 import java.io.File;
 import java.io.IOException;
@@ -63,8 +65,14 @@ public class KitManager {
                 ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                         .builder().setPath(path).build();
                 ConfigurationNode rootNode = loader.load();
-                Kit kit = rootNode.getValue(TypeToken.of(Kit.class));
-                kits.put(kit.getId(), kit);
+                String id = rootNode.getNode("id").getString();
+                try {
+                    Kit kit = rootNode.getValue(TypeToken.of(Kit.class));
+                    kits.put(kit.getId(), kit);
+                } catch (InvalidDataException e) {
+                    plugin.getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
+                            "unknown items.");
+                }
                 loader.save(rootNode);
             }
         } catch (ObjectMappingException e) {
@@ -105,5 +113,20 @@ public class KitManager {
      */
     public Kit get(String id) {
         return kits.get(id);
+    }
+
+    /**
+     * Removes the {@link Kit} and its config file if exists.
+     *
+     * @param id the id of the Kit
+     */
+    public void remove(String id) {
+        kits.remove(id);
+        Path path = Paths.get(plugin.getKitDir().toString() + File.separator + id + ".conf");
+        try {
+            Files.delete(path);
+        } catch (IOException e) {
+            throw new IllegalArgumentException(id + " does not exist.");
+        }
     }
 }

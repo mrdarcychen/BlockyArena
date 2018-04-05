@@ -63,7 +63,7 @@ public class GameManager {
         Arena arena = plugin.getArenaManager().getArena();
         // if there is no available Arena, no Game can be instantiated and null is returned
         if (arena == null) return null;
-        Game game = new Game(plugin, teamMode, arena);
+        Game game = new Game(plugin, teamMode, arena, 2); // TODO: customize number of teams
         games.add(game);
         return game;
     }

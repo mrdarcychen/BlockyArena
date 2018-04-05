@@ -33,7 +33,6 @@ import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
 import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.managers.ArenaManager;
 import net.huskycraft.blockyarena.managers.GameManager;
-import net.huskycraft.blockyarena.managers.GamerManager;
 import net.huskycraft.blockyarena.managers.KitManager;
 import net.huskycraft.blockyarena.utils.Kit;
 import net.huskycraft.blockyarena.utils.KitSerializer;
@@ -47,7 +46,6 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -58,8 +56,11 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
-@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.4.1")
+@Plugin(id = "blockyarena", name = "BlockyArena")
 public class BlockyArena {
+
+    private static BlockyArena plugin;
+
     @Inject
     private Logger logger;
 
@@ -73,10 +74,13 @@ public class BlockyArena {
 
     private Path arenaDir, kitDir;
 
-    private ArenaManager arenaManager;
-    private GameManager gameManager;
-    private GamerManager gamerManager;
-    private KitManager kitManager;
+    private static ArenaManager arenaManager;
+    private static GameManager gameManager;
+    private static KitManager kitManager;
+
+    public BlockyArena() {
+        this.plugin = this;
+    }
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
@@ -96,7 +100,6 @@ public class BlockyArena {
     private void createManagers() {
         arenaManager = new ArenaManager(this);
         gameManager = new GameManager(this);
-        gamerManager = new GamerManager(this);
         kitManager = new KitManager(this);
     }
 
@@ -140,6 +143,14 @@ public class BlockyArena {
                 .permission("blockyarena.create")
                 .build();
 
+        CommandSpec cmdRemove = CommandSpec.builder()
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+                .executor(CmdRemove.getInstance())
+                .permission("blockyarena.remove")
+                .build();
+
         CommandSpec cmdJoin = CommandSpec.builder()
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("mode")))
@@ -158,6 +169,7 @@ public class BlockyArena {
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("param")))
                 )
                 .executor(new CmdEdit(this))
+                .permission("blockyarena.edit")
                 .build();
 
         CommandSpec cmdKit = CommandSpec.builder()
@@ -168,6 +180,7 @@ public class BlockyArena {
         CommandSpec arenaCommandSpec = CommandSpec.builder()
                 .child(cmdEdit, "edit")
                 .child(cmdCreate, "create")
+                .child(cmdRemove, "remove")
                 .child(cmdJoin, "join")
                 .child(cmdQuit, "quit")
                 .child(cmdKit, "kit")
@@ -205,19 +218,19 @@ public class BlockyArena {
         return kitDir;
     }
 
-    public ArenaManager getArenaManager() {
+    public static ArenaManager getArenaManager() {
         return arenaManager;
     }
 
-    public GameManager getGameManager() {
+    public static GameManager getGameManager() {
         return gameManager;
     }
 
-    public GamerManager getGamerManager() {
-        return gamerManager;
+    public static KitManager getKitManager() {
+        return kitManager;
     }
 
-    public KitManager getKitManager() {
-        return kitManager;
+    public static BlockyArena getPlugin() {
+        return plugin;
     }
 }

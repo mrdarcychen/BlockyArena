@@ -25,6 +25,7 @@
 package net.huskycraft.blockyarena.commands;
 
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.managers.GamersManager;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
@@ -46,7 +47,7 @@ public class CmdQuit implements CommandExecutor{
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
-        Gamer gamer = plugin.getGamerManager().getGamer(player);
+        Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
         if (gamer.getStatus() != GamerStatus.PLAYING) {
             player.sendMessage(Text.of("You're not in any game."));
             return CommandResult.empty();
@@ -54,7 +55,7 @@ public class CmdQuit implements CommandExecutor{
         try {
             gamer.quit();
         } catch (NullPointerException e) {
-            player.sendMessage(Text.of("You're not in any game."));
+            player.sendMessage(Text.of("Unexpected error occurs when quitting you from the game."));
             return CommandResult.empty();
         }
         player.sendMessage(Text.of("You left the game."));
