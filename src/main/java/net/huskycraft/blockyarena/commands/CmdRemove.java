@@ -10,8 +10,9 @@ import org.spongepowered.api.text.Text;
 
 public class CmdRemove implements CommandExecutor {
 
-    public static final CmdRemove instance = new CmdRemove();
+    private static final CmdRemove instance = new CmdRemove();
 
+    /* enforce the singleton property with a private constructor */
     private CmdRemove() {}
 
     public static CmdRemove getInstance() {

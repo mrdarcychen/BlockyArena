@@ -22,12 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.huskycraft.blockyarena.managers;
+package net.huskycraft.blockyarena.utils;
 
 import com.google.common.reflect.TypeToken;
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.arenas.Arena;
-import net.huskycraft.blockyarena.utils.Kit;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;

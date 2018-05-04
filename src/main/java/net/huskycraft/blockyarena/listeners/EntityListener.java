@@ -28,7 +28,7 @@ import com.flowpowered.math.vector.Vector3d;
 import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.GameState;
-import net.huskycraft.blockyarena.managers.GamersManager;
+import net.huskycraft.blockyarena.games.GamersManager;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;

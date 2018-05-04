@@ -26,15 +26,15 @@ package net.huskycraft.blockyarena;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+import net.huskycraft.blockyarena.arenas.ArenaManager;
 import net.huskycraft.blockyarena.arenas.Spawn;
 import net.huskycraft.blockyarena.arenas.SpawnSerializer;
 import net.huskycraft.blockyarena.commands.*;
+import net.huskycraft.blockyarena.games.GameManager;
 import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
 import net.huskycraft.blockyarena.listeners.EntityListener;
-import net.huskycraft.blockyarena.managers.ArenaManager;
-import net.huskycraft.blockyarena.managers.GameManager;
-import net.huskycraft.blockyarena.managers.KitManager;
 import net.huskycraft.blockyarena.utils.Kit;
+import net.huskycraft.blockyarena.utils.KitManager;
 import net.huskycraft.blockyarena.utils.KitSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
@@ -57,9 +57,13 @@ import java.util.Arrays;
 import java.util.List;
 
 @Plugin(id = "blockyarena", name = "BlockyArena")
-public class BlockyArena {
+public final class BlockyArena {
 
-    private static BlockyArena plugin;
+    private static final BlockyArena PLUGIN = new BlockyArena();
+
+    private static ArenaManager arenaManager;
+    private static GameManager gameManager;
+    private static KitManager kitManager;
 
     @Inject
     private Logger logger;
@@ -74,12 +78,7 @@ public class BlockyArena {
 
     private Path arenaDir, kitDir;
 
-    private static ArenaManager arenaManager;
-    private static GameManager gameManager;
-    private static KitManager kitManager;
-
-    public BlockyArena() {
-        this.plugin = this;
+    private BlockyArena() {
     }
 
     @Listener
@@ -118,7 +117,8 @@ public class BlockyArena {
                     Files.createDirectory(dir);
                 }
             } catch (IOException e) {
-                logger.warn("Error creating directory for " + dir.getFileName().toString());
+                logger.warn("Error creating directory for "
+                        + dir.getFileName().toString());
             }
         }
     }
@@ -127,8 +127,10 @@ public class BlockyArena {
     registers event listeners to EventManager
      */
     private void registerListeners() {
-        Sponge.getEventManager().registerListeners(this, new EntityListener(this));
-        Sponge.getEventManager().registerListeners(this, new ClientConnectionEventListener(this));
+        Sponge.getEventManager().registerListeners(this,
+                new EntityListener(this));
+        Sponge.getEventManager().registerListeners(this,
+                new ClientConnectionEventListener(this));
     }
 
     /*
@@ -139,7 +141,7 @@ public class BlockyArena {
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
-                .executor(new CmdCreate(this))
+                .executor(CmdCreate.getInstance())
                 .permission("blockyarena.create")
                 .build();
 
@@ -155,11 +157,11 @@ public class BlockyArena {
                 .arguments(
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("mode")))
                 )
-                .executor(new CmdJoin(this))
+                .executor(CmdJoin.getInstance())
                 .build();
 
         CommandSpec cmdQuit = CommandSpec.builder()
-                .executor(new CmdQuit(this))
+                .executor(CmdQuit.getInstance())
                 .build();
 
         CommandSpec cmdEdit = CommandSpec.builder()
@@ -168,13 +170,13 @@ public class BlockyArena {
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
                         GenericArguments.onlyOne(GenericArguments.string(Text.of("param")))
                 )
-                .executor(new CmdEdit(this))
+                .executor(CmdEdit.getInstance())
                 .permission("blockyarena.edit")
                 .build();
 
         CommandSpec cmdKit = CommandSpec.builder()
                 .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
-                .executor(new CmdKit(this))
+                .executor(CmdKit.getInstance())
                 .build();
 
         CommandSpec arenaCommandSpec = CommandSpec.builder()
@@ -187,7 +189,7 @@ public class BlockyArena {
                 .build();
 
         Sponge.getCommandManager()
-                .register(this, arenaCommandSpec, "blockyarena", "arena", "ba");
+                .register(BlockyArena.getPlugin(), arenaCommandSpec, "blockyarena", "arena", "ba");
     }
 
     /**
@@ -231,6 +233,6 @@ public class BlockyArena {
     }
 
     public static BlockyArena getPlugin() {
-        return plugin;
+        return PLUGIN;
     }
 }

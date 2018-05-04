@@ -25,7 +25,7 @@
 package net.huskycraft.blockyarena.listeners;
 
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.managers.GamersManager;
+import net.huskycraft.blockyarena.games.GamersManager;
 import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;

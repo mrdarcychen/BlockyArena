@@ -26,8 +26,8 @@ package net.huskycraft.blockyarena.commands;
 
 import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.GamersManager;
 import net.huskycraft.blockyarena.games.TeamMode;
-import net.huskycraft.blockyarena.managers.GamersManager;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
@@ -40,10 +40,13 @@ import org.spongepowered.api.text.Text;
 
 public class CmdJoin implements CommandExecutor{
 
-    public static BlockyArena plugin;
+    private static final CmdJoin INSTANCE = new CmdJoin();
 
-    public CmdJoin(BlockyArena plugin) {
-        this.plugin = plugin;
+    /* enforce the singleton property with a private constructor */
+    private CmdJoin() {}
+
+    public static CmdJoin getInstance() {
+        return INSTANCE;
     }
 
     /**
@@ -59,7 +62,7 @@ public class CmdJoin implements CommandExecutor{
                 player.sendMessage(Text.of("You've already joined a game!"));
                 return CommandResult.empty();
             } else {
-                Game game = plugin.getGameManager().getGame(teamMode);
+                Game game = BlockyArena.getGameManager().getGame(teamMode);
                 if (game == null) {
                     player.sendMessage(Text.of("There is no available arena at this time."));
                     return CommandResult.empty();

@@ -24,8 +24,8 @@
  */
 package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.utils.Kit;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -37,10 +37,14 @@ import org.spongepowered.api.text.Text;
 
 public class CmdCreate implements CommandExecutor {
 
-    public static BlockyArena plugin;
+    private static final CmdCreate INSTANCE = new CmdCreate();
 
-    public CmdCreate(BlockyArena plugin) {
-        this.plugin = plugin;
+    /* enforce the singleton property with a private constructor */
+    private CmdCreate() {
+    }
+
+    public static CmdCreate getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -50,13 +54,13 @@ public class CmdCreate implements CommandExecutor {
         String id = args.<String>getOne("id").get();
         switch (type) {
             case "arena":
-                Arena arena = new Arena(plugin, id);
-                plugin.getArenaManager().add(arena);
+                Arena arena = new Arena(BlockyArena.getPlugin(), id);
+                BlockyArena.getArenaManager().add(arena);
                 player.sendMessage(Text.of(id + " is added on file. Start configuring it by typing /ba edit"));
                 return CommandResult.success();
             case "kit":
                 Kit kit = new Kit(player, id);
-                plugin.getKitManager().add(kit, id);
+                BlockyArena.getKitManager().add(kit, id);
                 player.sendMessage(Text.of(id + " is added on file."));
                 return CommandResult.success();
             default:

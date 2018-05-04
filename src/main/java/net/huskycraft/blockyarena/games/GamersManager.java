@@ -1,10 +1,12 @@
-package net.huskycraft.blockyarena.managers;
+package net.huskycraft.blockyarena.games;
 
 import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.utils.Gamer;
-import org.spongepowered.api.entity.living.player.Player;
 
-import java.util.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.UUID;
 
 /**
  * The manager that manages {@link Gamer}s.
