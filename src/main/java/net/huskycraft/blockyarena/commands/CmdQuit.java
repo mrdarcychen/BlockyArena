@@ -24,8 +24,7 @@
  */
 package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.managers.GamersManager;
+import net.huskycraft.blockyarena.games.GamersManager;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
@@ -36,12 +35,15 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-public class CmdQuit implements CommandExecutor{
+public class CmdQuit implements CommandExecutor {
 
-    public static BlockyArena plugin;
+    private static final CmdQuit INSTANCE = new CmdQuit();
 
-    public CmdQuit(BlockyArena plugin) {
-        this.plugin = plugin;
+    /* enforce the singleton property with a private constructor */
+    private CmdQuit() {}
+
+    public static CmdQuit getInstance() {
+        return INSTANCE;
     }
 
     @Override

@@ -22,16 +22,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.huskycraft.blockyarena.managers;
+package net.huskycraft.blockyarena.arenas;
 
-import net.huskycraft.blockyarena.arenas.Arena;
-import net.huskycraft.blockyarena.arenas.ArenaState;
 import net.huskycraft.blockyarena.BlockyArena;
 
 import java.io.File;
 import java.io.IOException;
-import java.nio.file.*;
-import java.util.*;
+import java.nio.file.DirectoryStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * An ArenaManager keeps track of the available Arenas in the server.

@@ -22,13 +22,10 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package net.huskycraft.blockyarena.managers;
+package net.huskycraft.blockyarena.games;
 
-import net.huskycraft.blockyarena.*;
+import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.arenas.Arena;
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.GameState;
-import net.huskycraft.blockyarena.games.TeamMode;
 
 import java.util.ArrayList;
 import java.util.List;

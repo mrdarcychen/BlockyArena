@@ -25,7 +25,7 @@
 package net.huskycraft.blockyarena.commands;
 
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.managers.GamersManager;
+import net.huskycraft.blockyarena.games.GamersManager;
 import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -37,11 +37,16 @@ import org.spongepowered.api.text.Text;
 
 public class CmdKit implements CommandExecutor {
 
-    public static BlockyArena plugin;
+    private static final CmdKit INSTANCE = new CmdKit();
 
-    public CmdKit(BlockyArena plugin) {
-        this.plugin = plugin;
+    /* enforce the singleton property with a private constructor */
+    private CmdKit() {}
+
+    public static CmdKit getInstance() {
+        return INSTANCE;
     }
+
+
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
@@ -50,11 +55,11 @@ public class CmdKit implements CommandExecutor {
             return CommandResult.empty();
         }
         String id = args.<String>getOne(Text.of("id")).get();
-        if (plugin.getKitManager().get(id) == null) {
+        if (BlockyArena.getKitManager().get(id) == null) {
             player.sendMessage(Text.of("The given kit " + id + " does not exist."));
             return CommandResult.empty();
         }
-        plugin.getKitManager().get(id).equip(player);
+        BlockyArena.getKitManager().get(id).equip(player);
         return CommandResult.success();
     }
 }

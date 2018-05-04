@@ -36,10 +36,14 @@ import org.spongepowered.api.text.Text;
 
 public class CmdEdit implements CommandExecutor{
 
-    public static BlockyArena plugin;
+    private static final CmdEdit INSTANCE = new CmdEdit();
 
-    public CmdEdit(BlockyArena plugin) {
-        this.plugin = plugin;
+    /* enforce the singleton property with a private constructor */
+    private CmdEdit() {
+    }
+
+    public static CmdEdit getInstance() {
+        return INSTANCE;
     }
 
     @Override
@@ -49,7 +53,7 @@ public class CmdEdit implements CommandExecutor{
         String type = args.<String>getOne("type").get();
         String param = args.<String>getOne("param").get();
 
-        Arena arena = plugin.getArenaManager().getArena(id);
+        Arena arena = BlockyArena.getArenaManager().getArena(id);
         if (arena == null) {
             player.sendMessage(Text.of("Arena " + id + " does not exist."));
             return CommandResult.empty();

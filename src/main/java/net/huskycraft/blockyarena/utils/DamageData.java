@@ -1,7 +1,7 @@
 package net.huskycraft.blockyarena.utils;
 
 import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.managers.GamersManager;
+import net.huskycraft.blockyarena.games.GamersManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
