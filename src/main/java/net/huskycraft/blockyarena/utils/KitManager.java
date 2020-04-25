@@ -47,18 +47,16 @@ import java.util.Map;
  */
 public class KitManager {
 
-    public static BlockyArena plugin;
     private Map<String, Kit> kits;
 
-    public KitManager(BlockyArena plugin) {
-        this.plugin = plugin;
+    public KitManager() {
         kits = new HashMap<>();
         loadKits();
     }
 
     private void loadKits() {
         try {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getKitDir(), "*.conf");
+            DirectoryStream<Path> stream = Files.newDirectoryStream(BlockyArena.getInstance().getKitDir(), "*.conf");
             for (Path path : stream) {
                 ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                         .builder().setPath(path).build();
@@ -68,7 +66,7 @@ public class KitManager {
                     Kit kit = rootNode.getValue(TypeToken.of(Kit.class));
                     kits.put(kit.getId(), kit);
                 } catch (InvalidDataException e) {
-                    plugin.getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
+                    BlockyArena.getInstance().getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
                             "unknown items.");
                 }
                 loader.save(rootNode);
@@ -88,8 +86,8 @@ public class KitManager {
      */
     public void add(Kit kit, String id) {
         kits.put(id, kit);
-        plugin.getLogger().warn(id + " has been added to kit manager.");
-        Path path = Paths.get(plugin.getKitDir().toString() + File.separator + id + ".conf");
+        BlockyArena.getInstance().getLogger().warn(id + " has been added to kit manager.");
+        Path path = Paths.get(BlockyArena.getInstance().getKitDir().toString() + File.separator + id + ".conf");
         ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                 .builder().setPath(path).build();
         try {
@@ -120,7 +118,7 @@ public class KitManager {
      */
     public void remove(String id) {
         kits.remove(id);
-        Path path = Paths.get(plugin.getKitDir().toString() + File.separator + id + ".conf");
+        Path path = Paths.get(BlockyArena.getInstance().getKitDir().toString() + File.separator + id + ".conf");
         try {
             Files.delete(path);
         } catch (IOException e) {

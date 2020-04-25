@@ -36,6 +36,11 @@ import net.huskycraft.blockyarena.listeners.EntityListener;
 import net.huskycraft.blockyarena.utils.Kit;
 import net.huskycraft.blockyarena.utils.KitManager;
 import net.huskycraft.blockyarena.utils.KitSerializer;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.ConfigurationOptions;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -46,6 +51,7 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.message.MessageEvent.MessageFormatter;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
@@ -58,35 +64,54 @@ import java.util.List;
 
 @Plugin(id = "blockyarena", name = "BlockyArena")
 public final class BlockyArena {
+	
+	private static ArenaManager arenaManager;
 
-    private static final BlockyArena PLUGIN = new BlockyArena();
+	private static GameManager gameManager;
 
-    private static ArenaManager arenaManager;
-    private static GameManager gameManager;
-    private static KitManager kitManager;
+	private static KitManager kitManager;
+	
+	//GLOBAL : Should be changed !
+	private int lobbyCoolDown;
 
-    @Inject
-    private Logger logger;
+	@Inject
+	private Logger logger;
 
-    @Inject
-    @DefaultConfig(sharedRoot = false)
-    private Path defaultConfig;
+	private static BlockyArena PLUGIN;
 
-    @Inject
-    @ConfigDir(sharedRoot = false)
-    private Path configDir;
+	//rootNode for config
+	private ConfigurationNode rootNode;
+	
+	@Inject
+	@DefaultConfig(sharedRoot = true)
+	private ConfigurationLoader<CommentedConfigurationNode> loader;
 
-    private Path arenaDir, kitDir;
+	@Inject
+	@DefaultConfig(sharedRoot = false)
+	private Path defaultConfig;
 
-    private BlockyArena() {
-    }
+	@Inject
+	@ConfigDir(sharedRoot = false)
+	private Path configDir;
+
+	private Path arenaDir;
+
+	private Path kitDir;
+	
+	@Inject
+	private  BlockyArena() {
+	}
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
-        registerTypeSerializers();
+        
+    	PLUGIN = this;
+    	
+    	registerTypeSerializers();
         registerCommands();
         registerListeners();
         createDirectories();
+        HandleConfiguration();
     }
 
     @Listener
@@ -97,9 +122,9 @@ public final class BlockyArena {
     creates managers for the plugin
      */
     private void createManagers() {
-        arenaManager = new ArenaManager(this);
-        gameManager = new GameManager(this);
-        kitManager = new KitManager(this);
+        arenaManager = new ArenaManager();
+        gameManager = new GameManager();
+        kitManager = new KitManager();
     }
 
     /*
@@ -109,6 +134,7 @@ public final class BlockyArena {
     private void createDirectories() {
         arenaDir = Paths.get(getConfigDir().toString() + "/arenas");
         kitDir = Paths.get(getConfigDir().toString() + "/kits");
+        defaultConfig = Paths.get(getConfigDir().toString(), "default.json");
 
         List<Path> directories = Arrays.asList(arenaDir, kitDir);
         for (Path dir : directories) {
@@ -122,15 +148,48 @@ public final class BlockyArena {
             }
         }
     }
+    
+    private void HandleConfiguration()
+    {
+    	
+    	loader = HoconConfigurationLoader.builder().setPath(defaultConfig).build();
+    	
+         this.rootNode = loader.createEmptyNode(ConfigurationOptions.defaults());
+    	 rootNode.getNode("timers", "lobby", "cooldownSec").setValue(15);
+    	 
+    	try {
+    		loader.save(rootNode);
+    	} catch(IOException e) {
+    	    // handle error
+    	}
+    	
+    	getLogger().error("value of node cooldown : " + rootNode.getNode("timers", "lobby", "cooldownSec").getInt());
+    	
+    	        
+    }
+    
+    public void reloadConfig()
+    {
+    	try{
+            rootNode = loader.load();
+            loader.save(rootNode);
+        }catch(IOException e){
+            e.printStackTrace();
+        }
+    	
+    	getLogger().warn("Reloaded !");
+    	getLogger().error("value of node cooldown : " + rootNode.getNode("timers", "lobby", "cooldownSec").getInt());
+    	
+    }
 
     /*
     registers event listeners to EventManager
      */
     private void registerListeners() {
         Sponge.getEventManager().registerListeners(this,
-                new EntityListener(this));
+                new EntityListener());
         Sponge.getEventManager().registerListeners(this,
-                new ClientConnectionEventListener(this));
+                new ClientConnectionEventListener());
     }
 
     /*
@@ -189,7 +248,7 @@ public final class BlockyArena {
                 .build();
 
         Sponge.getCommandManager()
-                .register(BlockyArena.getPlugin(), arenaCommandSpec, "blockyarena", "arena", "ba");
+                .register(BlockyArena.getInstance(), arenaCommandSpec, "blockyarena", "arena", "ba");
     }
 
     /**
@@ -232,7 +291,12 @@ public final class BlockyArena {
         return kitManager;
     }
 
-    public static BlockyArena getPlugin() {
+    public static BlockyArena getInstance() {
         return PLUGIN;
+    }
+    
+    public ConfigurationNode getRootNode()
+    {
+    	return this.rootNode;
     }
 }

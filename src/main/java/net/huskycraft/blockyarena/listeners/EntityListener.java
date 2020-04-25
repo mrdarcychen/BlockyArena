@@ -37,19 +37,60 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
+import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
 public class EntityListener {
 
-    public static BlockyArena plugin;
 
-    public EntityListener(BlockyArena plugin) {
-        this.plugin = plugin;
+    public EntityListener() {
     }
+    
+    @Listener
+    public void onReload(GameReloadEvent event)
+    {
+    	BlockyArena.getInstance().reloadConfig();
+    }
+    
+	@Listener
+	public void onCommand(SendCommandEvent event, @First Player p) 
+	{
+		Gamer gamer = GamersManager.getGamer(p.getUniqueId()).get();
+
+		Game game = gamer.getGame();
+		
+		String command = event.getCommand();
+
+		if (game != null)
+		{
+			
+				if (game.getGameState() == GameState.RECRUITING || game.getGameState() == GameState.STARTED || game.getGameState() == GameState.STARTING || game.getGameState() == GameState.STOPPING) 
+				{
+						
+					MessageChannel.TO_ALL.send((Text)Text.builder("command issued : " + command).color(TextColors.GOLD).build());
+					if (!(command.equalsIgnoreCase("ba") || command.equalsIgnoreCase("arena") || command.equalsIgnoreCase("blockyarena")))
+					{
+					event.setCancelled(true);
+					p.sendMessage(ChatTypes.CHAT,
+							(Text) Text.builder("[BLOCKYARENA] YOU CANT ISSUE COMMAND WHILE IN GAME !!")
+									.color(TextColors.DARK_RED).build());
+					}
+					else
+					{
+						//ba or arena or blockyarena command is issued ! So we can move on and proceed event !
+					}
+				}
+		}
+	}
 
     @Listener
     public void onDamageEntity(DamageEntityEvent event) {
@@ -59,7 +100,7 @@ public class EntityListener {
             // if the victim is in a game, proceed analysis
             if (victim.getStatus() == GamerStatus.PLAYING) {
                 Game game = victim.getGame();
-                DamageData damageData = new DamageData(plugin, victim, event.getCause());
+                DamageData damageData = new DamageData(BlockyArena.getInstance(), victim, event.getCause());
                 Optional<Gamer> optAttacker = damageData.getAttacker();
                 if (game.getGameState() != GameState.STARTED) {
                     if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {

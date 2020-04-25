@@ -35,12 +35,9 @@ import java.util.List;
  */
 public class GameManager {
 
-    public static BlockyArena plugin;
-
     private List<Game> games; // a list of active games in the server
 
-    public GameManager(BlockyArena plugin) {
-        this.plugin = plugin;
+    public GameManager() {
         games = new ArrayList<>();
     }
 
@@ -57,10 +54,10 @@ public class GameManager {
             }
         }
         // if there is no active Game, initialize a new Game
-        Arena arena = plugin.getArenaManager().getArena();
+        Arena arena = BlockyArena.getArenaManager().getArena();
         // if there is no available Arena, no Game can be instantiated and null is returned
         if (arena == null) return null;
-        Game game = new Game(plugin, teamMode, arena, 2); // TODO: customize number of teams
+        Game game = new Game(teamMode, arena, 2); // TODO: customize number of teams
         games.add(game);
         return game;
     }

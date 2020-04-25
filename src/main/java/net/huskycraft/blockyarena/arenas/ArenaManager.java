@@ -40,12 +40,9 @@ import java.util.Map;
  */
 public class ArenaManager {
 
-    public static BlockyArena plugin;
-
     private Map<String, Arena> arenas; // the list of Arenas available in the server
 
-    public ArenaManager(BlockyArena plugin) {
-        this.plugin = plugin;
+    public ArenaManager() {
         arenas = new HashMap<>();
         loadArenas();
     }
@@ -55,13 +52,13 @@ public class ArenaManager {
      */
     private void loadArenas() {
         try {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(plugin.getArenaDir(), "*.conf");
+            DirectoryStream<Path> stream = Files.newDirectoryStream(BlockyArena.getInstance().getArenaDir(), "*.conf");
             for (Path path : stream) {
-                Arena arena = new Arena(plugin, path);
+                Arena arena = new Arena(path);
                 arenas.put(arena.getID(), arena);
             }
         } catch (IOException e) {
-            plugin.getLogger().warn("Error loading existing arena configs.");
+        	BlockyArena.getInstance().getLogger().warn("Error loading existing arena configs.");
         }
     }
 
@@ -102,7 +99,7 @@ public class ArenaManager {
      */
     public void remove(String id) {
         arenas.remove(id);
-        Path path = Paths.get(plugin.getArenaDir().toString() + File.separator + id + ".conf");
+        Path path = Paths.get(BlockyArena.getInstance().getArenaDir().toString() + File.separator + id + ".conf");
         try {
             Files.delete(path);
         } catch (IOException e) {

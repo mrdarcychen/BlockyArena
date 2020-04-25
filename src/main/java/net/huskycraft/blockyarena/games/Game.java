@@ -32,6 +32,7 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
@@ -46,7 +47,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class Game {
 
-    public static BlockyArena plugin;
     protected Arena arena; // the Arena associated with this Game
     protected List<Gamer> gamers; // the list of Gamers in this Game with corresponding connection status
     protected TeamMode teamMode;
@@ -61,8 +61,7 @@ public class Game {
      * The GameState is set to RECRUITING by default.
      * @param arena an enabled arena
      */
-    public Game(BlockyArena plugin, TeamMode teamMode, Arena arena, int numTeams) {
-        this.plugin = plugin;
+    public Game(TeamMode teamMode, Arena arena, int numTeams) {
         this.teamMode = teamMode;
         this.arena = arena;
         gamers = new ArrayList<>();
@@ -144,12 +143,17 @@ public class Game {
                 teamB.add(gamersItr.next());
             }
             gameState = GameState.STARTING;
-            startingCountdown(10);
+            startingCountdown(BlockyArena.getInstance().getRootNode().getNode("timers", "lobby", "cooldownSec").getInt());
         } else if (timer != null) {
             timer.cancel();
             gameState = GameState.RECRUITING;
             broadcast(Text.of("Waiting for more players to join ..."));
+            
         }
+        else {
+        	MessageChannel.TO_ALL.send((Text)Text.builder("New arena game ! join with /ba join solo !").color(TextColors.GOLD).build());
+        }
+
     }
     
     /**
@@ -199,7 +203,7 @@ public class Game {
 
         winner.broadcast(victory);
         loser.broadcast(gameOver);
-        Task.builder().execute(() -> terminate()).delay(3, TimeUnit.SECONDS).submit(plugin);
+        Task.builder().execute(() -> terminate()).delay(3, TimeUnit.SECONDS).submit(BlockyArena.getInstance());
     }
 
     private void startingCountdown(int second) {
@@ -215,7 +219,7 @@ public class Game {
                 player.playSound(SoundTypes.BLOCK_DISPENSER_DISPENSE, player.getHeadRotation(), 100);
             }
             timer = Task.builder()
-                    .execute(() -> startingCountdown(second - 1)).delay(1, TimeUnit.SECONDS).submit(plugin);
+                    .execute(() -> startingCountdown(second - 1)).delay(1, TimeUnit.SECONDS).submit(BlockyArena.getInstance());
         }
     }
 
@@ -258,7 +262,7 @@ public class Game {
             }
         }
         arena.setState(ArenaState.AVAILABLE);
-        plugin.getGameManager().remove(this);
+        BlockyArena.getGameManager().remove(this);
     }
 
     public Arena getArena() {
