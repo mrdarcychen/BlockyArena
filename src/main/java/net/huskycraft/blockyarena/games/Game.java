@@ -27,16 +27,32 @@ package net.huskycraft.blockyarena.games;
 import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.arenas.ArenaState;
+import net.huskycraft.blockyarena.managers.ConfigManager;
 import net.huskycraft.blockyarena.utils.Gamer;
+
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.CauseStackManager.StackFrame;
+import org.spongepowered.api.event.cause.EventContextKeys;
+import org.spongepowered.api.event.cause.entity.spawn.SpawnTypes;
+import org.spongepowered.api.item.FireworkEffect;
+import org.spongepowered.api.item.FireworkShapes;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.util.Color;
+
+import com.google.common.collect.Lists;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -46,7 +62,6 @@ import java.util.concurrent.TimeUnit;
  */
 public class Game {
 
-    public static BlockyArena plugin;
     protected Arena arena; // the Arena associated with this Game
     protected List<Gamer> gamers; // the list of Gamers in this Game with corresponding connection status
     protected TeamMode teamMode;
@@ -61,8 +76,7 @@ public class Game {
      * The GameState is set to RECRUITING by default.
      * @param arena an enabled arena
      */
-    public Game(BlockyArena plugin, TeamMode teamMode, Arena arena, int numTeams) {
-        this.plugin = plugin;
+    public Game(TeamMode teamMode, Arena arena, int numTeams) {
         this.teamMode = teamMode;
         this.arena = arena;
         gamers = new ArrayList<>();
@@ -82,13 +96,44 @@ public class Game {
             gamer.getPlayer().sendMessage(Text.of("Unable to join the game at this time."));
             return;
         }
+        //If a player just joined the session, and the arena is full, we won't broadcast.
+        else
+        {
+        	checkForBroadcast(gamer);
+        }
         gamers.add(gamer);
         broadcast(Text.of(gamer.getName() + " joined the game. " +
                 "(" + gamers.size() + "/" + teamMode.getCapacity() * 2 + ")"));
         inspect();
+        
+        
     }
 
-    /**
+    /*
+     * Check for config and game type before broadcasting
+     */
+    private void checkForBroadcast(Gamer gamer) {
+    	
+    	//if config allow you to broadcast message when arena is created
+    	if(ConfigManager.getInstance().allowBroadcast())
+    	{
+    		switch(teamMode)
+    		{
+			case DOUBLES:
+				broadcastToAllPlayers((Text)Text.builder("[BlockyArena] " + gamer.getName() +" joins a doubles arena ! type /ba doubles to join !").color(TextColors.GOLD).build());
+				break;
+			case SOLO:
+				broadcastToAllPlayers((Text)Text.builder("[BlockyArena] " + gamer.getName() +" joins a solo arena ! type /ba solo to join !").color(TextColors.GOLD).build());
+				break;
+			default:
+				break;
+    		}
+    		
+    	}
+		
+	}
+
+	/**
      * Removes the given gamer from this Game.
      *
      * @param gamer the gamer to be removed from this Game
@@ -144,12 +189,19 @@ public class Game {
                 teamB.add(gamersItr.next());
             }
             gameState = GameState.STARTING;
-            startingCountdown(10);
+            startingCountdown(ConfigManager.getInstance().getLobbyCountdown());
         } else if (timer != null) {
             timer.cancel();
             gameState = GameState.RECRUITING;
             broadcast(Text.of("Waiting for more players to join ..."));
+            
         }
+        //When player is in the lobby session and join a session
+        else {
+        	
+        	
+        }
+
     }
     
     /**
@@ -199,7 +251,40 @@ public class Game {
 
         winner.broadcast(victory);
         loser.broadcast(gameOver);
-        Task.builder().execute(() -> terminate()).delay(3, TimeUnit.SECONDS).submit(plugin);
+        
+        
+        /*
+         * FEEL FREE TO REMOVE IF NEEDED
+         * 
+         */
+        
+        List<Color> colors = Lists.newArrayList(Color.BLACK, Color.BLUE, Color.CYAN, Color.DARK_CYAN, Color.DARK_GREEN, Color.DARK_MAGENTA,
+                Color.GRAY, Color.GREEN, Color.LIME, Color.MAGENTA, Color.NAVY, Color.PINK, Color.PURPLE, Color.RED, Color.WHITE, Color.YELLOW);
+        Collections.shuffle(colors);
+        
+        FireworkEffect fireworkEffect = FireworkEffect.builder()
+                .colors(colors.get(0), colors.get(1), colors.get(2))
+                .shape(FireworkShapes.STAR)
+                .build();
+
+      Player p = winner.getGamers().iterator().next().getPlayer();
+        
+        
+        Entity firework = p.getWorld().createEntity(EntityTypes.FIREWORK,p.getLocation().getPosition());
+        
+        firework.offer(Keys.FIREWORK_EFFECTS, Lists.newArrayList(fireworkEffect));
+        firework.offer(Keys.FIREWORK_FLIGHT_MODIFIER, 2);
+
+        
+        try (StackFrame frame = Sponge.getCauseStackManager().pushCauseFrame()) {
+            frame.addContext(EventContextKeys.SPAWN_TYPE, SpawnTypes.PLUGIN);
+
+        	   p.getWorld().spawnEntity(firework);
+           
+            
+        }
+        
+        Task.builder().execute(() -> terminate()).delay(4, TimeUnit.SECONDS).submit(BlockyArena.getInstance());
     }
 
     private void startingCountdown(int second) {
@@ -215,7 +300,7 @@ public class Game {
                 player.playSound(SoundTypes.BLOCK_DISPENSER_DISPENSE, player.getHeadRotation(), 100);
             }
             timer = Task.builder()
-                    .execute(() -> startingCountdown(second - 1)).delay(1, TimeUnit.SECONDS).submit(plugin);
+                    .execute(() -> startingCountdown(second - 1)).delay(1, TimeUnit.SECONDS).submit(BlockyArena.getInstance());
         }
     }
 
@@ -246,6 +331,15 @@ public class Game {
             }
         }
     }
+    
+    /**
+     * Broadcasts the given message to all players in the server
+     *
+     * @param msg the message to be delivered
+     */
+	public void broadcastToAllPlayers(Text msg) {
+		MessageChannel.TO_ALL.send(msg);
+	}
 
     /**
      * Terminates this Game permanently.
@@ -258,7 +352,7 @@ public class Game {
             }
         }
         arena.setState(ArenaState.AVAILABLE);
-        plugin.getGameManager().remove(this);
+        BlockyArena.getGameManager().remove(this);
     }
 
     public Arena getArena() {
