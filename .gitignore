@@ -3,3 +3,9 @@ build
 .gradle
 out
 META-INF
+/bin/
+connection.project.dir
+.classpath
+.project
+.settings/
+

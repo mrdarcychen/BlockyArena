@@ -29,6 +29,7 @@ import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.GameState;
 import net.huskycraft.blockyarena.games.GamersManager;
+import net.huskycraft.blockyarena.managers.ConfigManager;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
@@ -37,19 +38,68 @@ import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
+import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.channel.MessageChannel;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
 
 import java.util.Optional;
 
 public class EntityListener {
 
-    public static BlockyArena plugin;
 
-    public EntityListener(BlockyArena plugin) {
-        this.plugin = plugin;
+    public EntityListener() {
     }
+    
+    @Listener
+    public void onReload(GameReloadEvent event)
+    {
+    	ConfigManager.getInstance().reloadConfiguration();
+    }
+    
+	@Listener
+	public void onCommand(SendCommandEvent event, @First Player p) 
+	{
+		
+		Gamer gamer = GamersManager.getGamer(p.getUniqueId()).get();
+
+		Game game = gamer.getGame();
+		
+		String command = event.getCommand();
+
+		if (game != null)
+		{
+				//The player is currently playing !
+				if (gamer.getStatus() == GamerStatus.PLAYING)
+				{
+						//If the player doesnt have the permission to bypass !!
+						if(!p.hasPermission("blockyarena.bypass.command"))
+						{
+							if (!(command.equalsIgnoreCase("ba") || command.equalsIgnoreCase("arena") || command.equalsIgnoreCase("blockyarena")))
+							{
+							event.setCancelled(true);
+							p.sendMessage(ChatTypes.CHAT,
+									(Text) Text.builder("[BLOCKYARENA] Only command you can do is : /ba or /arena or /blockyarena !")
+											.color(TextColors.RED).build());
+							}
+							else
+							{
+								//ba or arena or blockyarena command is issued ! So we can move on and proceed event !
+							}
+						}
+						else
+						{
+							//Player can bypass permission so we move on
+						}
+					
+				}
+		}
+	}
 
     @Listener
     public void onDamageEntity(DamageEntityEvent event) {
@@ -59,7 +109,7 @@ public class EntityListener {
             // if the victim is in a game, proceed analysis
             if (victim.getStatus() == GamerStatus.PLAYING) {
                 Game game = victim.getGame();
-                DamageData damageData = new DamageData(plugin, victim, event.getCause());
+                DamageData damageData = new DamageData(BlockyArena.getInstance(), victim, event.getCause());
                 Optional<Gamer> optAttacker = damageData.getAttacker();
                 if (game.getGameState() != GameState.STARTED) {
                     if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {

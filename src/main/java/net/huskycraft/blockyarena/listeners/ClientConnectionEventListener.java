@@ -24,22 +24,21 @@
  */
 package net.huskycraft.blockyarena.listeners;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.GamersManager;
-import net.huskycraft.blockyarena.utils.Gamer;
+import java.util.UUID;
+
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
-import java.util.UUID;
+import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.games.GamersManager;
+import net.huskycraft.blockyarena.utils.Gamer;
 
 public class ClientConnectionEventListener {
 
-    public static BlockyArena plugin;
 
-    public ClientConnectionEventListener(BlockyArena plugin) {
-        this.plugin = plugin;
+    public ClientConnectionEventListener() {
     }
 
     @Listener
@@ -54,6 +53,8 @@ public class ClientConnectionEventListener {
         gamer.setOnline(true);
         gamer.setName(user.getName());
         gamer.setPlayer(user.getPlayer().get());
+        
+        BlockyArena.getInstance().getLogger().debug("A new player logged in !");
     }
 
     @Listener
@@ -63,6 +64,7 @@ public class ClientConnectionEventListener {
         gamer.setOnline(false);
         if (gamer.getGame() != null) {
             gamer.quit();
+            BlockyArena.getInstance().getLogger().debug("A player disconnected !");
         }
     }
 

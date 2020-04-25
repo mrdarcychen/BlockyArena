@@ -1,19 +1,16 @@
 package net.huskycraft.blockyarena.games;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.utils.Gamer;
-
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
+import net.huskycraft.blockyarena.utils.Gamer;
+
 /**
  * The manager that manages {@link Gamer}s.
  */
 public class GamersManager {
-
-    public static final BlockyArena plugin = BlockyArena.getPlugin();
 
     private static Set<Gamer> gamers = new HashSet<>();
 

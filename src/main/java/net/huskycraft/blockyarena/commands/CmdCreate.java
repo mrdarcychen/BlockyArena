@@ -54,7 +54,7 @@ public class CmdCreate implements CommandExecutor {
         String id = args.<String>getOne("id").get();
         switch (type) {
             case "arena":
-                Arena arena = new Arena(BlockyArena.getPlugin(), id);
+                Arena arena = new Arena(id);
                 BlockyArena.getArenaManager().add(arena);
                 player.sendMessage(Text.of(id + " is added on file. Start configuring it by typing /ba edit"));
                 return CommandResult.success();
