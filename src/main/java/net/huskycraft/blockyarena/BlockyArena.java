@@ -24,13 +24,20 @@
  */
 package net.huskycraft.blockyarena;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
-
+import com.google.common.reflect.TypeToken;
+import com.google.inject.Inject;
+import net.huskycraft.blockyarena.arenas.ArenaManager;
+import net.huskycraft.blockyarena.arenas.Spawn;
+import net.huskycraft.blockyarena.arenas.SpawnSerializer;
+import net.huskycraft.blockyarena.commands.*;
+import net.huskycraft.blockyarena.games.GameManager;
+import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
+import net.huskycraft.blockyarena.listeners.EntityListener;
+import net.huskycraft.blockyarena.managers.ConfigManager;
+import net.huskycraft.blockyarena.utils.Kit;
+import net.huskycraft.blockyarena.utils.KitManager;
+import net.huskycraft.blockyarena.utils.KitSerializer;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -43,26 +50,12 @@ import org.spongepowered.api.event.game.state.GameStartingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
-import com.google.common.reflect.TypeToken;
-import com.google.inject.Inject;
-
-import net.huskycraft.blockyarena.arenas.ArenaManager;
-import net.huskycraft.blockyarena.arenas.Spawn;
-import net.huskycraft.blockyarena.arenas.SpawnSerializer;
-import net.huskycraft.blockyarena.commands.CmdCreate;
-import net.huskycraft.blockyarena.commands.CmdEdit;
-import net.huskycraft.blockyarena.commands.CmdJoin;
-import net.huskycraft.blockyarena.commands.CmdKit;
-import net.huskycraft.blockyarena.commands.CmdQuit;
-import net.huskycraft.blockyarena.commands.CmdRemove;
-import net.huskycraft.blockyarena.games.GameManager;
-import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
-import net.huskycraft.blockyarena.listeners.EntityListener;
-import net.huskycraft.blockyarena.managers.ConfigManager;
-import net.huskycraft.blockyarena.utils.Kit;
-import net.huskycraft.blockyarena.utils.KitManager;
-import net.huskycraft.blockyarena.utils.KitSerializer;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 @Plugin(id = "blockyarena", name = "BlockyArena")
 public final class BlockyArena {
@@ -111,32 +104,23 @@ public final class BlockyArena {
 		registerListeners();
 		createDirectories();
 
-		createConfigManager();
-
-		getLogger().warn("PreInit finished ! !");
 	}
 
 	@Listener
 	public void onServerStarting(GameStartingServerEvent event) {
 		createManagers();
-		getLogger().warn("Started !");
 	}
 
 	/*
 	 * creates managers for the plugin Maybe using Singleton Instance for others ??
 	 */
 	private void createManagers() {
-		arenaManager = new ArenaManager();
-		gameManager = new GameManager();
-		kitManager = new KitManager();
-	}
-
-	// Create The Config Manager, and load config if they exist
-	private void createConfigManager() {
-		confManager = ConfigManager.getInstance();
-		confManager.load();
-
-	}
+        arenaManager = new ArenaManager(); // TODO: use static factory
+        gameManager = new GameManager();
+        kitManager = new KitManager();
+        confManager = ConfigManager.getInstance();
+        confManager.load();
+    }
 
 	/*
 	 * creates directories for arenas and classes if they do not exist pre: plugin
@@ -247,5 +231,4 @@ public final class BlockyArena {
 	public static BlockyArena getInstance() {
 		return PLUGIN;
 	}
-
 }

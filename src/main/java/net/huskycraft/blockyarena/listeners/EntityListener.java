@@ -43,7 +43,6 @@ import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.event.game.GameReloadEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.world.World;
@@ -63,43 +62,30 @@ public class EntityListener {
     }
     
 	@Listener
-	public void onCommand(SendCommandEvent event, @First Player p) 
-	{
-		
-		Gamer gamer = GamersManager.getGamer(p.getUniqueId()).get();
+    public void onCommand(SendCommandEvent event, @First Player p) {
+        Gamer gamer = GamersManager.getGamer(p.getUniqueId()).get();
+        Game game = gamer.getGame();
+        String command = event.getCommand();
 
-		Game game = gamer.getGame();
-		
-		String command = event.getCommand();
-
-		if (game != null)
-		{
-				//The player is currently playing !
-				if (gamer.getStatus() == GamerStatus.PLAYING)
-				{
-						//If the player doesnt have the permission to bypass !!
-						if(!p.hasPermission("blockyarena.bypass.command"))
-						{
-							if (!(command.equalsIgnoreCase("ba") || command.equalsIgnoreCase("arena") || command.equalsIgnoreCase("blockyarena")))
-							{
-							event.setCancelled(true);
-							p.sendMessage(ChatTypes.CHAT,
-									(Text) Text.builder("[BLOCKYARENA] Only command you can do is : /ba or /arena or /blockyarena !")
-											.color(TextColors.RED).build());
-							}
-							else
-							{
-								//ba or arena or blockyarena command is issued ! So we can move on and proceed event !
-							}
-						}
-						else
-						{
-							//Player can bypass permission so we move on
-						}
-					
-				}
-		}
-	}
+        if (game != null) {
+            //The player is currently playing !
+            if (gamer.getStatus() == GamerStatus.PLAYING) {
+                //If the player doesnt have the permission to bypass !!
+                if (!p.hasPermission("blockyarena.bypass.command")) {
+                    if (!(command.equalsIgnoreCase("ba") || command.equalsIgnoreCase("arena") || command.equalsIgnoreCase("blockyarena"))) {
+                        event.setCancelled(true);
+                        p.sendMessage(ChatTypes.CHAT,
+                                Text.builder("[BLOCKYARENA] Only command you can do is : /ba or /arena or /blockyarena !")
+                                        .color(TextColors.RED).build());
+                    } else {
+                        //ba or arena or blockyarena command is issued ! So we can move on and proceed event !
+                    }
+                } else {
+                    //Player can bypass permission so we move on
+                }
+            }
+        }
+    }
 
     @Listener
     public void onDamageEntity(DamageEntityEvent event) {
