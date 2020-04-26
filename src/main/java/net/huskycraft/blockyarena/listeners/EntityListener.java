@@ -29,6 +29,7 @@ import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.GameState;
 import net.huskycraft.blockyarena.games.GamersManager;
+import net.huskycraft.blockyarena.managers.ConfigManager;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
@@ -58,12 +59,13 @@ public class EntityListener {
     @Listener
     public void onReload(GameReloadEvent event)
     {
-    	BlockyArena.getInstance().reloadConfig();
+    	ConfigManager.getInstance().reloadConfiguration();
     }
     
 	@Listener
 	public void onCommand(SendCommandEvent event, @First Player p) 
 	{
+		
 		Gamer gamer = GamersManager.getGamer(p.getUniqueId()).get();
 
 		Game game = gamer.getGame();
@@ -72,22 +74,29 @@ public class EntityListener {
 
 		if (game != null)
 		{
-			
-				if (game.getGameState() == GameState.RECRUITING || game.getGameState() == GameState.STARTED || game.getGameState() == GameState.STARTING || game.getGameState() == GameState.STOPPING) 
+				//The player is currently playing !
+				if (gamer.getStatus() == GamerStatus.PLAYING)
 				{
-						
-					MessageChannel.TO_ALL.send((Text)Text.builder("command issued : " + command).color(TextColors.GOLD).build());
-					if (!(command.equalsIgnoreCase("ba") || command.equalsIgnoreCase("arena") || command.equalsIgnoreCase("blockyarena")))
-					{
-					event.setCancelled(true);
-					p.sendMessage(ChatTypes.CHAT,
-							(Text) Text.builder("[BLOCKYARENA] YOU CANT ISSUE COMMAND WHILE IN GAME !!")
-									.color(TextColors.DARK_RED).build());
-					}
-					else
-					{
-						//ba or arena or blockyarena command is issued ! So we can move on and proceed event !
-					}
+						//If the player doesnt have the permission to bypass !!
+						if(!p.hasPermission("blockyarena.bypass.command"))
+						{
+							if (!(command.equalsIgnoreCase("ba") || command.equalsIgnoreCase("arena") || command.equalsIgnoreCase("blockyarena")))
+							{
+							event.setCancelled(true);
+							p.sendMessage(ChatTypes.CHAT,
+									(Text) Text.builder("[BLOCKYARENA] Only command you can do is : /ba or /arena or /blockyarena !")
+											.color(TextColors.RED).build());
+							}
+							else
+							{
+								//ba or arena or blockyarena command is issued ! So we can move on and proceed event !
+							}
+						}
+						else
+						{
+							//Player can bypass permission so we move on
+						}
+					
 				}
 		}
 	}

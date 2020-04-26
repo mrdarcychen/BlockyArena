@@ -24,24 +24,13 @@
  */
 package net.huskycraft.blockyarena;
 
-import com.google.common.reflect.TypeToken;
-import com.google.inject.Inject;
-import net.huskycraft.blockyarena.arenas.ArenaManager;
-import net.huskycraft.blockyarena.arenas.Spawn;
-import net.huskycraft.blockyarena.arenas.SpawnSerializer;
-import net.huskycraft.blockyarena.commands.*;
-import net.huskycraft.blockyarena.games.GameManager;
-import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
-import net.huskycraft.blockyarena.listeners.EntityListener;
-import net.huskycraft.blockyarena.utils.Kit;
-import net.huskycraft.blockyarena.utils.KitManager;
-import net.huskycraft.blockyarena.utils.KitSerializer;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.ConfigurationOptions;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.args.GenericArguments;
@@ -51,252 +40,212 @@ import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
-import org.spongepowered.api.event.message.MessageEvent.MessageFormatter;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.text.Text;
 
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
+import com.google.common.reflect.TypeToken;
+import com.google.inject.Inject;
+
+import net.huskycraft.blockyarena.arenas.ArenaManager;
+import net.huskycraft.blockyarena.arenas.Spawn;
+import net.huskycraft.blockyarena.arenas.SpawnSerializer;
+import net.huskycraft.blockyarena.commands.CmdCreate;
+import net.huskycraft.blockyarena.commands.CmdEdit;
+import net.huskycraft.blockyarena.commands.CmdJoin;
+import net.huskycraft.blockyarena.commands.CmdKit;
+import net.huskycraft.blockyarena.commands.CmdQuit;
+import net.huskycraft.blockyarena.commands.CmdRemove;
+import net.huskycraft.blockyarena.games.GameManager;
+import net.huskycraft.blockyarena.listeners.ClientConnectionEventListener;
+import net.huskycraft.blockyarena.listeners.EntityListener;
+import net.huskycraft.blockyarena.managers.ConfigManager;
+import net.huskycraft.blockyarena.utils.Kit;
+import net.huskycraft.blockyarena.utils.KitManager;
+import net.huskycraft.blockyarena.utils.KitSerializer;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 
 @Plugin(id = "blockyarena", name = "BlockyArena")
 public final class BlockyArena {
+
+	private static BlockyArena PLUGIN;
 	
 	private static ArenaManager arenaManager;
 
 	private static GameManager gameManager;
 
 	private static KitManager kitManager;
-	
-	//GLOBAL : Should be changed !
-	private int lobbyCoolDown;
+
+	/*
+	 * Handle all of configuration !
+	 */
+	private ConfigManager confManager;
 
 	@Inject
 	private Logger logger;
 
-	private static BlockyArena PLUGIN;
-
-	//rootNode for config
-	private ConfigurationNode rootNode;
-	
-	@Inject
-	@DefaultConfig(sharedRoot = true)
-	private ConfigurationLoader<CommentedConfigurationNode> loader;
-
 	@Inject
 	@DefaultConfig(sharedRoot = false)
+	//The path to the default.conf file
 	private Path defaultConfig;
 
 	@Inject
 	@ConfigDir(sharedRoot = false)
+	//The default path to this plugin dir : /config/blockyarena
 	private Path configDir;
 
 	private Path arenaDir;
 
 	private Path kitDir;
-	
+
 	@Inject
-	private  BlockyArena() {
+	private BlockyArena() {
 	}
 
-    @Listener
-    public void onPreInit(GamePreInitializationEvent event) {
-        
-    	PLUGIN = this;
-    	
-    	registerTypeSerializers();
-        registerCommands();
-        registerListeners();
-        createDirectories();
-        HandleConfiguration();
-    }
+	@Listener
+	public void onPreInit(GamePreInitializationEvent event) {
 
-    @Listener
-    public void onServerStarting(GameStartingServerEvent event) {
-        createManagers();
-    }
-    /*
-    creates managers for the plugin
-     */
-    private void createManagers() {
-        arenaManager = new ArenaManager();
-        gameManager = new GameManager();
-        kitManager = new KitManager();
-    }
+		PLUGIN = this;
 
-    /*
-    creates directories for arenas and classes if they do not exist
-    pre: plugin config directory exists (throws IOException if not)
-     */
-    private void createDirectories() {
-        arenaDir = Paths.get(getConfigDir().toString() + "/arenas");
-        kitDir = Paths.get(getConfigDir().toString() + "/kits");
-        defaultConfig = Paths.get(getConfigDir().toString(), "default.json");
+		registerTypeSerializers();
+		registerCommands();
+		registerListeners();
+		createDirectories();
 
-        List<Path> directories = Arrays.asList(arenaDir, kitDir);
-        for (Path dir : directories) {
-            try {
-                if (!dir.toFile().exists()) {
-                    Files.createDirectory(dir);
-                }
-            } catch (IOException e) {
-                logger.warn("Error creating directory for "
-                        + dir.getFileName().toString());
-            }
-        }
-    }
-    
-    private void HandleConfiguration()
-    {
-    	
-    	loader = HoconConfigurationLoader.builder().setPath(defaultConfig).build();
-    	
-         this.rootNode = loader.createEmptyNode(ConfigurationOptions.defaults());
-    	 rootNode.getNode("timers", "lobby", "cooldownSec").setValue(15);
-    	 
-    	try {
-    		loader.save(rootNode);
-    	} catch(IOException e) {
-    	    // handle error
-    	}
-    	
-    	getLogger().error("value of node cooldown : " + rootNode.getNode("timers", "lobby", "cooldownSec").getInt());
-    	
-    	        
-    }
-    
-    public void reloadConfig()
-    {
-    	try{
-            rootNode = loader.load();
-            loader.save(rootNode);
-        }catch(IOException e){
-            e.printStackTrace();
-        }
-    	
-    	getLogger().warn("Reloaded !");
-    	getLogger().error("value of node cooldown : " + rootNode.getNode("timers", "lobby", "cooldownSec").getInt());
-    	
-    }
+		createConfigManager();
 
-    /*
-    registers event listeners to EventManager
-     */
-    private void registerListeners() {
-        Sponge.getEventManager().registerListeners(this,
-                new EntityListener());
-        Sponge.getEventManager().registerListeners(this,
-                new ClientConnectionEventListener());
-    }
+		getLogger().warn("PreInit finished ! !");
+	}
 
-    /*
-    registers user commands to CommandManager
-     */
-    private void registerCommands() {
-        CommandSpec cmdCreate = CommandSpec.builder()
-                .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
-                .executor(CmdCreate.getInstance())
-                .permission("blockyarena.create")
-                .build();
+	@Listener
+	public void onServerStarting(GameStartingServerEvent event) {
+		createManagers();
+		getLogger().warn("Started !");
+	}
 
-        CommandSpec cmdRemove = CommandSpec.builder()
-                .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
-                .executor(CmdRemove.getInstance())
-                .permission("blockyarena.remove")
-                .build();
+	/*
+	 * creates managers for the plugin Maybe using Singleton Instance for others ??
+	 */
+	private void createManagers() {
+		arenaManager = new ArenaManager();
+		gameManager = new GameManager();
+		kitManager = new KitManager();
+	}
 
-        CommandSpec cmdJoin = CommandSpec.builder()
-                .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("mode")))
-                )
-                .executor(CmdJoin.getInstance())
-                .build();
+	// Create The Config Manager, and load config if they exist
+	private void createConfigManager() {
+		confManager = ConfigManager.getInstance();
+		confManager.load();
 
-        CommandSpec cmdQuit = CommandSpec.builder()
-                .executor(CmdQuit.getInstance())
-                .build();
+	}
 
-        CommandSpec cmdEdit = CommandSpec.builder()
-                .arguments(
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
-                        GenericArguments.onlyOne(GenericArguments.string(Text.of("param")))
-                )
-                .executor(CmdEdit.getInstance())
-                .permission("blockyarena.edit")
-                .build();
+	/*
+	 * creates directories for arenas and classes if they do not exist pre: plugin
+	 * config directory exists (throws IOException if not)
+	 */
+	private void createDirectories() {
+		arenaDir = Paths.get(getConfigDir().toString() + "/arenas");
+		kitDir = Paths.get(getConfigDir().toString() + "/kits");
+		// The path to the "default.conf" configuration
+		defaultConfig = Paths.get(getConfigDir().toString(), "default.conf");
 
-        CommandSpec cmdKit = CommandSpec.builder()
-                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
-                .executor(CmdKit.getInstance())
-                .build();
+		List<Path> directories = Arrays.asList(arenaDir, kitDir);
+		for (Path dir : directories) {
+			try {
+				if (!dir.toFile().exists()) {
+					Files.createDirectory(dir);
+				}
+			} catch (IOException e) {
+				logger.warn("Error creating directory for " + dir.getFileName().toString());
+			}
+		}
+	}
 
-        CommandSpec arenaCommandSpec = CommandSpec.builder()
-                .child(cmdEdit, "edit")
-                .child(cmdCreate, "create")
-                .child(cmdRemove, "remove")
-                .child(cmdJoin, "join")
-                .child(cmdQuit, "quit")
-                .child(cmdKit, "kit")
-                .build();
+	/*
+	 * registers event listeners to EventManager
+	 */
+	private void registerListeners() {
+		Sponge.getEventManager().registerListeners(this, new EntityListener());
+		Sponge.getEventManager().registerListeners(this, new ClientConnectionEventListener());
+	}
 
-        Sponge.getCommandManager()
-                .register(BlockyArena.getInstance(), arenaCommandSpec, "blockyarena", "arena", "ba");
-    }
+	/*
+	 * registers user commands to CommandManager
+	 */
+	private void registerCommands() {
+		CommandSpec cmdCreate = CommandSpec.builder()
+				.arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
+						GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+				.executor(CmdCreate.getInstance()).permission("blockyarena.create").build();
 
-    /**
-     * Registers all custom TypeSerializers.
-     */
-    private void registerTypeSerializers() {
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Spawn.class), new SpawnSerializer(this));
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer(this));
-    }
+		CommandSpec cmdRemove = CommandSpec.builder()
+				.arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
+						GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+				.executor(CmdRemove.getInstance()).permission("blockyarena.remove").build();
 
-    public Logger getLogger() {
-        return logger;
-    }
+		CommandSpec cmdJoin = CommandSpec.builder()
+				.arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("mode"))))
+				.executor(CmdJoin.getInstance()).build();
 
-    public Path getDefaultConfig() {
-        return defaultConfig;
-    }
+		CommandSpec cmdQuit = CommandSpec.builder().executor(CmdQuit.getInstance()).build();
 
-    public Path getConfigDir() {
-        return configDir;
-    }
+		CommandSpec cmdEdit = CommandSpec.builder()
+				.arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))),
+						GenericArguments.onlyOne(GenericArguments.string(Text.of("type"))),
+						GenericArguments.onlyOne(GenericArguments.string(Text.of("param"))))
+				.executor(CmdEdit.getInstance()).permission("blockyarena.edit").build();
 
-    public Path getArenaDir() {
-        return arenaDir;
-    }
+		CommandSpec cmdKit = CommandSpec.builder()
+				.arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+				.executor(CmdKit.getInstance()).build();
 
-    public Path getKitDir() {
-        return kitDir;
-    }
+		CommandSpec arenaCommandSpec = CommandSpec.builder().child(cmdEdit, "edit").child(cmdCreate, "create")
+				.child(cmdRemove, "remove").child(cmdJoin, "join").child(cmdQuit, "quit").child(cmdKit, "kit").build();
 
-    public static ArenaManager getArenaManager() {
-        return arenaManager;
-    }
+		Sponge.getCommandManager().register(BlockyArena.getInstance(), arenaCommandSpec, "blockyarena", "arena", "ba");
+	}
 
-    public static GameManager getGameManager() {
-        return gameManager;
-    }
+	/**
+	 * Registers all custom TypeSerializers.
+	 */
+	private void registerTypeSerializers() {
+		TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Spawn.class), new SpawnSerializer(this));
+		TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer(this));
+	}
 
-    public static KitManager getKitManager() {
-        return kitManager;
-    }
+	public Logger getLogger() {
+		return logger;
+	}
 
-    public static BlockyArena getInstance() {
-        return PLUGIN;
-    }
-    
-    public ConfigurationNode getRootNode()
-    {
-    	return this.rootNode;
-    }
+	public Path getDefaultConfig() {
+		return defaultConfig;
+	}
+
+	public Path getConfigDir() {
+		return configDir;
+	}
+
+	public Path getArenaDir() {
+		return arenaDir;
+	}
+
+	public Path getKitDir() {
+		return kitDir;
+	}
+
+	public static ArenaManager getArenaManager() {
+		return arenaManager;
+	}
+
+	public static GameManager getGameManager() {
+		return gameManager;
+	}
+
+	public static KitManager getKitManager() {
+		return kitManager;
+	}
+
+	public static BlockyArena getInstance() {
+		return PLUGIN;
+	}
+
 }

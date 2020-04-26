@@ -4,3 +4,5 @@ build
 out
 META-INF
 /bin/
+connection.project.dir
+.classpath
