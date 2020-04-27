@@ -1,34 +1,23 @@
 /*
- * This file is part of BlockyArena, licensed under the MIT License (MIT).
+ * Copyright 2017-2020 The BlockyArena Contributors.
  *
- * Copyright (c) 2018 HuskyCraft <https://www.huskycraft.net>
- * Copyright (c) 2018 Darcy-Chen
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package net.huskycraft.blockyarena.arenas;
 
 import com.flowpowered.math.vector.Vector3d;
-import com.google.inject.Inject;
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.utils.Gamer;
-import org.slf4j.Logger;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
@@ -37,24 +26,38 @@ import org.spongepowered.api.world.World;
  */
 public class Spawn {
 
-    private Location<World> spawnLocation; // the spawn location of the team
-    private Vector3d spawnRotation; // the spawn rotation of the team
+    private final Transform<World> transform;
 
     /**
      * Constructs a Team with the location of the spawn point and the rotation of the spawn point
-     * @param spawnLocation the location that a player spawns
-     * @param spawnRotation the heading of a player who spawns at the spawn location
+     *
+     * @param location the location that a player spawns
+     * @param rotation the heading of a player who spawns at the spawn location
      */
-    public Spawn(Location<World> spawnLocation, Vector3d spawnRotation) {
-        this.spawnLocation = spawnLocation;
-        this.spawnRotation = spawnRotation;
+    @Deprecated
+    public Spawn(Location<World> location, Vector3d rotation) {
+        transform = new Transform<>(location.getExtent(), location.getPosition(), rotation);
     }
 
+    private Spawn(Transform<World> transform) {
+        this.transform = transform;
+    }
+
+    @Deprecated
     public Location getSpawnLocation() {
-        return spawnLocation;
+        return transform.getLocation();
     }
 
+    @Deprecated
     public Vector3d getSpawnRotation() {
-        return spawnRotation;
+        return transform.getRotation();
+    }
+
+    public Transform<World> getTransform() {
+        return transform;
+    }
+
+    public static Spawn of(Transform<World> transform) {
+        return new Spawn(transform);
     }
 }
