@@ -24,21 +24,23 @@
  */
 package net.huskycraft.blockyarena.arenas;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
+import org.spongepowered.api.world.Location;
+
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
+
 import net.huskycraft.blockyarena.BlockyArena;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
 import ninja.leaping.configurate.loader.ConfigurationLoader;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.spongepowered.api.world.Location;
-
-import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 
 /**
  * An Arena represents an specific region for dueling.

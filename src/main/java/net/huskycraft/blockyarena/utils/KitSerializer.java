@@ -24,17 +24,19 @@
  */
 package net.huskycraft.blockyarena.utils;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Optional;
+
+import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.inventory.property.SlotIndex;
+
 import com.google.common.reflect.TypeToken;
+
 import net.huskycraft.blockyarena.BlockyArena;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
-import org.spongepowered.api.item.inventory.ItemStack;
-import org.spongepowered.api.item.inventory.property.SlotIndex;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 
 public class KitSerializer implements TypeSerializer<Kit> {
 
