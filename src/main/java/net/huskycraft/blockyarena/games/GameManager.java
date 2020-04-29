@@ -42,17 +42,17 @@ public class GameManager {
      */
     public Game getGame(TeamMode teamMode) {
         for (Game game : games) {
-            boolean isActive = game.getGameState() == GameState.RECRUITING;
+            boolean isActive = game.canJoin();
             boolean isGivenType = game.getTeamMode() == teamMode;
             if (isActive && isGivenType) {
                 return game;
             }
         }
         // if there is no active Game, initialize a new Game
-        Arena arena = plugin.getArenaManager().getArena();
+        Arena arena = BlockyArena.getArenaManager().getArena();
         // if there is no available Arena, no Game can be instantiated and null is returned
         if (arena == null) return null;
-        Game game = new Game(plugin, teamMode, arena, 2); // TODO: customize number of teams
+        Game game = new Game(teamMode, arena);
         games.add(game);
         return game;
     }

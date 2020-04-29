@@ -51,7 +51,7 @@ import java.util.List;
 @Plugin(id = "blockyarena", name = "BlockyArena")
 public final class BlockyArena {
 
-    private static final BlockyArena PLUGIN = new BlockyArena();
+    private static BlockyArena PLUGIN;
 
     private static ArenaManager arenaManager;
     private static GameManager gameManager;
@@ -70,11 +70,13 @@ public final class BlockyArena {
 
     private Path arenaDir, kitDir;
 
+    @Inject
     private BlockyArena() {
     }
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
+        PLUGIN = this;
         registerTypeSerializers();
         registerCommands();
         registerListeners();

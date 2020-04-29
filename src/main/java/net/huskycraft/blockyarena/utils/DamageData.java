@@ -16,7 +16,6 @@
 
 package net.huskycraft.blockyarena.utils;
 
-import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.GamersManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
@@ -34,25 +33,12 @@ import java.util.Optional;
  */
 public class DamageData {
 
-    public static BlockyArena plugin;
     private final Gamer victim;
     private Optional<Gamer> attacker;
-    private Cause cause;
     private DamageType damageType;
 
-    public DamageData(BlockyArena plugin, Gamer victim, Cause cause) {
-        this.plugin = plugin;
+    public DamageData(Gamer victim, Cause cause) {
         this.victim = victim;
-        this.cause = cause;
-        attacker = Optional.empty();
-        analyze();
-    }
-
-    /**
-     * Analyzes the Cause of the DamageEntityEvent.
-     *
-     */
-    public void analyze() {
         Optional<DamageSource> optDamageSourcecause = cause.first(DamageSource.class);
         if (optDamageSourcecause.isPresent()) {
             DamageSource damageSource = optDamageSourcecause.get();
@@ -77,13 +63,11 @@ public class DamageData {
                     Player player = (Player) directSource;
                     attacker = Optional.of(GamersManager.getGamer(player.getUniqueId()).get());
                 }
-
             } else if (damageSource instanceof BlockDamageSource) {
                 // TODO
 
             }
         }
-
     }
 
     public String getDeathMessage() {
@@ -103,6 +87,10 @@ public class DamageData {
 
     public Optional<Gamer> getAttacker() {
         return attacker;
+    }
+
+    public Gamer getVictim() {
+        return victim;
     }
 
     public DamageType getDamageType() {
