@@ -16,16 +16,17 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.Team;
+import java.util.concurrent.TimeUnit;
+
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 
-import java.util.concurrent.TimeUnit;
+import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.Team;
 
 public class StoppingState extends MatchState {
 
@@ -52,6 +53,6 @@ public class StoppingState extends MatchState {
         loser.broadcast(gameOver);
         Task.builder().execute(() -> {
             game.setMatchState(new LeavingState(game));
-        }).delay(3, TimeUnit.SECONDS).submit(BlockyArena.getPlugin());
+        }).delay(3, TimeUnit.SECONDS).submit(BlockyArena.getInstance());
     }
 }

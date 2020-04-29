@@ -16,14 +16,14 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.utils.DamageData;
-import net.huskycraft.blockyarena.utils.Gamer;
+import java.util.List;
+
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 
-import java.util.ArrayList;
-import java.util.List;
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.utils.DamageData;
+import net.huskycraft.blockyarena.utils.Gamer;
 
 public abstract class MatchState {
 

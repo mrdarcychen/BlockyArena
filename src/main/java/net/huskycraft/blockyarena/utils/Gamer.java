@@ -16,16 +16,18 @@
 
 package net.huskycraft.blockyarena.utils;
 
-import com.flowpowered.math.vector.Vector3d;
-import net.huskycraft.blockyarena.arenas.Spawn;
-import net.huskycraft.blockyarena.games.Game;
+import java.util.UUID;
+
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
 
-import java.util.UUID;
+import com.flowpowered.math.vector.Vector3d;
+
+import net.huskycraft.blockyarena.arenas.Spawn;
+import net.huskycraft.blockyarena.games.Game;
 
 /**
  * A Gamer object stores a player's gaming profile.

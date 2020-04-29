@@ -16,18 +16,20 @@
 
 package net.huskycraft.blockyarena.arenas;
 
-import com.flowpowered.math.vector.Vector3d;
-import com.google.common.reflect.TypeToken;
-import net.huskycraft.blockyarena.BlockyArena;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
+import java.util.UUID;
+
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
 
-import java.util.UUID;
+import com.flowpowered.math.vector.Vector3d;
+import com.google.common.reflect.TypeToken;
+
+import net.huskycraft.blockyarena.BlockyArena;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
 public class SpawnSerializer implements TypeSerializer<Spawn> {
 

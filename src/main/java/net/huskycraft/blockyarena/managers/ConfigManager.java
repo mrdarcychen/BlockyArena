@@ -84,7 +84,7 @@ public class ConfigManager {
 			e.printStackTrace();
 		}
 		
-		BlockyArena.getInstance().getLogger().info("Configuration reloaded !");
+		BlockyArena.getInstance().getLogger().warn("Configuration reloaded !");
 	}
 	
 	/*

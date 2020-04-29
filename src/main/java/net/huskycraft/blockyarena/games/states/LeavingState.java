@@ -33,6 +33,9 @@ public class LeavingState extends MatchState {
         }
         game.getArena().setState(ArenaState.AVAILABLE);
         BlockyArena.getGameManager().remove(game);
+        
+        
+        
     }
 
 }

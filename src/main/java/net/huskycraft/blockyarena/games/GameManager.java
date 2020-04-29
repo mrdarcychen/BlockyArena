@@ -16,11 +16,11 @@
 
 package net.huskycraft.blockyarena.games;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.arenas.Arena;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.arenas.Arena;
 
 /**
  * The GameManager manages all registered Game session in the server.

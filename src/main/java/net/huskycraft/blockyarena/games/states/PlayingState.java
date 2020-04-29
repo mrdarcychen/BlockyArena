@@ -16,11 +16,6 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import com.flowpowered.math.vector.Vector3d;
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.Team;
-import net.huskycraft.blockyarena.utils.DamageData;
-import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
@@ -29,6 +24,13 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.World;
+
+import com.flowpowered.math.vector.Vector3d;
+
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.Team;
+import net.huskycraft.blockyarena.utils.DamageData;
+import net.huskycraft.blockyarena.utils.Gamer;
 
 public class PlayingState extends MatchState {
 

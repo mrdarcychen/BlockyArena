@@ -16,19 +16,20 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.Team;
-import net.huskycraft.blockyarena.utils.Gamer;
+import java.util.Iterator;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
+import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.Team;
+import net.huskycraft.blockyarena.utils.Gamer;
 
 public class StartingState extends MatchState {
 
@@ -63,7 +64,7 @@ public class StartingState extends MatchState {
                         System.out.println("TMINUS: " + tMinus); // TODO: DELETE
                         tMinus--;
                     }
-                }).submit(BlockyArena.getPlugin());
+                }).submit(BlockyArena.getInstance());
     }
 
     @Override

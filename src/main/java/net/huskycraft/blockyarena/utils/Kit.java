@@ -16,7 +16,10 @@
 
 package net.huskycraft.blockyarena.utils;
 
-import net.huskycraft.blockyarena.BlockyArena;
+import java.util.Map;
+import java.util.Optional;
+import java.util.TreeMap;
+
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
@@ -24,7 +27,7 @@ import org.spongepowered.api.item.inventory.entity.PlayerInventory;
 import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 
-import java.util.*;
+import net.huskycraft.blockyarena.BlockyArena;
 
 /**
  * A Kit represents a player's equipments and a collection of ItemStacks that appear in the hotbar and main grid.

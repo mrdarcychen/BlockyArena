@@ -16,11 +16,12 @@
 
 package net.huskycraft.blockyarena.games.states;
 
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.text.Text;
+
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.text.Text;
 
 public class EnteringState extends MatchState {
 

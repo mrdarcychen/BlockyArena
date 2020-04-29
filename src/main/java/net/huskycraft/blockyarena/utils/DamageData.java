@@ -16,7 +16,8 @@
 
 package net.huskycraft.blockyarena.utils;
 
-import net.huskycraft.blockyarena.games.GamersManager;
+import java.util.Optional;
+
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -26,7 +27,7 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 
-import java.util.Optional;
+import net.huskycraft.blockyarena.games.GamersManager;
 
 /**
  * A DamageData represents the information about a specific damage dealt on a Gamer.
