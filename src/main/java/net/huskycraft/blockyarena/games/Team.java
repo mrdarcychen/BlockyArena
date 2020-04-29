@@ -24,15 +24,16 @@
  */
 package net.huskycraft.blockyarena.games;
 
-import net.huskycraft.blockyarena.arenas.Spawn;
-import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.title.Title;
-
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
+
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.title.Title;
+
+import net.huskycraft.blockyarena.arenas.Spawn;
+import net.huskycraft.blockyarena.utils.Gamer;
+import net.huskycraft.blockyarena.utils.GamerStatus;
 
 /**
  * A Team represents a single Gamer or a group of Gamers who cooperate to win a Game.

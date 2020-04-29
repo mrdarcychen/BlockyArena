@@ -1,7 +1,23 @@
+/*
+ * Copyright 2017-2020 The BlockyArena Contributors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package net.huskycraft.blockyarena.utils;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.GamersManager;
+import java.util.Optional;
+
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -11,32 +27,19 @@ import org.spongepowered.api.event.cause.entity.damage.source.DamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.EntityDamageSource;
 import org.spongepowered.api.event.cause.entity.damage.source.IndirectEntityDamageSource;
 
-import java.util.Optional;
+import net.huskycraft.blockyarena.games.GamersManager;
 
 /**
  * A DamageData represents the information about a specific damage dealt on a Gamer.
  */
 public class DamageData {
 
-    public static BlockyArena plugin;
     private final Gamer victim;
     private Optional<Gamer> attacker;
-    private Cause cause;
     private DamageType damageType;
 
-    public DamageData(BlockyArena plugin, Gamer victim, Cause cause) {
-        this.plugin = plugin;
+    public DamageData(Gamer victim, Cause cause) {
         this.victim = victim;
-        this.cause = cause;
-        attacker = Optional.empty();
-        analyze();
-    }
-
-    /**
-     * Analyzes the Cause of the DamageEntityEvent.
-     *
-     */
-    public void analyze() {
         Optional<DamageSource> optDamageSourcecause = cause.first(DamageSource.class);
         if (optDamageSourcecause.isPresent()) {
             DamageSource damageSource = optDamageSourcecause.get();
@@ -61,13 +64,11 @@ public class DamageData {
                     Player player = (Player) directSource;
                     attacker = Optional.of(GamersManager.getGamer(player.getUniqueId()).get());
                 }
-
             } else if (damageSource instanceof BlockDamageSource) {
                 // TODO
 
             }
         }
-
     }
 
     public String getDeathMessage() {
@@ -87,6 +88,10 @@ public class DamageData {
 
     public Optional<Gamer> getAttacker() {
         return attacker;
+    }
+
+    public Gamer getVictim() {
+        return victim;
     }
 
     public DamageType getDamageType() {

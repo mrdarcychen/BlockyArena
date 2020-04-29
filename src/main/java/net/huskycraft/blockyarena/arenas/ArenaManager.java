@@ -24,8 +24,6 @@
  */
 package net.huskycraft.blockyarena.arenas;
 
-import net.huskycraft.blockyarena.BlockyArena;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -34,6 +32,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
+
+import net.huskycraft.blockyarena.BlockyArena;
 
 /**
  * An ArenaManager keeps track of the available Arenas in the server.
