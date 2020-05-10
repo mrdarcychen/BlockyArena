@@ -27,6 +27,8 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+import java.util.Optional;
+
 public class CmdKit implements CommandExecutor {
 
     private static final CmdKit INSTANCE = new CmdKit();
@@ -41,7 +43,22 @@ public class CmdKit implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Player player = (Player)src;
+        Player player;
+        Optional<Player> playerArg = args.getOne(Text.of("player"));
+
+        if (src instanceof Player) {
+            if (playerArg.isPresent() && src != playerArg.get()) {
+                src.sendMessage(Text.of("You are not allowed to set another player's kit."));
+                return CommandResult.empty();
+            }
+            player = (Player)src;
+        } else {
+            if (!playerArg.isPresent()) {
+                return CommandResult.empty();
+            }
+            player = playerArg.get();
+        }
+
         if (GamersManager.getGamer(player.getUniqueId()).get().getStatus() != GamerStatus.PLAYING) {
             player.sendMessage(Text.of("You are not allowed to get any kit when you are not in a game."));
             return CommandResult.empty();
