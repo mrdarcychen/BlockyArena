@@ -169,7 +169,10 @@ public final class BlockyArena {
                 .build();
 
         CommandSpec cmdKit = CommandSpec.builder()
-                .arguments(GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))))
+                .arguments(
+                        GenericArguments.onlyOne(GenericArguments.string(Text.of("id"))),
+                        GenericArguments.optionalWeak(GenericArguments.playerOrSource(Text.of("player")))
+                )
                 .executor(CmdKit.getInstance())
                 .build();
 
