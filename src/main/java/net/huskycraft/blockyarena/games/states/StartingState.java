@@ -16,65 +16,65 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import java.util.Iterator;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
+import net.huskycraft.blockyarena.arenas.SpawnPoint;
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.Team;
+import net.huskycraft.blockyarena.games.Timer;
+import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.Team;
-import net.huskycraft.blockyarena.utils.Gamer;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Stream;
 
 public class StartingState extends MatchState {
 
-    private Task task;
-    private int tMinus;
+    private Timer timer;
 
     public StartingState(Game game, List<Gamer> gamers, int countdown) {
         super(game);
         this.gamers = gamers;
-        tMinus = countdown;
-        task = Task.builder()
-                .interval(1, TimeUnit.SECONDS)
-                .execute(() -> {
-                    if (tMinus == 0) {
-                        task.cancel();
-                        Team teamA = new Team(game.getArena().getTeamSpawnA(), game);
-                        Team teamB = new Team(game.getArena().getTeamSpawnB(), game);
-                        Iterator<Gamer> gamersItr = gamers.iterator();
-                        while (gamersItr.hasNext()) {
-                            teamA.add(gamersItr.next());
-                            teamB.add(gamersItr.next());
-                        }
-                        game.setMatchState(new PlayingState(game, teamA, teamB));
-                    } else {
-                        Title title = Title.builder()
-                                .title(Text.of(tMinus)).fadeIn(2).fadeOut(2).stay(16).build();
-                        for (Gamer gamer : gamers) {
-                            Player player = gamer.getPlayer();
-                            player.sendTitle(title);
-                            player.playSound(SoundTypes.BLOCK_DISPENSER_DISPENSE, player.getHeadRotation(), 100);
-                        }
-                        System.out.println("TMINUS: " + tMinus); // TODO: DELETE
-                        tMinus--;
-                    }
-                }).submit(BlockyArena.getInstance());
+        timer = new Timer(countdown, tMinus -> {
+            if (tMinus == 0) {
+                game.setMatchState(new PlayingState(game, partition()));
+                return;
+            }
+            Title title = Title.builder().title(Text.of(tMinus)).fadeIn(2)
+                    .fadeOut(2).stay(16).build();
+            for (Gamer gamer : gamers) {
+                Player player = gamer.getPlayer();
+                player.sendTitle(title);
+                player.playSound(SoundTypes.BLOCK_NOTE_HAT, player.getLocation().getPosition(), 100);
+            }
+        });
     }
 
     @Override
     public void dismiss(Gamer gamer) {
         super.dismiss(gamer);
         // if fall below min requirement, new entering state
-        if (gamers.size() <= game.getTeamMode().getCapacity() * 2) {
-            task.cancel();
+        if (gamers.size() <= game.getTotalCapacity()) {
+            timer.cancel();
             broadcast(Text.of("Waiting for more players to join ..."));
             game.setMatchState(new EnteringState(game));
         }
+    }
+
+    private List<Team> partition() {
+        Stream<SpawnPoint> startPoints = game.getArena().getStartPoints();
+        List<Team> teams = new ArrayList<>();
+        startPoints.forEach(point -> teams.add(new Team(point, game)));
+        Iterator<Gamer> gamersItr = gamers.iterator();
+        int gamersLeft = gamers.size();
+        while (gamersItr.hasNext()) {
+            int teamNum = gamersLeft % teams.size();
+            teams.get(teamNum).add(gamersItr.next());
+            gamersLeft--;
+        }
+        return teams;
     }
 }

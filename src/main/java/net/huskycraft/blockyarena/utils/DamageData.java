@@ -35,7 +35,7 @@ import net.huskycraft.blockyarena.games.GamersManager;
 public class DamageData {
 
     private final Gamer victim;
-    private Optional<Gamer> attacker;
+    private Gamer attacker;
     private DamageType damageType;
 
     public DamageData(Gamer victim, Cause cause) {
@@ -52,7 +52,7 @@ public class DamageData {
                 if (indirectSource instanceof Player) {
                     Player player = (Player) indirectSource;
 
-                    attacker = Optional.of(GamersManager.getGamer(player.getUniqueId()).get());
+                    attacker = GamersManager.getGamer(player.getUniqueId()).get();
                 }
 //                Optional<Player> owner = cause.getContext().get(EventContextKeys.OWNER).get()
 //                        .getPlayer();
@@ -62,24 +62,23 @@ public class DamageData {
                 Entity directSource = entityDamageSource.getSource();
                 if (directSource instanceof Player) {
                     Player player = (Player) directSource;
-                    attacker = Optional.of(GamersManager.getGamer(player.getUniqueId()).get());
+                    attacker = GamersManager.getGamer(player.getUniqueId()).get();
                 }
             } else if (damageSource instanceof BlockDamageSource) {
                 // TODO
-
             }
         }
     }
 
     public String getDeathMessage() {
-        if (damageType.getName().equalsIgnoreCase("attack")) {
-            return victim.getName() + " was killed by " + attacker.get().getName() + ".";
+        if (damageType.getName().equalsIgnoreCase("attack") && attacker != null) {
+            return victim.getName() + " was killed by " + attacker.getName() + ".";
         } else if (damageType.getName().equalsIgnoreCase("fall")) {
             return victim.getName() + " fell from a high place.";
         } else if (damageType.getName().equalsIgnoreCase("fire")) {
             return victim.getName() + " was burned to death.";
-        } else if (damageType.getName().equalsIgnoreCase("magic")) {
-            return victim.getName() + " was killed by " + attacker.get().getName() + "'s magic.";
+        } else if (damageType.getName().equalsIgnoreCase("magic") && attacker != null) {
+            return victim.getName() + " was killed by " + attacker.getName() + "'s magic.";
         } else if (damageType.getName().equalsIgnoreCase("void")) {
             return victim.getName() + " fell into the void.";
         }
@@ -87,7 +86,7 @@ public class DamageData {
     }
 
     public Optional<Gamer> getAttacker() {
-        return attacker;
+        return Optional.ofNullable(attacker);
     }
 
     public Gamer getVictim() {

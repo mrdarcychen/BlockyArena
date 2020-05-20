@@ -16,14 +16,13 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import java.util.List;
-
-import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.text.Text;
-
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.text.Text;
+
+import java.util.List;
 
 public abstract class MatchState {
 
@@ -32,27 +31,35 @@ public abstract class MatchState {
 
     public MatchState(Game game) {
         this.game = game;
-        gamers = new ArrayList<>();
+        this.gamers = game.getGamersList();
     }
 
-
+    /*
+     * Called when a new player try to join an arena
+     */
     public void recruit(Gamer gamer) {
 
     }
 
+    /*
+     * Called when you quit the game
+     */
     public void dismiss(Gamer gamer) {
         gamers.remove(gamer);
         broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + game.getTeamMode().getCapacity() * 2 + ")"));
+                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
     }
 
+    /*
+     * Called when you kill a @Gamer gamer
+     */
     public void eliminate(Gamer gamer, Text cause) {
 
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
         if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {
-            damageData.getVictim().spawnAt(game.getArena().getLobbySpawn());
+            damageData.getVictim().getPlayer().setTransform(game.getArena().getLobbySpawn().getTransform());
         }
         event.setCancelled(true);
     }

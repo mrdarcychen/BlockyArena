@@ -18,15 +18,17 @@ package net.huskycraft.blockyarena.utils;
 
 import java.util.UUID;
 
+import net.huskycraft.blockyarena.arenas.Arena;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.Location;
+import org.spongepowered.api.world.World;
 
 import com.flowpowered.math.vector.Vector3d;
 
-import net.huskycraft.blockyarena.arenas.Spawn;
+import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import net.huskycraft.blockyarena.games.Game;
 
 /**
@@ -42,7 +44,7 @@ public class Gamer {
     private Game game; // the Game session this player is currently in
     private GamerStatus status; // the gaming status of this player
 
-    private Location savedLocation; // the saved location of the player for record
+    private Location<World> savedLocation; // the saved location of the player for record
     private Kit kit; // the original inventory of the player for record
 
     /**
@@ -75,7 +77,7 @@ public class Gamer {
      *
      * @param spawn the Spawn point where this Gamer is going to be at
      */
-    public void spawnAt(Spawn spawn) {
+    public void spawnAt(SpawnPoint spawn) {
         player.setVelocity(new Vector3d(0.0, 0.0, 0.0)); // TODO: doesn't work
         player.setLocationAndRotation(spawn.getSpawnLocation(), spawn.getSpawnRotation());
     }
@@ -143,8 +145,10 @@ public class Gamer {
         saveLocation();
         saveInventory();
         player.getInventory().clear();  // TODO: allow bringing personal kit
-        player.sendMessage(Text.of("Sending you to " + game.getArena().getID() + " ..."));
-        spawnAt(game.getArena().getLobbySpawn());
+        player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
+        Arena arena = game.getArena();
+        SpawnPoint spawnPoint = arena.getLobbySpawn();
+        player.setTransform(spawnPoint.getTransform());
         // TODO: refer to game logistics for the following parameters
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
         player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
@@ -163,6 +167,7 @@ public class Gamer {
         setLocation(getSavedLocation());
         setStatus(GamerStatus.AVAILABLE);
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+        player.sendMessage(Text.of("you have your gamemode changed to survival !"));
         player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
         player.offer(Keys.FOOD_LEVEL, 20);
     }
@@ -174,7 +179,7 @@ public class Gamer {
     public void spectate(Game game) {
         player.offer(Keys.GAME_MODE, GameModes.SPECTATOR);
         setStatus(GamerStatus.SPECTATING);
-        spawnAt(game.getArena().getSpectatorSpawn());
+        player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
     }
 
     /**

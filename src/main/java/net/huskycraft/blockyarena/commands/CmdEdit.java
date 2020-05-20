@@ -16,6 +16,9 @@
 
 package net.huskycraft.blockyarena.commands;
 
+import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.arenas.ArenaManager;
+import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -24,12 +27,14 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.arenas.Arena;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CmdEdit implements CommandExecutor{
 
     private static final CmdEdit INSTANCE = new CmdEdit();
+    private Map<Player, Arena.Builder> builders = new HashMap<>();
+
 
     /* enforce the singleton property with a private constructor */
     private CmdEdit() {
@@ -44,30 +49,32 @@ public class CmdEdit implements CommandExecutor{
         Player player = (Player)src;
         String id = args.<String>getOne("id").get();
         String type = args.<String>getOne("type").get();
-        String param = args.<String>getOne("param").get();
+        String param = args.<String>getOne("param").orElse("");
 
-        Arena arena = BlockyArena.getArenaManager().getArena(id);
-        if (arena == null) {
+        Arena.Builder builder = builders.get(player);
+        if (builder == null) {
             player.sendMessage(Text.of("Arena " + id + " does not exist."));
             return CommandResult.empty();
         }
-        switch (type) {
-            case "spawn":
+        if ("save".equals(type)) {
+            Arena arena = builder.build();
+            ArenaManager.getInstance().add(arena);
+        } else {
                 switch (param) {
                     case "a":
-                        arena.setTeamSpawnA(player.getLocation(), player.getHeadRotation());
+                        builder.addStartPoint(SpawnPoint.of(player.getTransform()));
                         player.sendMessage(Text.of("Spawn point A is set."));
                         break;
                     case "b":
-                        arena.setTeamSpawnB(player.getLocation(), player.getHeadRotation());
+                        builder.addStartPoint(SpawnPoint.of(player.getTransform()));
                         player.sendMessage(Text.of("Spawn point B is set."));
                         break;
                     case "lobby":
-                        arena.setLobbySpawn(player.getLocation(), player.getHeadRotation());
+                        builder.setLobbySpawn(SpawnPoint.of(player.getTransform()));
                         player.sendMessage(Text.of("Lobby spawn point is set."));
                         break;
                     case "spectator":
-                        arena.setSpectatorSpawn(player.getLocation(), player.getHeadRotation());
+                        builder.setSpectatorSpawn(SpawnPoint.of(player.getTransform()));
                         player.sendMessage(Text.of("Spectator spawn point is set."));
                         break;
                     default:
@@ -76,5 +83,9 @@ public class CmdEdit implements CommandExecutor{
                 }
         }
         return CommandResult.success();
+    }
+    public void expectBuilder(Player player, String arenaName) {
+        Arena.Builder builder = new Arena.Builder(arenaName);
+        builders.put(player, builder);
     }
 }

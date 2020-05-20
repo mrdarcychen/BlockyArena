@@ -16,16 +16,15 @@
 
 package net.huskycraft.blockyarena.arenas;
 
+import com.flowpowered.math.vector.Vector3d;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 
-import com.flowpowered.math.vector.Vector3d;
-
 /**
- * A Spawn object represents a specific spawn location with head rotation for a Team.
+ * Represents a specific spawn location with head rotation for a Team.
  */
-public class Spawn {
+public class SpawnPoint {
 
     private final Transform<World> transform;
 
@@ -36,11 +35,11 @@ public class Spawn {
      * @param rotation the heading of a player who spawns at the spawn location
      */
     @Deprecated
-    public Spawn(Location<World> location, Vector3d rotation) {
+    public SpawnPoint(Location<World> location, Vector3d rotation) {
         transform = new Transform<>(location.getExtent(), location.getPosition(), rotation);
     }
 
-    private Spawn(Transform<World> transform) {
+    private SpawnPoint(Transform<World> transform) {
         this.transform = transform;
     }
 
@@ -58,7 +57,7 @@ public class Spawn {
         return transform;
     }
 
-    public static Spawn of(Transform<World> transform) {
-        return new Spawn(transform);
+    public static SpawnPoint of(Transform<World> transform) {
+        return new SpawnPoint(transform);
     }
 }

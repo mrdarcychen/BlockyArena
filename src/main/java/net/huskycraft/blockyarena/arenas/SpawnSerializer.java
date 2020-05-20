@@ -19,6 +19,7 @@ package net.huskycraft.blockyarena.arenas;
 import java.util.UUID;
 
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.Location;
 import org.spongepowered.api.world.World;
 import org.spongepowered.api.world.extent.Extent;
@@ -31,7 +32,7 @@ import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 
-public class SpawnSerializer implements TypeSerializer<Spawn> {
+public class SpawnSerializer implements TypeSerializer<SpawnPoint> {
 
     public static BlockyArena plugin;
 
@@ -40,23 +41,22 @@ public class SpawnSerializer implements TypeSerializer<Spawn> {
     }
 
     @Override
-    public Spawn deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
+    public SpawnPoint deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
         if (!Sponge.getServer().getWorld(extentUUID).isPresent()) {
             plugin.getLogger().warn("Cannot find extent with UUID " + extentUUID.toString());
         }
-        Extent extent = Sponge.getServer().getWorld(extentUUID).get();
-        Location<World> spawnLocation = new Location(
-                 extent,
-                new Vector3d(value.getNode("location").getValue(TypeToken.of(Vector3d.class))));
-        Vector3d spawnRotation = value.getNode("rotation").getValue(TypeToken.of(Vector3d.class));
-        return new Spawn(spawnLocation, spawnRotation);
+        World extent = Sponge.getServer().getWorld(extentUUID).get();
+        Vector3d position = value.getNode("position").getValue(TypeToken.of(Vector3d.class));
+        Vector3d rotation = value.getNode("rotation").getValue(TypeToken.of(Vector3d.class));
+        return SpawnPoint.of(new Transform<>(extent, position, rotation));
     }
 
     @Override
-    public void serialize(TypeToken<?> type, Spawn obj, ConfigurationNode value) throws ObjectMappingException {
-        value.getNode("extent").setValue(TypeToken.of(UUID.class), obj.getSpawnLocation().getExtent().getUniqueId());
-        value.getNode("location").setValue(TypeToken.of(Vector3d.class), obj.getSpawnLocation().getPosition());
-        value.getNode("rotation").setValue(TypeToken.of(Vector3d.class), obj.getSpawnRotation());
+    public void serialize(TypeToken<?> type, SpawnPoint obj, ConfigurationNode value) throws ObjectMappingException {
+        Transform<World> transform = obj.getTransform();
+        value.getNode("extent").setValue(TypeToken.of(UUID.class), transform.getExtent().getUniqueId());
+        value.getNode("position").setValue(TypeToken.of(Vector3d.class),transform.getPosition());
+        value.getNode("rotation").setValue(TypeToken.of(Vector3d.class), transform.getRotation());
     }
 }
