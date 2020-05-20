@@ -28,12 +28,14 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import net.huskycraft.blockyarena.arenas.SpawnPoint;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-import net.huskycraft.blockyarena.arenas.Spawn;
 import net.huskycraft.blockyarena.utils.Gamer;
 import net.huskycraft.blockyarena.utils.GamerStatus;
+import org.spongepowered.api.world.World;
 
 /**
  * A Team represents a single Gamer or a group of Gamers who cooperate to win a Game.
@@ -41,16 +43,11 @@ import net.huskycraft.blockyarena.utils.GamerStatus;
 public class Team {
 
     private Set<Gamer> gamers;
-    private Spawn teamSpawn;
+    private SpawnPoint startPoint;
     private Game game;
 
-    /**
-     * Constructs a Team with the given in-game Spawn point for this Team.
-     *
-     * @param teamSpawn the in-game Spawn point for this Team
-     */
-    public Team(Spawn teamSpawn, Game game) {
-        this.teamSpawn = teamSpawn;
+    public Team(SpawnPoint startPoint, Game game) {
+        this.startPoint = startPoint;
         this.game = game;
         gamers = new HashSet<>();
     }
@@ -67,7 +64,7 @@ public class Team {
 
     public void sendAllToSpawn() {
         for (Gamer gamer : gamers) {
-            gamer.spawnAt(teamSpawn);
+            gamer.getPlayer().setTransform(startPoint.getTransform());
         }
     }
 

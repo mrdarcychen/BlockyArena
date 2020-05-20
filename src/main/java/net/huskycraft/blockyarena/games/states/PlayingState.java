@@ -16,8 +16,16 @@
 
 package net.huskycraft.blockyarena.games.states;
 
+import com.flowpowered.math.vector.Vector3d;
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.Team;
+import net.huskycraft.blockyarena.utils.DamageData;
+import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Entity;
+import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
@@ -25,24 +33,20 @@ import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.World;
 
-import com.flowpowered.math.vector.Vector3d;
-
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.Team;
-import net.huskycraft.blockyarena.utils.DamageData;
-import net.huskycraft.blockyarena.utils.Gamer;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 public class PlayingState extends MatchState {
 
-    private Team teamA;
-    private Team teamB;
+    private List<Team> teams;
 
-    public PlayingState(Game game, Team teamA, Team teamB) {
+    public PlayingState(Game game, List<Team> teams) {
         super(game);
-        this.teamA = teamA;
-        this.teamB = teamB;
-        teamA.sendAllToSpawn();
-        teamB.sendAllToSpawn();
+        System.out.println("In Playing State");
+        this.teams = teams;
+        teams.forEach(Team::sendAllToSpawn);
     }
 
     @Override
@@ -60,10 +64,11 @@ public class PlayingState extends MatchState {
                 .title(deathText).fadeOut(2).stay(16).build();
         gamer.getPlayer().sendTitle(deathTitle);
         gamer.spectate(game);
-        if (teamA.hasGamerLeft() && !teamB.hasGamerLeft()) {
-            game.setMatchState(new StoppingState(game, teamA, teamB));
-        } else if (teamB.hasGamerLeft() && !teamA.hasGamerLeft()) {
-            game.setMatchState(new StoppingState(game, teamB, teamA));
+        List<Team> teamsAlive = teams.stream().filter(Team::hasGamerLeft).collect(Collectors.toList());
+        if (teamsAlive.size() == 1) {
+            Team winner = teamsAlive.get(0);
+            List<Team> losers = teams.stream().filter(it -> it != winner).collect(Collectors.toList());
+            game.setMatchState(new StoppingState(game, winner, losers));
         }
     }
 
@@ -91,13 +96,12 @@ public class PlayingState extends MatchState {
     private void spawnLightningOn(Gamer gamer) {
         World extent = gamer.getPlayer().getLocation().getExtent();
         Vector3d position = gamer.getPlayer().getLocation().getPosition();
-        Entity lightning = extent.createEntity(EntityTypes.LIGHTNING, position.add(0, 1, 0));
-        lightning.damage(0.0, DamageSources.GENERIC);
+        Lightning lightning = (Lightning) extent.createEntity(EntityTypes.LIGHTNING, position);
+        lightning.setEffect(true); // TODO: cannot make lightning act as an effect
         extent.spawnEntity(lightning);
     }
 
     private boolean areTeammates(Gamer a, Gamer b) {
-        Team[] teams = { teamA, teamB };
         for (Team team : teams) {
             if (team.contains(a) && team.contains(b)) {
                 return true;
