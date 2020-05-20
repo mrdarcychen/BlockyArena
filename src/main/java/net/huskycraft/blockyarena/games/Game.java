@@ -16,28 +16,15 @@
 
 package net.huskycraft.blockyarena.games;
 
-import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.arenas.Arena;
-import net.huskycraft.blockyarena.arenas.ArenaState;
 import net.huskycraft.blockyarena.games.states.EnteringState;
 import net.huskycraft.blockyarena.games.states.MatchState;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
-import org.spongepowered.api.effect.sound.SoundTypes;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Event;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.scheduler.Task;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.format.TextStyles;
-import org.spongepowered.api.text.title.Title;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 
 /**
  * A Game represents a specific session dedicated to a single duel.
@@ -45,14 +32,19 @@ import java.util.concurrent.TimeUnit;
 public class Game {
 
     protected Arena arena;
-    protected TeamMode teamMode;
+    protected int teamSize;
+    //The current state this game is on
     private MatchState state;
+    private List<Gamer> gamersList;
+    private final long totalCapacity;
 
-    public Game(TeamMode teamMode, Arena arena) {
-        this.teamMode = teamMode;
+    public Game(int teamSize, Arena arena) {
         this.arena = arena;
-        arena.setState(ArenaState.OCCUPIED);
+        this.teamSize = teamSize;
+        this.setGamersList(new ArrayList<Gamer>());
+        arena.setBusy(true);
         state = new EnteringState(this);
+        totalCapacity = teamSize * arena.getStartPoints().count();
     }
 
     public void add(Gamer gamer) {
@@ -71,8 +63,8 @@ public class Game {
         return state instanceof EnteringState;
     }
 
-    public TeamMode getTeamMode() {
-        return teamMode;
+    public long getTotalCapacity() {
+        return totalCapacity;
     }
 
     public Arena getArena() {
@@ -81,5 +73,17 @@ public class Game {
 
     public void setMatchState(MatchState state) {
         this.state = state;
+    }
+
+	public List<Gamer> getGamersList() {
+		return gamersList;
+	}
+
+	public void setGamersList(List<Gamer> gamersList) {
+		this.gamersList = gamersList;
+	}
+
+	public int getTeamSize() {
+        return teamSize;
     }
 }
