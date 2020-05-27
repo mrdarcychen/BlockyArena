@@ -13,22 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.huskycraft.blockyarena.listeners;
 
-package net.huskycraft.blockyarena.games.states;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameReloadEvent;
 
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.GameManager;
-import net.huskycraft.blockyarena.utils.Gamer;
+import net.huskycraft.blockyarena.managers.ConfigManager;
 
-import java.util.List;
-import java.util.Optional;
+public class ServerListener {
 
-public class LeavingState extends MatchState {
 
-    public LeavingState(Game game, List<Gamer> gamers) {
-        super(game, gamers);
-        gamers.forEach(this::dismiss);
-        game.getArena().setBusy(false);
-        GameManager.getInstance().remove(game);
+    public ServerListener() {
+    }
+    
+    @Listener
+    public void onReload(GameReloadEvent event) {
+    	ConfigManager.getInstance().reloadConfiguration();
     }
 }

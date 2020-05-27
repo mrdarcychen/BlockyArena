@@ -2,7 +2,6 @@ package net.huskycraft.blockyarena.managers;
 
 import java.io.IOException;
 
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.config.DefaultConfig;
 
 import com.google.inject.Inject;

@@ -16,45 +16,81 @@
 
 package net.huskycraft.blockyarena.games.states;
 
+import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
+import net.huskycraft.blockyarena.utils.GamerStatus;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.title.Title;
 
 import java.util.List;
 
 public abstract class MatchState {
 
     protected final Game game;
-    protected List<Gamer> gamers;
+    protected List<Gamer> gamers; // only store active gamers
 
-    public MatchState(Game game) {
+    public MatchState(Game game, List<Gamer> gamers) {
         this.game = game;
-        this.gamers = game.getGamersList();
+        this.gamers = gamers;
     }
 
     /*
-     * Called when a new player try to join an arena
+     * Called when a new player try to join an arena.
      */
     public void recruit(Gamer gamer) {
-
+        // execute only if the gamer is accepted to the game
+        gamer.saveLocation();
+        gamer.saveInventory();
+        gamer.setGame(game);
+        Player player = gamer.getPlayer();
+        player.getInventory().clear();  // TODO: allow bringing personal kit
+        player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
+        Arena arena = game.getArena();
+        SpawnPoint spawnPoint = arena.getLobbySpawn();
+        player.setTransform(spawnPoint.getTransform());
+        // TODO: refer to game logistics for the following parameters
+        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
+        player.offer(Keys.FOOD_LEVEL, 20);
     }
 
     /*
      * Called when you quit the game
      */
     public void dismiss(Gamer gamer) {
-        gamers.remove(gamer);
-        broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
+        System.out.println("dismiss" + gamer.getName());
+        gamer.retrieveInventory();
+        gamer.setLocation(gamer.getSavedLocation());
+        gamer.setGame(null);
+        Player player = gamer.getPlayer();
+        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+        System.out.println(player.getName() + ": " + player.get(Keys.GAME_MODE));
+        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
+        player.offer(Keys.FOOD_LEVEL, 20);
     }
 
     /*
      * Called when you kill a @Gamer gamer
      */
     public void eliminate(Gamer gamer, Text cause) {
-
+        broadcast(cause);
+        Player player = gamer.getPlayer();
+        player.offer(Keys.GAME_MODE, GameModes.SPECTATOR);
+        player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
+        Text deathText = Text.builder("YOU DIED!")
+                .color(TextColors.RED).build();
+        Title deathTitle = Title.builder()
+                .title(deathText).fadeOut(2).stay(16).build();
+        gamer.getPlayer().sendTitle(deathTitle);
+        // gamer.spectate(game);
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
@@ -70,11 +106,6 @@ public abstract class MatchState {
      * @param msg the message to be delivered
      */
     public void broadcast(Text msg) {
-        for (Gamer gamer : gamers) {
-            // broadcast if the Gamer still has connection
-            if (gamer.getGame() == game) {
-                gamer.getPlayer().sendMessage(msg);
-            }
-        }
+        gamers.forEach(it -> it.getPlayer().sendMessage(msg));
     }
 }

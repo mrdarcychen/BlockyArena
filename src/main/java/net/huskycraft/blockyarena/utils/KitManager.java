@@ -24,15 +24,6 @@
  */
 package net.huskycraft.blockyarena.utils;
 
-import com.google.common.reflect.TypeToken;
-import net.huskycraft.blockyarena.BlockyArena;
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-import ninja.leaping.configurate.objectmapping.ObjectMappingException;
-import org.spongepowered.api.data.persistence.InvalidDataException;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
@@ -42,19 +33,36 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.spongepowered.api.data.persistence.InvalidDataException;
+
+import com.google.common.reflect.TypeToken;
+
+import net.huskycraft.blockyarena.BlockyArena;
+import ninja.leaping.configurate.ConfigurationNode;
+import ninja.leaping.configurate.commented.CommentedConfigurationNode;
+import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
+import ninja.leaping.configurate.loader.ConfigurationLoader;
+import ninja.leaping.configurate.objectmapping.ObjectMappingException;
+
 /**
  * A KitManager manages all predefined gaming Kits.
  */
 public class KitManager {
+	
+	private static final KitManager INSTANCE = new KitManager();
 
     private Map<String, Kit> kits;
-
-    public KitManager() {
-        kits = new HashMap<>();
-        loadKits();
+    
+    private KitManager() {
+    	 kits = new HashMap<>();
     }
 
-    private void loadKits() {
+	public static KitManager getInstance() {
+		return INSTANCE;
+	}
+
+	
+    public void loadKits() {
         try {
             DirectoryStream<Path> stream = Files.newDirectoryStream(BlockyArena.getInstance().getKitDir(), "*.conf");
             for (Path path : stream) {
@@ -66,7 +74,7 @@ public class KitManager {
                     Kit kit = rootNode.getValue(TypeToken.of(Kit.class));
                     kits.put(kit.getId(), kit);
                 } catch (InvalidDataException e) {
-                    BlockyArena.getInstance().getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
+                	BlockyArena.getInstance().getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
                             "unknown items.");
                 }
                 loader.save(rootNode);
