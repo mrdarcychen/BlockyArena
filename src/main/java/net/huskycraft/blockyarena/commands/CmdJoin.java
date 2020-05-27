@@ -16,6 +16,11 @@
 
 package net.huskycraft.blockyarena.commands;
 
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.GameManager;
+import net.huskycraft.blockyarena.games.GamersManager;
+import net.huskycraft.blockyarena.games.TeamMode;
+import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -23,13 +28,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.GamersManager;
-import net.huskycraft.blockyarena.games.TeamMode;
-import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
 
 public class CmdJoin implements CommandExecutor{
 
@@ -51,17 +49,17 @@ public class CmdJoin implements CommandExecutor{
         Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
         try {
             TeamMode teamMode = TeamMode.valueOf(args.<String>getOne("mode").get().toUpperCase());
-            if (GamersManager.getGamer(player.getUniqueId()).get().getStatus() == GamerStatus.PLAYING) {
+            if (GamersManager.isInGame(player)) {
                 player.sendMessage(Text.of("You've already joined a game!"));
                 return CommandResult.empty();
-            } else {
-                Game game = BlockyArena.getGameManager().getGame(teamMode);
-                if (game == null) {
-                    player.sendMessage(Text.of("There is no available arena at this time."));
-                    return CommandResult.empty();
-                }
-                gamer.join(game);
             }
+            Game game = GameManager.getInstance().getGame(teamMode.getCapacity());
+            if (game == null) {
+                player.sendMessage(Text.of("There is no available arena at this time."));
+                return CommandResult.empty();
+            }
+            game.add(gamer);
+            // gamer.join(game);
         } catch (IllegalArgumentException e) {
             player.sendMessage(Text.of("You've entered an invalid team mode!"));
             return CommandResult.empty();

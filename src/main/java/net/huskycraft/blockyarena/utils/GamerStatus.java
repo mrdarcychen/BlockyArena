@@ -16,6 +16,7 @@
 
 package net.huskycraft.blockyarena.utils;
 
+@Deprecated
 public enum GamerStatus {
     PLAYING, SPECTATING, AVAILABLE, IDLE, OFFLINE
 }

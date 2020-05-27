@@ -36,11 +36,10 @@ public class StartingState extends MatchState {
     private Timer timer;
 
     public StartingState(Game game, List<Gamer> gamers, int countdown) {
-        super(game);
-        this.gamers = gamers;
+        super(game, gamers);
         timer = new Timer(countdown, tMinus -> {
             if (tMinus == 0) {
-                game.setMatchState(new PlayingState(game, partition()));
+                game.setMatchState(new PlayingState(game, gamers, partition()));
                 return;
             }
             Title title = Title.builder().title(Text.of(tMinus)).fadeIn(2)
@@ -56,6 +55,9 @@ public class StartingState extends MatchState {
     @Override
     public void dismiss(Gamer gamer) {
         super.dismiss(gamer);
+        gamers.remove(gamer);
+        broadcast(Text.of(gamer.getName() + " left the game." +
+                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
         // if fall below min requirement, new entering state
         if (gamers.size() <= game.getTotalCapacity()) {
             timer.cancel();

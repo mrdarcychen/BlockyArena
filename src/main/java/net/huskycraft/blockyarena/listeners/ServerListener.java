@@ -13,10 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package net.huskycraft.blockyarena.listeners;
 
-package net.huskycraft.blockyarena.arenas;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.GameReloadEvent;
 
-@Deprecated
-public enum ArenaState {
-    AVAILABLE, OCCUPIED, DISABLED, INCOMPLETE
+import net.huskycraft.blockyarena.managers.ConfigManager;
+
+public class ServerListener {
+
+
+    public ServerListener() {
+    }
+    
+    @Listener
+    public void onReload(GameReloadEvent event) {
+    	ConfigManager.getInstance().reloadConfiguration();
+    }
 }

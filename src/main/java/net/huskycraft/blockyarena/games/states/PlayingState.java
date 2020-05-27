@@ -42,8 +42,8 @@ public class PlayingState extends MatchState {
 
     private List<Team> teams;
 
-    public PlayingState(Game game, List<Team> teams) {
-        super(game);
+    public PlayingState(Game game, List<Gamer> gamers, List<Team> teams) {
+        super(game, gamers);
         System.out.println("In Playing State");
         this.teams = teams;
         teams.forEach(Team::sendAllToSpawn);
@@ -52,34 +52,34 @@ public class PlayingState extends MatchState {
     @Override
     public void dismiss(Gamer gamer) {
         super.dismiss(gamer);
+        gamers.remove(gamer);
+        broadcast(Text.of(gamer.getName() + " left the game." +
+                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
         eliminate(gamer, Text.of(gamer.getPlayer().getName() + " has left the game."));
     }
 
     @Override
     public void eliminate(Gamer gamer, Text cause) {
-        broadcast(cause);
-        Text deathText = Text.builder("YOU DIED!")
-                .color(TextColors.RED).build();
-        Title deathTitle = Title.builder()
-                .title(deathText).fadeOut(2).stay(16).build();
-        gamer.getPlayer().sendTitle(deathTitle);
-        gamer.spectate(game);
+        super.eliminate(gamer, cause);
+        teams.forEach(it -> it.eliminate(gamer));
         List<Team> teamsAlive = teams.stream().filter(Team::hasGamerLeft).collect(Collectors.toList());
         if (teamsAlive.size() == 1) {
             Team winner = teamsAlive.get(0);
             List<Team> losers = teams.stream().filter(it -> it != winner).collect(Collectors.toList());
-            game.setMatchState(new StoppingState(game, winner, losers));
+            game.setMatchState(new StoppingState(game, gamers, winner, losers));
         }
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
         Gamer victim = damageData.getVictim();
+        // if fell into the void, eliminate
         if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {
             event.setCancelled(true);
             spawnLightningOn(damageData.getVictim());
             eliminate(victim, Text.of(damageData.getDeathMessage()));
             return;
         }
+        // if attacked by teammates, cancel
         if (damageData.getAttacker().isPresent()) {
             if (areTeammates(victim, damageData.getAttacker().get())) {
                 event.setCancelled(true);

@@ -16,22 +16,22 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import java.util.concurrent.TimeUnit;
-
-import org.spongepowered.api.scheduler.Task;
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.Team;
+import net.huskycraft.blockyarena.games.Timer;
+import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.Team;
+import java.util.List;
 
 public class StoppingState extends MatchState {
 
-    public StoppingState(Game game, Team winner, Team loser) {
-        super(game);
+    public StoppingState(Game game, List<Gamer> gamers, Team winner, List<Team> losers) {
+        super(game, gamers);
         Title victory = Title.builder()
                 .title(Text.builder("VICTORY!")
                         .color(TextColors.GOLD)
@@ -50,9 +50,20 @@ public class StoppingState extends MatchState {
                 .build();
 
         winner.broadcast(victory);
-        loser.broadcast(gameOver);
-        Task.builder().execute(() -> {
-            game.setMatchState(new LeavingState(game));
-        }).delay(3, TimeUnit.SECONDS).submit(BlockyArena.getInstance());
+        winner.getGamers().iterator().next().getPlayer().playSound(SoundTypes.ENTITY_PLAYER_LEVELUP, winner.getGamers().iterator().next().getPlayer().getHeadRotation(), 100);
+        losers.forEach(it -> {
+            it.broadcast(gameOver);
+            it.getGamers().forEach(gamer -> {
+                gamer.getPlayer().playSound(SoundTypes.BLOCK_GLASS_BREAK, gamer.getPlayer().getHeadRotation(), 100);
+            });
+        });
+
+        System.out.println("IN STOPPING STATE");
+        gamers.forEach(it -> System.out.println(it.getName() + " is in list"));
+        new Timer(5, (tMinus) -> {
+            if (tMinus == 0) {
+                game.setMatchState(new LeavingState(game, gamers));
+            }
+        });
     }
 }

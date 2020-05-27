@@ -18,20 +18,17 @@ package net.huskycraft.blockyarena.games.states;
 
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.GameManager;
+import net.huskycraft.blockyarena.utils.Gamer;
+
+import java.util.List;
+import java.util.Optional;
 
 public class LeavingState extends MatchState {
 
-    public LeavingState(Game game) {
-        super(game);
-        synchronized (game) {
-            for (int i = 0; i < gamers.size(); i++) {
-                // remove if the gamer still has connection
-                if (gamers.get(i).getGame() == game) {
-                    gamers.get(i).quit();
-                }
-            }
-            game.getArena().setBusy(false);
-            GameManager.getInstance().remove(game);
-        }
+    public LeavingState(Game game, List<Gamer> gamers) {
+        super(game, gamers);
+        gamers.forEach(this::dismiss);
+        game.getArena().setBusy(false);
+        GameManager.getInstance().remove(game);
     }
 }

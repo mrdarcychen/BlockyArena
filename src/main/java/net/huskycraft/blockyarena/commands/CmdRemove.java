@@ -23,7 +23,8 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.text.Text;
 
-import net.huskycraft.blockyarena.BlockyArena;
+import net.huskycraft.blockyarena.arenas.ArenaManager;
+import net.huskycraft.blockyarena.utils.KitManager;
 
 public class CmdRemove implements CommandExecutor {
 
@@ -44,7 +45,7 @@ public class CmdRemove implements CommandExecutor {
 
             case "arena":
                 try {
-                    BlockyArena.getArenaManager().remove(id);
+                	ArenaManager.getInstance().remove(id);
                     break;
                 } catch (IllegalArgumentException e) {
                     src.sendMessage(Text.of(e.getMessage()));
@@ -53,7 +54,7 @@ public class CmdRemove implements CommandExecutor {
 
             case "kit":
                 try {
-                    BlockyArena.getKitManager().remove(id);
+                	KitManager.getInstance().remove(id);
                     break;
                 } catch (IllegalArgumentException e) {
                     src.sendMessage(Text.of(e.getMessage()));

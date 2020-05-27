@@ -24,9 +24,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.games.GamersManager;
 import net.huskycraft.blockyarena.utils.GamerStatus;
+import net.huskycraft.blockyarena.utils.KitManager;
 
 public class CmdKit implements CommandExecutor {
 
@@ -43,16 +43,20 @@ public class CmdKit implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player)src;
-        if (GamersManager.getGamer(player.getUniqueId()).get().getStatus() != GamerStatus.PLAYING) {
+        if (!inGame(player)) {
             player.sendMessage(Text.of("You are not allowed to get any kit when you are not in a game."));
             return CommandResult.empty();
         }
         String id = args.<String>getOne(Text.of("id")).get();
-        if (BlockyArena.getKitManager().get(id) == null) {
+        if (KitManager.getInstance().get(id) == null) {
             player.sendMessage(Text.of("The given kit " + id + " does not exist."));
             return CommandResult.empty();
         }
-        BlockyArena.getKitManager().get(id).equip(player);
+        KitManager.getInstance().get(id).equip(player);
         return CommandResult.success();
+    }
+
+    private boolean inGame(Player player) {
+        return GamersManager.getGamer(player.getUniqueId()).get().getGame().isPresent();
     }
 }

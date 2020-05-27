@@ -16,45 +16,52 @@
 
 package net.huskycraft.blockyarena.games;
 
+import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.arenas.ArenaManager;
+
 import java.util.ArrayList;
 import java.util.List;
-
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.arenas.Arena;
+import java.util.Optional;
 
 /**
  * The GameManager manages all registered Game session in the server.
  */
 public class GameManager {
 
-    public static BlockyArena plugin;
-
+	private static final GameManager INSTANCE = new GameManager();
+	
     private List<Game> games; // a list of active games in the server
 
-    public GameManager(BlockyArena plugin) {
-        this.plugin = plugin;
-        games = new ArrayList<>();
+    private GameManager() {
+    	games = new ArrayList<>();
     }
 
+	public static GameManager getInstance() {
+		return INSTANCE;
+	}
+    
     /**
      * Gets an available active Game from the list based on the given team mode.
+     * 
+     * If there no available game for the given type, we create another Game object
      * @return null if no Game is available
      */
-    public Game getGame(TeamMode teamMode) {
+    public Game getGame(int teamSize) {
         for (Game game : games) {
             boolean isActive = game.canJoin();
-            boolean isGivenType = game.getTeamMode() == teamMode;
+            boolean isGivenType = game.getTeamSize() == teamSize;
             if (isActive && isGivenType) {
                 return game;
             }
         }
         // if there is no active Game, initialize a new Game
-        Arena arena = BlockyArena.getArenaManager().getArena();
-        // if there is no available Arena, no Game can be instantiated and null is returned
-        if (arena == null) return null;
-        Game game = new Game(teamMode, arena);
-        games.add(game);
-        return game;
+        Optional<Arena> optArena = ArenaManager.getInstance().getArena();
+        if (optArena.isPresent()) {
+            Game game = new Game(teamSize, optArena.get());
+            games.add(game);
+            return game;
+        }
+        return null;
     }
 
     /**

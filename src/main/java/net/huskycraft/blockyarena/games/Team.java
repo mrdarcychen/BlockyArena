@@ -16,9 +16,7 @@
 
 package net.huskycraft.blockyarena.games;
 
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.Set;
+import java.util.*;
 
 import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import org.spongepowered.api.entity.Transform;
@@ -34,14 +32,14 @@ import org.spongepowered.api.world.World;
  */
 public class Team {
 
-    private Set<Gamer> gamers;
+    private Map<Gamer, Boolean> gamers; // gamers and whether eliminated or not
     private SpawnPoint startPoint;
     private Game game;
 
     public Team(SpawnPoint startPoint, Game game) {
         this.startPoint = startPoint;
         this.game = game;
-        gamers = new HashSet<>();
+        gamers = new HashMap<>();
     }
 
     /**
@@ -50,39 +48,31 @@ public class Team {
      * @param gamer the Gamer to be added to this Team
      */
     public void add(Gamer gamer) {
-        gamers.add(gamer);
+        gamers.put(gamer, false);
     }
 
+    public void eliminate(Gamer gamer) {
+        gamers.replace(gamer, true);
+    }
 
     public void sendAllToSpawn() {
-        for (Gamer gamer : gamers) {
-            gamer.getPlayer().setTransform(startPoint.getTransform());
-        }
+        gamers.keySet().forEach(it -> it.getPlayer().setTransform(startPoint.getTransform()));
     }
 
     public boolean hasGamerLeft() {
-        for (Gamer gamer : gamers) {
-            if (gamer.getGame() == game && gamer.getStatus() == GamerStatus.PLAYING) {
-                return true;
-            }
-        }
-        return false;
+        return gamers.values().stream().anyMatch(it -> !it);
     }
 
     public void broadcast(Text text) {
-        gamers.forEach(gamer -> {
-            if (gamer.getGame() == game) {
-                gamer.getPlayer().sendMessage(text);
-            }
-        });
+        gamers.keySet().forEach(it -> it.getPlayer().sendMessage(text));
     }
 
     public void broadcast(Title title) {
-        gamers.forEach(gamer -> {
-            if (gamer.getGame() == game) {
-                gamer.getPlayer().sendTitle(title);
-            }
-        });
+        gamers.keySet().forEach(it -> it.getPlayer().sendTitle(title));
+    }
+
+    public boolean isEliminated(Gamer gamer) {
+        return gamers.get(gamer);
     }
 
     /**
@@ -92,16 +82,16 @@ public class Team {
      * @return true if the Gamer is on this Team, false otherwise
      */
     public boolean contains(Gamer gamer) {
-        return gamers.contains(gamer);
+        return gamers.containsKey(gamer);
     }
 
     public Set<Gamer> getGamers() {
-        return gamers;
+        return gamers.keySet();
     }
 
     public String toString() {
         String str = "";
-        Iterator<Gamer> gamersItr = gamers.iterator();
+        Iterator<Gamer> gamersItr = gamers.keySet().iterator();
         while (gamersItr.hasNext()) {
             str += gamersItr.next().getName();
             if (gamersItr.hasNext()) {

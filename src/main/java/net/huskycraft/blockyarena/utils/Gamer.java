@@ -16,6 +16,7 @@
 
 package net.huskycraft.blockyarena.utils;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import net.huskycraft.blockyarena.arenas.Arena;
@@ -42,7 +43,6 @@ public class Gamer {
     private Player player; // the player instance in which this Gamer profile is associated with
 
     private Game game; // the Game session this player is currently in
-    private GamerStatus status; // the gaming status of this player
 
     private Location<World> savedLocation; // the saved location of the player for record
     private Kit kit; // the original inventory of the player for record
@@ -54,7 +54,6 @@ public class Gamer {
      */
     public Gamer(UUID uniqueId) {
         this.uniqueId = uniqueId;
-        status = GamerStatus.AVAILABLE;
     }
 
     /**
@@ -113,26 +112,8 @@ public class Gamer {
      *
      * @return the Game this Gamer is currently in
      */
-    public Game getGame() {
-        return game;
-    }
-
-    /**
-     * Sets the GamerStatus of this Gamer.
-     *
-     * @param status the GamerStatus of this Gamer
-     */
-    public void setStatus(GamerStatus status) {
-        this.status = status;
-    }
-
-    /**
-     * Gets the GamerStatus of this Gamer.
-     *
-     * @return the GamerStatus of this Gamer
-     */
-    public GamerStatus getStatus() {
-        return status;
+    public Optional<Game> getGame() {
+        return Optional.ofNullable(game);
     }
 
     /**
@@ -140,46 +121,48 @@ public class Gamer {
      *
      * @param game the Game in which the Gamer is about to join
      */
+    @Deprecated
     public void join(Game game) {
-        this.game = game;
-        saveLocation();
-        saveInventory();
-        player.getInventory().clear();  // TODO: allow bringing personal kit
-        player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
-        Arena arena = game.getArena();
-        SpawnPoint spawnPoint = arena.getLobbySpawn();
-        player.setTransform(spawnPoint.getTransform());
-        // TODO: refer to game logistics for the following parameters
-        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
-        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
-        player.offer(Keys.FOOD_LEVEL, 20);
-        setStatus(GamerStatus.PLAYING);
-        game.add(this);
+//        this.game = game;
+//        saveLocation();
+//        saveInventory();
+//        player.getInventory().clear();  // TODO: allow bringing personal kit
+//        player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
+//        Arena arena = game.getArena();
+//        SpawnPoint spawnPoint = arena.getLobbySpawn();
+//        player.setTransform(spawnPoint.getTransform());
+//        // TODO: refer to game logistics for the following parameters
+//        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+//        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
+//        player.offer(Keys.FOOD_LEVEL, 20);
+//        setStatus(GamerStatus.PLAYING);
+        // game.add(this);
     }
 
     /**
      * Quits from the Game in which the Gamer is currently in.
      */
+    @Deprecated
     public void quit() {
-        game.remove(this);
-        this.game = null;
-        retrieveInventory();
-        setLocation(getSavedLocation());
-        setStatus(GamerStatus.AVAILABLE);
-        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
-        player.sendMessage(Text.of("you have your gamemode changed to survival !"));
-        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
-        player.offer(Keys.FOOD_LEVEL, 20);
+//        this.game = null;
+//        retrieveInventory();
+//        setLocation(getSavedLocation());
+//        setStatus(GamerStatus.AVAILABLE);
+//        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+//        player.sendMessage(Text.of("you have your gamemode changed to survival !"));
+//        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
+//        player.offer(Keys.FOOD_LEVEL, 20);
     }
 
     /**
      * Spectates the given game. Sets the gamemode to be SPECTATOR and teleports to the spectator spawn of the Game.
      * @param game the game the gamer about to spectate
      */
+    @Deprecated
     public void spectate(Game game) {
-        player.offer(Keys.GAME_MODE, GameModes.SPECTATOR);
-        setStatus(GamerStatus.SPECTATING);
-        player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
+//        player.offer(Keys.GAME_MODE, GameModes.SPECTATOR);
+//        setStatus(GamerStatus.SPECTATING);
+//        player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
     }
 
     /**
@@ -243,5 +226,9 @@ public class Gamer {
      */
     public Player getPlayer() {
         return player;
+    }
+
+    public void setGame(Game game) {
+        this.game = game;
     }
 }

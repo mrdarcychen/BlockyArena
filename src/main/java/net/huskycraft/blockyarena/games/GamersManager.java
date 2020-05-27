@@ -22,6 +22,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.entity.living.player.Player;
 
 /**
  * The manager that manages {@link Gamer}s.
@@ -52,5 +53,10 @@ public class GamersManager {
             }
         }
         return Optional.empty();
+    }
+
+    public static boolean isInGame(Player player) {
+        Optional<Gamer> optGamer = getGamer(player.getUniqueId());
+        return optGamer.map(gamer -> gamer.getGame().isPresent()).orElse(false);
     }
 }
