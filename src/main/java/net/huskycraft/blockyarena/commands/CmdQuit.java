@@ -24,6 +24,8 @@
  */
 package net.huskycraft.blockyarena.commands;
 
+import net.huskycraft.blockyarena.games.GamersManager;
+import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -31,10 +33,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-import net.huskycraft.blockyarena.games.GamersManager;
-import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
 
 public class CmdQuit implements CommandExecutor {
 
@@ -51,16 +49,17 @@ public class CmdQuit implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
         Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
-        if (gamer.getStatus() != GamerStatus.PLAYING) {
+        if (!gamer.getGame().isPresent()) {
             player.sendMessage(Text.of("You're not in any game."));
             return CommandResult.empty();
         }
-        try {
-            gamer.quit();
-        } catch (NullPointerException e) {
-            player.sendMessage(Text.of("Unexpected error occurs when quitting you from the game."));
-            return CommandResult.empty();
-        }
+        gamer.getGame().ifPresent(it -> it.remove(gamer));
+//        try {
+//            gamer.quit();
+//        } catch (NullPointerException e) {
+//            player.sendMessage(Text.of("Unexpected error occurs when quitting you from the game."));
+//            return CommandResult.empty();
+//        }
         player.sendMessage(Text.of("You left the game."));
         return CommandResult.success();
     }

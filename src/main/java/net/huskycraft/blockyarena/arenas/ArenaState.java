@@ -24,6 +24,7 @@
  */
 package net.huskycraft.blockyarena.arenas;
 
+@Deprecated
 public enum ArenaState {
     AVAILABLE, OCCUPIED, DISABLED, INCOMPLETE
 }

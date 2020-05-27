@@ -24,6 +24,7 @@
  */
 package net.huskycraft.blockyarena.games;
 
+@Deprecated
 public enum  GameState {
     RECRUITING, STARTING, STARTED, STOPPING, STOPPED
 }

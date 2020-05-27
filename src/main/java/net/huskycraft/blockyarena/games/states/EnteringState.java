@@ -16,41 +16,50 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import org.spongepowered.api.event.entity.DamageEntityEvent;
-import org.spongepowered.api.text.Text;
-
+import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.managers.ConfigManager;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
+import net.huskycraft.blockyarena.utils.GamerStatus;
+import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
+import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.text.Text;
 
 public class EnteringState extends MatchState {
 
     public EnteringState(Game game) {
-        super(game);
+        super(game, game.getGamersList());
     }
 
     @Override
     public void recruit(Gamer gamer) {
-        if (gamers.size() == game.getTeamMode().getCapacity() * 2) { // TODO: starting condition, need to change to accommodate more modes
+        if (gamers.size() == game.getTotalCapacity()) { // TODO: starting condition, need to change to accommodate more modes
             gamer.getPlayer().sendMessage(Text.of("Unable to join the game at this time."));
             return;
         }
         gamers.add(gamer);
+        super.recruit(gamer);
+        //Utils.broadcastToEveryone("the arena : " + game.getArena().getID() +" is used !!", TextColors.GREEN);
         broadcast(Text.of(gamer.getName() + " joined the game. " + "(" +
-                gamers.size() + "/" + game.getTeamMode().getCapacity() * 2 + ")"));
-        boolean canSolo = game.getTeamMode().getCapacity() * 2 == gamers.size();
-        boolean canDoubles = game.getTeamMode().getCapacity() * 2 == gamers.size();
-        if (canSolo || canDoubles) {
-            game.setMatchState(new StartingState(game, gamers, 15));
+                gamers.size() + "/" + game.getTotalCapacity() + ")"));
+        if (gamers.size() == game.getTotalCapacity()) {
+            game.setMatchState(new StartingState(game, gamers, ConfigManager.getInstance().getLobbyCountdown()));
         }
     }
 
     @Override
     public void dismiss(Gamer gamer) {
         super.dismiss(gamer);
+        gamers.remove(gamer);
+        broadcast(Text.of(gamer.getName() + " left the game." +
+                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
         // if no one is left, cancel timer and go directly to leaving
         if (gamers.isEmpty()) {
-            game.setMatchState(new LeavingState(game));
+            game.setMatchState(new LeavingState(game, gamers));
         }
     }
 

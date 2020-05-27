@@ -24,9 +24,6 @@
  */
 package net.huskycraft.blockyarena.commands;
 
-import net.huskycraft.blockyarena.BlockyArena;
-import net.huskycraft.blockyarena.games.GamersManager;
-import net.huskycraft.blockyarena.utils.GamerStatus;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -35,7 +32,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import java.util.Optional;
+import net.huskycraft.blockyarena.games.GamersManager;
+import net.huskycraft.blockyarena.utils.GamerStatus;
+import net.huskycraft.blockyarena.utils.KitManager;
 
 public class CmdKit implements CommandExecutor {
 
@@ -51,32 +50,21 @@ public class CmdKit implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Player player;
-        Optional<Player> playerArg = args.getOne(Text.of("player"));
-
-        if (src instanceof Player) {
-            if (playerArg.isPresent() && src != playerArg.get()) {
-                src.sendMessage(Text.of("You are not allowed to set another player's kit."));
-                return CommandResult.empty();
-            }
-            player = (Player)src;
-        } else {
-            if (!playerArg.isPresent()) {
-                return CommandResult.empty();
-            }
-            player = playerArg.get();
-        }
-
-        if (GamersManager.getGamer(player.getUniqueId()).get().getStatus() != GamerStatus.PLAYING) {
+        Player player = (Player)src;
+        if (!inGame(player)) {
             player.sendMessage(Text.of("You are not allowed to get any kit when you are not in a game."));
             return CommandResult.empty();
         }
         String id = args.<String>getOne(Text.of("id")).get();
-        if (BlockyArena.getKitManager().get(id) == null) {
+        if (KitManager.getInstance().get(id) == null) {
             player.sendMessage(Text.of("The given kit " + id + " does not exist."));
             return CommandResult.empty();
         }
-        BlockyArena.getKitManager().get(id).equip(player);
+        KitManager.getInstance().get(id).equip(player);
         return CommandResult.success();
+    }
+
+    private boolean inGame(Player player) {
+        return GamersManager.getGamer(player.getUniqueId()).get().getGame().isPresent();
     }
 }

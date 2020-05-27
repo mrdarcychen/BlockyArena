@@ -32,9 +32,10 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
-import net.huskycraft.blockyarena.BlockyArena;
 import net.huskycraft.blockyarena.arenas.Arena;
+import net.huskycraft.blockyarena.arenas.ArenaManager;
 import net.huskycraft.blockyarena.utils.Kit;
+import net.huskycraft.blockyarena.utils.KitManager;
 
 public class CmdCreate implements CommandExecutor {
 
@@ -55,13 +56,12 @@ public class CmdCreate implements CommandExecutor {
         String id = args.<String>getOne("id").get();
         switch (type) {
             case "arena":
-                Arena arena = new Arena(id);
-                BlockyArena.getArenaManager().add(arena);
+                CmdEdit.getInstance().expectBuilder(player, id);
                 player.sendMessage(Text.of(id + " is added on file. Start configuring it by typing /ba edit"));
                 return CommandResult.success();
             case "kit":
                 Kit kit = new Kit(player, id);
-                BlockyArena.getKitManager().add(kit, id);
+               KitManager.getInstance().add(kit, id);
                 player.sendMessage(Text.of(id + " is added on file."));
                 return CommandResult.success();
             default:
