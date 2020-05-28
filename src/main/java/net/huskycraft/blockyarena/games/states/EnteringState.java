@@ -16,23 +16,19 @@
 
 package net.huskycraft.blockyarena.games.states;
 
-import net.huskycraft.blockyarena.arenas.Arena;
-import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.managers.ConfigManager;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 
+import java.util.List;
+
 public class EnteringState extends MatchState {
 
-    public EnteringState(Game game) {
-        super(game, game.getGamersList());
+    public EnteringState(Game game, List<Gamer> gamers) {
+        super(game, gamers);
     }
 
     @Override

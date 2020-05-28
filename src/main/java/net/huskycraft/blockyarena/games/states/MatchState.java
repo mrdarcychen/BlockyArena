@@ -21,10 +21,7 @@ import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
-import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
@@ -47,8 +44,7 @@ public abstract class MatchState {
      */
     public void recruit(Gamer gamer) {
         // execute only if the gamer is accepted to the game
-        gamer.saveLocation();
-        gamer.saveInventory();
+        game.addSnapshot(gamer.takeSnapshot());
         gamer.setGame(game);
         Player player = gamer.getPlayer();
         player.getInventory().clear();  // TODO: allow bringing personal kit
@@ -57,24 +53,17 @@ public abstract class MatchState {
         SpawnPoint spawnPoint = arena.getLobbySpawn();
         player.setTransform(spawnPoint.getTransform());
         // TODO: refer to game logistics for the following parameters
-        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
-        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
-        player.offer(Keys.FOOD_LEVEL, 20);
+        player.health().set(player.health().getMaxValue());
+        gamer.spectate(false);
     }
 
     /*
      * Called when you quit the game
      */
     public void dismiss(Gamer gamer) {
-        System.out.println("dismiss" + gamer.getName());
-        gamer.retrieveInventory();
-        gamer.setLocation(gamer.getSavedLocation());
+        game.restoreSnapshotOf(gamer.getPlayer());
         gamer.setGame(null);
-        Player player = gamer.getPlayer();
-        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
-        System.out.println(player.getName() + ": " + player.get(Keys.GAME_MODE));
-        player.offer(Keys.HEALTH, player.get(Keys.MAX_HEALTH).get());
-        player.offer(Keys.FOOD_LEVEL, 20);
+        gamer.spectate(false);
     }
 
     /*
@@ -82,8 +71,8 @@ public abstract class MatchState {
      */
     public void eliminate(Gamer gamer, Text cause) {
         broadcast(cause);
+        gamer.spectate(true);
         Player player = gamer.getPlayer();
-        player.offer(Keys.GAME_MODE, GameModes.SPECTATOR);
         player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
         Text deathText = Text.builder("YOU DIED!")
                 .color(TextColors.RED).build();
