@@ -1,39 +1,30 @@
 /*
- * This file is part of BlockyArena, licensed under the MIT License (MIT).
+ * Copyright 2017-2020 The BlockyArena Contributors.
  *
- * Copyright (c) 2018 HuskyCraft <https://www.huskycraft.net>
- * Copyright (c) 2018 Darcy-Chen
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Permission is hereby granted, free of charge, to any person obtaining a copy
- * of this software and associated documentation files (the "Software"), to deal
- * in the Software without restriction, including without limitation the rights
- * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
- * copies of the Software, and to permit persons to whom the Software is
- * furnished to do so, subject to the following conditions:
+ *     http://www.apache.org/licenses/LICENSE-2.0
  *
- * The above copyright notice and this permission notice shall be included in
- * all copies or substantial portions of the Software.
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
 package net.huskycraft.blockyarena.games;
 
-import java.util.*;
-
 import net.huskycraft.blockyarena.arenas.SpawnPoint;
-import org.spongepowered.api.entity.Transform;
+import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
-import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
-import org.spongepowered.api.world.World;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * A Team represents a single Gamer or a group of Gamers who cooperate to win a Game.
@@ -42,11 +33,9 @@ public class Team {
 
     private Map<Gamer, Boolean> gamers; // gamers and whether eliminated or not
     private SpawnPoint startPoint;
-    private Game game;
 
     public Team(SpawnPoint startPoint, Game game) {
         this.startPoint = startPoint;
-        this.game = game;
         gamers = new HashMap<>();
     }
 
@@ -79,8 +68,9 @@ public class Team {
         gamers.keySet().forEach(it -> it.getPlayer().sendTitle(title));
     }
 
+    // returns false if gamer is not on this team
     public boolean isEliminated(Gamer gamer) {
-        return gamers.get(gamer);
+        return gamers.getOrDefault(gamer, false);
     }
 
     /**

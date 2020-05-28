@@ -62,7 +62,7 @@ public class StartingState extends MatchState {
         if (gamers.size() <= game.getTotalCapacity()) {
             timer.cancel();
             broadcast(Text.of("Waiting for more players to join ..."));
-            game.setMatchState(new EnteringState(game));
+            game.setMatchState(new EnteringState(game, gamers));
         }
     }
 

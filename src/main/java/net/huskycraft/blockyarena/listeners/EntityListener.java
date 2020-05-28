@@ -16,6 +16,10 @@
 
 package net.huskycraft.blockyarena.listeners;
 
+import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.GamersManager;
+import net.huskycraft.blockyarena.utils.DamageData;
+import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.command.SendCommandEvent;
@@ -24,12 +28,6 @@ import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
-
-import net.huskycraft.blockyarena.games.Game;
-import net.huskycraft.blockyarena.games.GamersManager;
-import net.huskycraft.blockyarena.utils.DamageData;
-import net.huskycraft.blockyarena.utils.Gamer;
-import net.huskycraft.blockyarena.utils.GamerStatus;
 
 import java.util.Optional;
 

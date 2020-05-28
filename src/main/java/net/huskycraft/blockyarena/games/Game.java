@@ -21,6 +21,8 @@ import net.huskycraft.blockyarena.games.states.EnteringState;
 import net.huskycraft.blockyarena.games.states.MatchState;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
+import net.huskycraft.blockyarena.utils.PlayerSnapshot;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 import java.util.ArrayList;
@@ -35,15 +37,15 @@ public class Game {
     protected int teamSize;
     //The current state this game is on
     private MatchState state;
-    private List<Gamer> gamersList;
+    private List<PlayerSnapshot> snapshots;
     private final long totalCapacity;
 
     public Game(int teamSize, Arena arena) {
         this.arena = arena;
         this.teamSize = teamSize;
-        this.setGamersList(new ArrayList<Gamer>());
         arena.setBusy(true);
-        state = new EnteringState(this);
+        snapshots = new ArrayList<>();
+        state = new EnteringState(this, new ArrayList<>());
         totalCapacity = teamSize * arena.getStartPoints().count();
     }
 
@@ -57,6 +59,19 @@ public class Game {
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
         state.analyze(event, damageData);
+    }
+
+    public void addSnapshot(PlayerSnapshot snapshot) {
+        snapshots.add(snapshot);
+    }
+
+    public void restoreSnapshotOf(Player player) {
+        snapshots.stream().filter(it -> it.getPlayer().equals(player)).findAny()
+                .ifPresent(PlayerSnapshot::restore);
+    }
+
+    public void restoreSnapshots() {
+        snapshots.forEach(PlayerSnapshot::restore);
     }
 
     public boolean canJoin() {
@@ -74,14 +89,6 @@ public class Game {
     public void setMatchState(MatchState state) {
         this.state = state;
     }
-
-	public List<Gamer> getGamersList() {
-		return gamersList;
-	}
-
-	public void setGamersList(List<Gamer> gamersList) {
-		this.gamersList = gamersList;
-	}
 
 	public int getTeamSize() {
         return teamSize;

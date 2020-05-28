@@ -21,13 +21,17 @@ import net.huskycraft.blockyarena.games.GameManager;
 import net.huskycraft.blockyarena.utils.Gamer;
 
 import java.util.List;
-import java.util.Optional;
 
 public class LeavingState extends MatchState {
 
     public LeavingState(Game game, List<Gamer> gamers) {
         super(game, gamers);
-        gamers.forEach(this::dismiss);
+
+        game.restoreSnapshots();
+        gamers.forEach(it -> {
+            it.setGame(null);
+            it.spectate(false);
+        });
         game.getArena().setBusy(false);
         GameManager.getInstance().remove(game);
     }

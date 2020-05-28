@@ -21,21 +21,14 @@ import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.Team;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
-import org.spongepowered.api.data.key.Keys;
-import org.spongepowered.api.entity.Entity;
-import org.spongepowered.api.entity.EntityType;
 import org.spongepowered.api.entity.EntityTypes;
 import org.spongepowered.api.entity.weather.Lightning;
-import org.spongepowered.api.event.cause.entity.damage.source.DamageSources;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.text.title.Title;
 import org.spongepowered.api.world.World;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class PlayingState extends MatchState {
@@ -51,11 +44,11 @@ public class PlayingState extends MatchState {
 
     @Override
     public void dismiss(Gamer gamer) {
-        super.dismiss(gamer);
         gamers.remove(gamer);
         broadcast(Text.of(gamer.getName() + " left the game." +
                 "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
         eliminate(gamer, Text.of(gamer.getPlayer().getName() + " has left the game."));
+        super.dismiss(gamer);
     }
 
     @Override
@@ -81,7 +74,15 @@ public class PlayingState extends MatchState {
         }
         // if attacked by teammates, cancel
         if (damageData.getAttacker().isPresent()) {
-            if (areTeammates(victim, damageData.getAttacker().get())) {
+            Gamer attacker = damageData.getAttacker().get();
+            if (areTeammates(victim, attacker)) {
+                event.setCancelled(true);
+            }
+            Optional<Game> optGame = attacker.getGame();
+            if (!optGame.isPresent() || !optGame.get().equals(game)) {
+                event.setCancelled(true);
+            }
+            if (teams.stream().anyMatch(team -> team.isEliminated(attacker))) {
                 event.setCancelled(true);
             }
         }
