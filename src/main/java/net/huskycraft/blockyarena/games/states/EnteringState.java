@@ -33,7 +33,7 @@ public class EnteringState extends MatchState {
 
     @Override
     public void recruit(Gamer gamer) {
-        if (gamers.size() == game.getTotalCapacity()) { // TODO: starting condition, need to change to accommodate more modes
+        if (gamers.size() == teamMode.getTotalCapacity()) { // TODO: starting condition, need to change to accommodate more modes
             gamer.getPlayer().sendMessage(Text.of("Unable to join the game at this time."));
             return;
         }
@@ -41,8 +41,8 @@ public class EnteringState extends MatchState {
         super.recruit(gamer);
         //Utils.broadcastToEveryone("the arena : " + game.getArena().getID() +" is used !!", TextColors.GREEN);
         broadcast(Text.of(gamer.getName() + " joined the game. " + "(" +
-                gamers.size() + "/" + game.getTotalCapacity() + ")"));
-        if (gamers.size() == game.getTotalCapacity()) {
+                gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
+        if (gamers.size() == teamMode.getTotalCapacity()) {
             game.setMatchState(new StartingState(game, gamers, ConfigManager.getInstance().getLobbyCountdown()));
         }
     }
@@ -52,7 +52,7 @@ public class EnteringState extends MatchState {
         super.dismiss(gamer);
         gamers.remove(gamer);
         broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
+                "(" + gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
         // if no one is left, cancel timer and go directly to leaving
         if (gamers.isEmpty()) {
             game.setMatchState(new LeavingState(game, gamers));

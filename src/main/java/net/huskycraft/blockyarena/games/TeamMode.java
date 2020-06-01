@@ -19,16 +19,38 @@ package net.huskycraft.blockyarena.games;
 /**
  * A TeamMode represents the mode of a Team based on the number of gamers on a Team.
  */
-public enum TeamMode {
-    SOLO(1), DOUBLES(2);
+public class TeamMode {
 
-    private int capacity; // the capacity of each team in this mode
+    private final int teamSize; // the capacity of each team in this mode
+    private final int teamCount;
 
-    TeamMode(int capacity) {
-        this.capacity = capacity;
+    /**
+     * Create a team mode with uniform configuration.
+     * @param teamSize the number of players on each team
+     * @param teamCount the number of teams
+     */
+    TeamMode(int teamSize, int teamCount) {
+        assert teamSize >= 1;
+        assert teamCount >= 2;
+        this.teamSize = teamSize;
+        this.teamCount = teamCount;
     }
 
-    public int getCapacity() {
-        return capacity;
+    public int getTotalCapacity() {
+        return teamSize * teamCount;
+    }
+
+    public int getTeamCount() {
+        return teamCount;
+    }
+
+    public String toString() {
+        if (teamSize == 1 && teamCount == 2) {
+            return "1v1";
+        }
+        if (teamSize == 2 && teamCount == 2) {
+            return "2v2";
+        }
+        return "ffa";
     }
 }
