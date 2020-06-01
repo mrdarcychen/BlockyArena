@@ -20,13 +20,16 @@ import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.Team;
 import net.huskycraft.blockyarena.games.Timer;
 import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.effect.sound.SoundType;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 public class StoppingState extends MatchState {
 
@@ -37,7 +40,7 @@ public class StoppingState extends MatchState {
                         .color(TextColors.GOLD)
                         .style(TextStyles.BOLD)
                         .build())
-                .subtitle(Text.of(winner.toString() + " won the game."))
+                .subtitle(Text.of(winner+ " won the game."))
                 .fadeIn(1).stay(60).fadeOut(2)
                 .build();
         Title gameOver = Title.builder()
@@ -45,12 +48,14 @@ public class StoppingState extends MatchState {
                         .color(TextColors.RED)
                         .style(TextStyles.BOLD)
                         .build())
-                .subtitle(Text.of(winner.toString() + " won the game."))
+                .subtitle(Text.of(winner + " won the game."))
                 .fadeIn(1).stay(60).fadeOut(2)
                 .build();
 
         winner.broadcast(victory);
-        winner.getGamers().iterator().next().getPlayer().playSound(SoundTypes.ENTITY_PLAYER_LEVELUP, winner.getGamers().iterator().next().getPlayer().getHeadRotation(), 100);
+        winner.getGamers().stream().map(Gamer::getPlayer).forEach(it -> it.playSound(
+                SoundTypes.ENTITY_PLAYER_LEVELUP, it.getLocation().getPosition(), 100
+        ));
         losers.forEach(it -> {
             it.broadcast(gameOver);
             it.getGamers().forEach(gamer -> {
@@ -58,8 +63,6 @@ public class StoppingState extends MatchState {
             });
         });
 
-        System.out.println("IN STOPPING STATE");
-        gamers.forEach(it -> System.out.println(it.getName() + " is in list"));
         new Timer(5, (tMinus) -> {
             if (tMinus == 0) {
                 game.setMatchState(new LeavingState(game, gamers));

@@ -33,8 +33,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * An ArenaManager keeps track of the available Arenas in the server.
@@ -93,8 +93,22 @@ public class ArenaManager {
         }
     }
 
-    public Optional<Arena> getArena() {
+    public Optional<Arena> findArena() {
         return arenas.stream().filter(it -> !it.isBusy()).findAny();
+    }
+    
+    public Optional<Arena> findArena(String mode) {
+        Predicate<Arena> criteria;
+        switch (mode.toLowerCase()) {
+            case "1v1": case "2v2": criteria = (it -> !it.isBusy()); break;
+            case "ffa": criteria = (it) -> !it.isBusy() && it.getStartPoints().count() > 2;
+                break;
+            default:
+                criteria = (it) -> false;
+        }
+        return arenas.stream()
+                .filter(criteria)
+                .findAny();
     }
 
     public Optional<Arena> getArena(String name) {

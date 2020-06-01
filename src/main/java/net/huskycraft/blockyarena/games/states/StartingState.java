@@ -57,9 +57,9 @@ public class StartingState extends MatchState {
         super.dismiss(gamer);
         gamers.remove(gamer);
         broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
+                "(" + gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
         // if fall below min requirement, new entering state
-        if (gamers.size() <= game.getTotalCapacity()) {
+        if (gamers.size() <= teamMode.getTotalCapacity()) {
             timer.cancel();
             broadcast(Text.of("Waiting for more players to join ..."));
             game.setMatchState(new EnteringState(game, gamers));
@@ -67,9 +67,10 @@ public class StartingState extends MatchState {
     }
 
     private List<Team> partition() {
-        Stream<SpawnPoint> startPoints = game.getArena().getStartPoints();
         List<Team> teams = new ArrayList<>();
-        startPoints.forEach(point -> teams.add(new Team(point, game)));
+        game.getArena().getStartPoints()
+                .limit(teamMode.getTeamCount())
+                .forEach(point -> teams.add(new Team(point)));
         Iterator<Gamer> gamersItr = gamers.iterator();
         int gamersLeft = gamers.size();
         while (gamersItr.hasNext()) {

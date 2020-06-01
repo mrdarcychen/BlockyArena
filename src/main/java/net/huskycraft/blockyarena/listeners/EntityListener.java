@@ -22,6 +22,7 @@ import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.action.LightningEvent;
 import org.spongepowered.api.event.command.SendCommandEvent;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
@@ -76,7 +77,11 @@ public class EntityListener {
     public void onDamageEntity(DamageEntityEvent event) {
         if (event.getTargetEntity() instanceof Player) {
             Player player = (Player) event.getTargetEntity();
-            Gamer victim = GamersManager.getGamer(player.getUniqueId()).get();
+            Optional<Gamer> optGamer = GamersManager.getGamer(player.getUniqueId());
+            if (!optGamer.isPresent()) {
+                return;
+            }
+            Gamer victim = optGamer.get();
             // if the victim is in a game, proceed analysis
             Optional<Game> optGame = victim.getGame();
             if (optGame.isPresent()) {

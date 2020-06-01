@@ -21,7 +21,12 @@ import net.huskycraft.blockyarena.games.Game;
 import net.huskycraft.blockyarena.games.Team;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.effect.particle.ParticleEffect;
+import org.spongepowered.api.effect.particle.ParticleTypes;
+import org.spongepowered.api.effect.sound.SoundCategories;
+import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.EntityTypes;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.weather.Lightning;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
@@ -37,7 +42,6 @@ public class PlayingState extends MatchState {
 
     public PlayingState(Game game, List<Gamer> gamers, List<Team> teams) {
         super(game, gamers);
-        System.out.println("In Playing State");
         this.teams = teams;
         teams.forEach(Team::sendAllToSpawn);
     }
@@ -46,7 +50,7 @@ public class PlayingState extends MatchState {
     public void dismiss(Gamer gamer) {
         gamers.remove(gamer);
         broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + game.getTotalCapacity() + ")"));
+                "(" + gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
         eliminate(gamer, Text.of(gamer.getPlayer().getName() + " has left the game."));
         super.dismiss(gamer);
     }
@@ -68,7 +72,7 @@ public class PlayingState extends MatchState {
         // if fell into the void, eliminate
         if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {
             event.setCancelled(true);
-            spawnLightningOn(damageData.getVictim());
+            showDeathEffect(damageData.getVictim());
             eliminate(victim, Text.of(damageData.getDeathMessage()));
             return;
         }
@@ -76,6 +80,8 @@ public class PlayingState extends MatchState {
         if (damageData.getAttacker().isPresent()) {
             Gamer attacker = damageData.getAttacker().get();
             if (areTeammates(victim, attacker)) {
+                attacker.getPlayer().playSound(SoundTypes.ITEM_SHIELD_BLOCK,
+                        attacker.getPlayer().getLocation().getPosition(), 50);
                 event.setCancelled(true);
             }
             Optional<Game> optGame = attacker.getGame();
@@ -88,18 +94,20 @@ public class PlayingState extends MatchState {
         }
         if (event.willCauseDeath()) {
             event.setCancelled(true);
-            spawnLightningOn(victim);
+            showDeathEffect(victim);
             // eliminate the victim
             eliminate(victim, Text.of(damageData.getDeathMessage()));
         }
     }
 
-    private void spawnLightningOn(Gamer gamer) {
-        World extent = gamer.getPlayer().getLocation().getExtent();
-        Vector3d position = gamer.getPlayer().getLocation().getPosition();
-        Lightning lightning = (Lightning) extent.createEntity(EntityTypes.LIGHTNING, position);
-        lightning.setEffect(true); // TODO: cannot make lightning act as an effect
-        extent.spawnEntity(lightning);
+    private void showDeathEffect(Gamer gamer) {
+        ParticleEffect effect = ParticleEffect.builder()
+                .type(ParticleTypes.FIREWORKS_SPARK)
+                .quantity(200)
+                .build();
+        Player player = gamer.getPlayer();
+        player.playSound(SoundTypes.ENTITY_BAT_DEATH, player.getLocation().getPosition(), 100);
+        player.spawnParticles(effect, player.getLocation().getPosition());
     }
 
     private boolean areTeammates(Gamer a, Gamer b) {

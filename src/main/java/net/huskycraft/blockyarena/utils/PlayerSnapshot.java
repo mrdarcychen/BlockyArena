@@ -36,7 +36,6 @@ public class PlayerSnapshot {
         this.transform = player.getTransform();
         kit = new Kit(player, null);
         gameMode = player.gameMode().get();
-        System.out.println(gameMode);
         health = player.health().get();
         food = player.foodLevel().get();
     }
@@ -44,12 +43,9 @@ public class PlayerSnapshot {
     public void restore() {
         player.setTransform(transform);
         kit.equip(player);
-        System.out.println(player.getName() + " currently " + player.gameMode().get());
-        player.gameMode().set(gameMode);
         player.offer(Keys.GAME_MODE, gameMode);
-        System.out.println(gameMode + " -> " + player.gameMode().get());
-        player.health().set(health);
-        player.foodLevel().set(food);
+        player.offer(Keys.HEALTH, health);
+        player.offer(Keys.FOOD_LEVEL, food);
     }
 
     public Player getPlayer() {

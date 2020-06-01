@@ -22,6 +22,7 @@ import net.huskycraft.blockyarena.arenas.ArenaManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 /**
  * The GameManager manages all registered Game session in the server.
@@ -46,18 +47,26 @@ public class GameManager {
      * If there no available game for the given type, we create another Game object
      * @return null if no Game is available
      */
-    public Game getGame(int teamSize) {
-        for (Game game : games) {
-            boolean isActive = game.canJoin();
-            boolean isGivenType = game.getTeamSize() == teamSize;
-            if (isActive && isGivenType) {
-                return game;
-            }
+    public Game getGame(String str) {
+        String mode = str.toLowerCase();
+        Predicate<Game> criteria = (it) -> it.canJoin() && it.getTeamMode().toString().equals(mode);
+        Optional<Game> optGame = games.stream().filter(criteria).findAny();
+        if (optGame.isPresent()) {
+            return optGame.get();
         }
-        // if there is no active Game, initialize a new Game
-        Optional<Arena> optArena = ArenaManager.getInstance().getArena();
+        Optional<Arena> optArena = ArenaManager.getInstance().findArena(mode);
         if (optArena.isPresent()) {
-            Game game = new Game(teamSize, optArena.get());
+            Arena arena = optArena.get();
+            int teamSize = 1;
+            int teamCount = 2;
+            if ("2v2".equals(mode)) {
+                teamSize = 2;
+            }
+            if ("ffa".equals(mode)) {
+                teamCount = (int) arena.getStartPoints().count();
+            }
+            TeamMode teamMode = new TeamMode(teamSize, teamCount);
+            Game game = new Game(teamMode, optArena.get());
             games.add(game);
             return game;
         }

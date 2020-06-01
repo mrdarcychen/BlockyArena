@@ -29,6 +29,8 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+import java.util.Optional;
+
 public class CmdJoin implements CommandExecutor{
 
     private static final CmdJoin INSTANCE = new CmdJoin();
@@ -45,26 +47,36 @@ public class CmdJoin implements CommandExecutor{
      */
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Player player = (Player)src;
+        Player player;
+        Optional<Player> playerArg = args.getOne(Text.of("player"));
+        if (src instanceof Player) {
+            if (playerArg.isPresent() && src != playerArg.get()) {
+                src.sendMessage(Text.of("This must be executed using a command block."));
+                return CommandResult.empty();
+            }
+            player = (Player)src;
+        } else {
+            if (!playerArg.isPresent()) {
+                return CommandResult.empty();
+            }
+            player = playerArg.get();
+        }
         Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
-        try {
-            TeamMode teamMode = TeamMode.valueOf(args.<String>getOne("mode").get().toUpperCase());
-            if (GamersManager.isInGame(player)) {
-                player.sendMessage(Text.of("You've already joined a game!"));
-                return CommandResult.empty();
-            }
-            Game game = GameManager.getInstance().getGame(teamMode.getCapacity());
-            if (game == null) {
-                player.sendMessage(Text.of("There is no available arena at this time."));
-                return CommandResult.empty();
-            }
-            game.add(gamer);
-            // gamer.join(game);
-        } catch (IllegalArgumentException e) {
-            player.sendMessage(Text.of("You've entered an invalid team mode!"));
+        Optional<String> optMode = args.getOne("mode");
+
+        if (!optMode.isPresent()) {
             return CommandResult.empty();
         }
-
+        if (GamersManager.isInGame(player)) {
+            player.sendMessage(Text.of("You've already joined a game!"));
+            return CommandResult.empty();
+        }
+        Game game = GameManager.getInstance().getGame(optMode.get());
+        if (game == null) {
+            player.sendMessage(Text.of("There is no available arena at this time."));
+            return CommandResult.empty();
+        }
+        game.add(gamer);
         return CommandResult.success();
     }
 }

@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * A Team represents a single Gamer or a group of Gamers who cooperate to win a Game.
@@ -34,7 +35,7 @@ public class Team {
     private Map<Gamer, Boolean> gamers; // gamers and whether eliminated or not
     private SpawnPoint startPoint;
 
-    public Team(SpawnPoint startPoint, Game game) {
+    public Team(SpawnPoint startPoint) {
         this.startPoint = startPoint;
         gamers = new HashMap<>();
     }

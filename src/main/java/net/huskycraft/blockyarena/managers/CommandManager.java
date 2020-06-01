@@ -23,7 +23,7 @@ import org.spongepowered.api.command.args.GenericArguments;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
 
-import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
+import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class CommandManager {
 
@@ -41,23 +41,25 @@ public class CommandManager {
 	    public void registerCommands() {
 	        CommandSpec cmdCreate = CommandSpec.builder()
 	                .arguments(
-	                        onlyOne(GenericArguments.string(Text.of("type"))),
-	                        onlyOne(GenericArguments.string(Text.of("id"))))
+	                        onlyOne(string(Text.of("type"))),
+	                        onlyOne(string(Text.of("id"))))
 	                .executor(CmdCreate.getInstance())
 	                .permission("blockyarena.create")
 	                .build();
 
 	        CommandSpec cmdRemove = CommandSpec.builder()
 	                .arguments(
-	                        onlyOne(GenericArguments.string(Text.of("type"))),
-	                        onlyOne(GenericArguments.string(Text.of("id"))))
+	                        onlyOne(string(Text.of("type"))),
+	                        onlyOne(string(Text.of("id"))))
 	                .executor(CmdRemove.getInstance())
 	                .permission("blockyarena.remove")
 	                .build();
 
 	        CommandSpec cmdJoin = CommandSpec.builder()
 	                .arguments(
-	                        onlyOne(GenericArguments.string(Text.of("mode")))
+	                        onlyOne(string(Text.of("mode"))),
+                            optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
+                                    .buildWith(none()))
 	                )
 	                .executor(CmdJoin.getInstance())
 	                .build();
@@ -68,16 +70,20 @@ public class CommandManager {
 
 	        CommandSpec cmdEdit = CommandSpec.builder()
 	                .arguments(
-	                        onlyOne(GenericArguments.string(Text.of("id"))),
-	                        onlyOne(GenericArguments.string(Text.of("type"))),
-	                        GenericArguments.optional(onlyOne(GenericArguments.string(Text.of("param"))))
+	                        onlyOne(string(Text.of("id"))),
+	                        onlyOne(string(Text.of("type"))),
+	                        optional(onlyOne(string(Text.of("param"))))
 	                )
 	                .executor(CmdEdit.getInstance())
 	                .permission("blockyarena.edit")
 	                .build();
 
 	        CommandSpec cmdKit = CommandSpec.builder()
-	                .arguments(onlyOne(GenericArguments.string(Text.of("id"))))
+                    .arguments(
+                            onlyOne(string(Text.of("id"))),
+                            optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
+                                    .buildWith(none()))
+                    )
 	                .executor(CmdKit.getInstance())
 	                .build();
 

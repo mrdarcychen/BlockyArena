@@ -44,7 +44,6 @@ public class DamageData {
         if (optDamageSourcecause.isPresent()) {
             DamageSource damageSource = optDamageSourcecause.get();
             damageType = damageSource.getType();
-
             if (damageSource instanceof IndirectEntityDamageSource) {
                 IndirectEntityDamageSource indirectEntityDamageSource =
                         (IndirectEntityDamageSource) damageSource;

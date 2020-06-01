@@ -53,14 +53,10 @@ public class ConfigManager {
 			loader = HoconConfigurationLoader.builder().setPath(BlockyArena.getInstance().getDefaultConfig()).build();
 		
 			//If file does not exist, we create it.
-			if(!BlockyArena.getInstance().getDefaultConfig().toFile().exists())
-			{
-				BlockyArena.getInstance().getLogger().error("default.conf doesnt exist !!");
-				BlockyArena.getInstance().getLogger().error("Creating default.conf for you.");
-				
+			if(!BlockyArena.getInstance().getDefaultConfig().toFile().exists()) {
+				BlockyArena.getInstance().getLogger().error("Creating a default config for BlockyArena.");
 				this.rootNode = loader.createEmptyNode(ConfigurationOptions.defaults());
 				this.rootNode.getNode("timers", "lobby", "cooldownSec").setValue(15);
-				this.rootNode.getNode("general", "broadcast", "join").setValue(true);
 			
 				
 		    	try {
@@ -73,9 +69,6 @@ public class ConfigManager {
 			}
 			else
 			{
-				BlockyArena.getInstance().getLogger().warn("default.conf does exist !!");
-				BlockyArena.getInstance().getLogger().warn("Loading config !");
-				
 				try {
 					this.rootNode = loader.load();
 					loader.save(rootNode);
@@ -89,8 +82,7 @@ public class ConfigManager {
 	/*
 	 * Reload the configuration file !
 	 */
-	public void reloadConfiguration()
-	{
+	public void reloadConfiguration() {
 		try {
 			this.rootNode = loader.load();
 			loader.save(rootNode);
@@ -99,7 +91,7 @@ public class ConfigManager {
 			e.printStackTrace();
 		}
 		
-		BlockyArena.getInstance().getLogger().warn("Configuration reloaded !");
+		BlockyArena.getInstance().getLogger().info("Configuration reloaded for BlockyArena!");
 	}
 	
 	/*
@@ -113,10 +105,5 @@ public class ConfigManager {
     // return preset countdown time in seconds
 	public int getLobbyCountdown() {
 	    return rootNode.getNode("timers", "lobby", "cooldownSec").getInt();
-    }
-
-    // return true if broadcast on joining is enabled, false otherwise
-    public boolean allowBroadcast() {
-	    return rootNode.getNode("general", "broadcast", "join").getBoolean();
     }
 }

@@ -58,7 +58,11 @@ public class Gamer {
     }
 
     public void spectate(boolean i) {
-        player.health().set(player.health().getMaxValue());
+        //player.getHealthData().set(player.getHealthData().maxHealth());
+        //player.health().set(player.health().getMaxValue());
+        // player.getFoodData().set(Keys.FOOD_LEVEL, player.getFoodData().foodLevel().getMaxValue());
+        player.offer(Keys.HEALTH, player.health().getMaxValue());
+        player.offer(Keys.FOOD_LEVEL, player.foodLevel().getMaxValue());
         player.offer(Keys.VANISH, i);
         player.offer(Keys.VANISH_IGNORES_COLLISION, i);
         player.offer(Keys.CAN_FLY, i);

@@ -19,11 +19,15 @@ package net.huskycraft.blockyarena.games.states;
 import net.huskycraft.blockyarena.arenas.Arena;
 import net.huskycraft.blockyarena.arenas.SpawnPoint;
 import net.huskycraft.blockyarena.games.Game;
+import net.huskycraft.blockyarena.games.TeamMode;
 import net.huskycraft.blockyarena.utils.DamageData;
 import net.huskycraft.blockyarena.utils.Gamer;
+import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
 
@@ -33,9 +37,11 @@ public abstract class MatchState {
 
     protected final Game game;
     protected List<Gamer> gamers; // only store active gamers
+    protected TeamMode teamMode;
 
     public MatchState(Game game, List<Gamer> gamers) {
         this.game = game;
+        teamMode = game.getTeamMode();
         this.gamers = gamers;
     }
 
@@ -49,11 +55,15 @@ public abstract class MatchState {
         Player player = gamer.getPlayer();
         player.getInventory().clear();  // TODO: allow bringing personal kit
         player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
+        //player.gameMode().set(GameModes.SURVIVAL);
+        //player.getGameModeData().set(Keys.GAME_MODE, GameModes.SURVIVAL);
+        player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
         Arena arena = game.getArena();
         SpawnPoint spawnPoint = arena.getLobbySpawn();
         player.setTransform(spawnPoint.getTransform());
         // TODO: refer to game logistics for the following parameters
-        player.health().set(player.health().getMaxValue());
+        //player.health().set(player.health().getMaxValue());
+        player.offer(Keys.HEALTH, player.health().getMaxValue());
         gamer.spectate(false);
     }
 

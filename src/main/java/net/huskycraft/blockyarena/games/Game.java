@@ -34,19 +34,16 @@ import java.util.List;
 public class Game {
 
     protected Arena arena;
-    protected int teamSize;
-    //The current state this game is on
     private MatchState state;
     private List<PlayerSnapshot> snapshots;
-    private final long totalCapacity;
+    private TeamMode teamMode;
 
-    public Game(int teamSize, Arena arena) {
+    public Game(TeamMode teamMode, Arena arena) {
         this.arena = arena;
-        this.teamSize = teamSize;
+        this.teamMode = teamMode;
         arena.setBusy(true);
         snapshots = new ArrayList<>();
         state = new EnteringState(this, new ArrayList<>());
-        totalCapacity = teamSize * arena.getStartPoints().count();
     }
 
     public void add(Gamer gamer) {
@@ -78,10 +75,6 @@ public class Game {
         return state instanceof EnteringState;
     }
 
-    public long getTotalCapacity() {
-        return totalCapacity;
-    }
-
     public Arena getArena() {
         return arena;
     }
@@ -90,7 +83,7 @@ public class Game {
         this.state = state;
     }
 
-	public int getTeamSize() {
-        return teamSize;
+    public TeamMode getTeamMode() {
+        return teamMode;
     }
 }
