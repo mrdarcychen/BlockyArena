@@ -26,7 +26,6 @@ import org.spongepowered.api.item.inventory.property.SlotIndex;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 
 public class KitSerializer implements TypeSerializer<Kit> {
 
@@ -39,16 +38,11 @@ public class KitSerializer implements TypeSerializer<Kit> {
     @Override
     public Kit deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         String id = value.getNode("id").getString();
-        Optional<ItemStack> headwear = Optional.ofNullable(
-                value.getNode("headwear").getValue(TypeToken.of(ItemStack.class)));
-        Optional<ItemStack> chestplate = Optional.ofNullable(
-                value.getNode("chestplate").getValue(TypeToken.of(ItemStack.class)));
-        Optional<ItemStack> leggings = Optional.ofNullable(
-                value.getNode("leggings").getValue(TypeToken.of(ItemStack.class)));
-        Optional<ItemStack> boots = Optional.ofNullable(
-                value.getNode("boots").getValue(TypeToken.of(ItemStack.class)));
-        Optional<ItemStack> offHand = Optional.ofNullable(
-                value.getNode("offHand").getValue(TypeToken.of(ItemStack.class)));
+        ItemStack headwear = value.getNode("headwear").getValue(TypeToken.of(ItemStack.class));
+        ItemStack chestplate = value.getNode("chestplate").getValue(TypeToken.of(ItemStack.class));
+        ItemStack leggings = value.getNode("leggings").getValue(TypeToken.of(ItemStack.class));
+        ItemStack boots = value.getNode("boots").getValue(TypeToken.of(ItemStack.class));
+        ItemStack offHand = value.getNode("offHand").getValue(TypeToken.of(ItemStack.class));
         Map<SlotIndex, ItemStack> main = new HashMap<>();
         for (ConfigurationNode indexNode : value.getNode("main").getChildrenMap().values()) {
             SlotIndex index = SlotIndex.of(indexNode.getKey());

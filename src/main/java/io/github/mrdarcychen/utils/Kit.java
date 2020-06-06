@@ -20,7 +20,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.entity.PlayerInventory;
-import org.spongepowered.api.item.inventory.equipment.EquipmentTypes;
 import org.spongepowered.api.item.inventory.property.SlotIndex;
 
 import java.util.Map;
@@ -34,11 +33,11 @@ public class Kit {
 
     private final String id;
     private final Map<SlotIndex, ItemStack> main;
-    private final Optional<ItemStack> headwear;
-    private final Optional<ItemStack> chestplate;
-    private final Optional<ItemStack> leggings;
-    private final Optional<ItemStack> boots;
-    private final Optional<ItemStack> offHand;
+    private final ItemStack headwear;
+    private final ItemStack chestplate;
+    private final ItemStack leggings;
+    private final ItemStack boots;
+    private final ItemStack offHand;
 
     /**
      * Constructs a Kit based on the given player's inventory.
@@ -57,11 +56,11 @@ public class Kit {
             }
             index++;
         }
-        headwear = inventory.getEquipment().getSlot(EquipmentTypes.HEADWEAR).get().peek();
-        chestplate = inventory.getEquipment().getSlot(EquipmentTypes.CHESTPLATE).get().peek();
-        leggings = inventory.getEquipment().getSlot(EquipmentTypes.LEGGINGS).get().peek();
-        boots = inventory.getEquipment().getSlot(EquipmentTypes.BOOTS).get().peek();
-        offHand = inventory.getOffhand().peek();
+        headwear = player.getHelmet().orElse(null);
+        chestplate = player.getChestplate().orElse(null);
+        leggings = player.getLeggings().orElse(null);
+        boots = player.getBoots().orElse(null);
+        offHand = inventory.getOffhand().peek().orElse(null);
     }
 
     /**
@@ -75,8 +74,8 @@ public class Kit {
      * @param boots the boots of this Kit
      * @param offHand the offhand ItemStack of this Kit
      */
-    public Kit(String id, Map<SlotIndex, ItemStack> main, Optional<ItemStack> headwear, Optional<ItemStack> chestplate,
-               Optional<ItemStack> leggings, Optional<ItemStack> boots, Optional<ItemStack> offHand) {
+    public Kit(String id, Map<SlotIndex, ItemStack> main, ItemStack headwear, ItemStack chestplate,
+               ItemStack leggings, ItemStack boots, ItemStack offHand) {
         this.id = id;
         this.main = main;
         this.headwear = headwear;
@@ -98,11 +97,11 @@ public class Kit {
         for (SlotIndex slotIndex : main.keySet()) {
             inventory.getMain().set(slotIndex, main.get(slotIndex).copy());
         }
-        headwear.ifPresent(itemStack -> player.setHelmet(itemStack.copy()));
-        chestplate.ifPresent(itemStack -> player.setChestplate(itemStack.copy()));
-        leggings.ifPresent(itemStack -> player.setLeggings(itemStack.copy()));
-        boots.ifPresent(itemStack -> player.setBoots(itemStack.copy()));
-        offHand.ifPresent(itemStack -> inventory.getOffhand().set(itemStack.copy()));
+        player.setHelmet(headwear.copy());
+        player.setHelmet(chestplate.copy());
+        player.setLeggings(leggings.copy());
+        player.setBoots(boots.copy());
+        inventory.getOffhand().set(offHand.copy());
     }
 
     /**
@@ -129,7 +128,7 @@ public class Kit {
      * @return the headwear of this Kit
      */
     public Optional<ItemStack> getHeadwear() {
-        return headwear;
+        return Optional.ofNullable(headwear);
     }
 
     /**
@@ -138,7 +137,7 @@ public class Kit {
      * @return the chestplate of this Kit
      */
     public Optional<ItemStack> getChestplate() {
-        return chestplate;
+        return Optional.ofNullable(chestplate);
     }
 
     /**
@@ -147,7 +146,7 @@ public class Kit {
      * @return the leggings of this Kit
      */
     public Optional<ItemStack> getLeggings() {
-        return leggings;
+        return Optional.ofNullable(leggings);
     }
 
     /**
@@ -156,7 +155,7 @@ public class Kit {
      * @return the boots of this Kit
      */
     public Optional<ItemStack> getBoots() {
-        return boots;
+        return Optional.ofNullable(boots);
     }
 
     /**
@@ -165,6 +164,6 @@ public class Kit {
      * @return the offhand ItemStack of this kit
      */
     public Optional<ItemStack> getOffHand() {
-        return offHand;
+        return Optional.ofNullable(offHand);
     }
 }
