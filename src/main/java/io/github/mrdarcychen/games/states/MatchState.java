@@ -49,6 +49,7 @@ public abstract class MatchState {
      */
     public void recruit(Gamer gamer) {
         // execute only if the gamer is accepted to the game
+        gamers.add(gamer);
         game.addSnapshot(gamer.takeSnapshot());
         gamer.setGame(game);
         Player player = gamer.getPlayer();
@@ -79,12 +80,15 @@ public abstract class MatchState {
         gamer.spectate(true);
         Player player = gamer.getPlayer();
         player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
+        showEliminateScreen(gamer);
+    }
+
+    private void showEliminateScreen(Gamer gamer) {
         Text deathText = Text.builder("YOU DIED!")
                 .color(TextColors.RED).build();
         Title deathTitle = Title.builder()
                 .title(deathText).fadeOut(2).stay(16).build();
         gamer.getPlayer().sendTitle(deathTitle);
-        // gamer.spectate(game);
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
