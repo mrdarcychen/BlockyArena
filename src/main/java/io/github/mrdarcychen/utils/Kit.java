@@ -97,11 +97,21 @@ public class Kit {
         for (SlotIndex slotIndex : main.keySet()) {
             inventory.getMain().set(slotIndex, main.get(slotIndex).copy());
         }
-        player.setHelmet(headwear.copy());
-        player.setHelmet(chestplate.copy());
-        player.setLeggings(leggings.copy());
-        player.setBoots(boots.copy());
-        inventory.getOffhand().set(offHand.copy());
+        if (headwear != null) {
+            player.setHelmet(headwear.copy());
+        }
+        if (chestplate != null) {
+            player.setChestplate(chestplate.copy());
+        }
+        if (leggings != null) {
+            player.setLeggings(leggings.copy());
+        }
+        if (boots != null) {
+            player.setBoots(boots.copy());
+        }
+        if (offHand != null) {
+            inventory.getOffhand().set(offHand.copy());
+        }
     }
 
     /**

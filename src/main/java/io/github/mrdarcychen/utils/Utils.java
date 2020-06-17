@@ -25,7 +25,7 @@ import org.spongepowered.api.text.format.TextColor;
 public class Utils {
 	
 	public static void broadcastToEveryone(String message, TextColor color) {
-        Text coloredText = Text.builder("[" + BlockyArena.getInstance().getLogger().getName() + "] " + message).color(color).build();
+        Text coloredText = Text.builder("[" + BlockyArena.getLogger().getName() + "] " + message).color(color).build();
         MessageChannel.TO_ALL.send(coloredText, ChatTypes.CHAT);
     }
 }

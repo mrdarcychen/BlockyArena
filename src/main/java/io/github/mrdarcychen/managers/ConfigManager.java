@@ -52,7 +52,7 @@ public class ConfigManager {
 		
 			//If file does not exist, we create it.
 			if(!BlockyArena.getInstance().getDefaultConfig().toFile().exists()) {
-				BlockyArena.getInstance().getLogger().error("Creating a default config for BlockyArena.");
+				BlockyArena.getLogger().error("Creating a default config for BlockyArena.");
 				this.rootNode = loader.createEmptyNode(ConfigurationOptions.defaults());
 				this.rootNode.getNode("timers", "lobby", "cooldownSec").setValue(15);
 			
@@ -89,7 +89,7 @@ public class ConfigManager {
 			e.printStackTrace();
 		}
 		
-		BlockyArena.getInstance().getLogger().info("Configuration reloaded for BlockyArena!");
+		BlockyArena.getLogger().info("Configuration reloaded for BlockyArena!");
 	}
 	
 	/*

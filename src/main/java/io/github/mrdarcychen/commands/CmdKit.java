@@ -16,8 +16,9 @@
 
 package io.github.mrdarcychen.commands;
 
+import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.games.GamersManager;
-import io.github.mrdarcychen.utils.KitManager;
+import io.github.mrdarcychen.KitManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -61,11 +62,11 @@ public class CmdKit implements CommandExecutor {
             return CommandResult.empty();
         }
         String id = args.<String>getOne(Text.of("id")).get();
-        if (KitManager.getInstance().get(id) == null) {
+        if (BlockyArena.getKitManager().get(id) == null) {
             player.sendMessage(Text.of("Kit " + id + " does not exist."));
             return CommandResult.empty();
         }
-        KitManager.getInstance().get(id).equip(player);
+        BlockyArena.getKitManager().get(id).equip(player);
         return CommandResult.success();
     }
 

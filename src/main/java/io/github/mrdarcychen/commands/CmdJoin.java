@@ -71,7 +71,7 @@ public class CmdJoin implements CommandExecutor{
                     " quit to leave the current game session."));
             return CommandResult.empty();
         }
-        Game game = GameManager.getInstance().getGame(optMode.get());
+        Game game = GameManager.getGame(optMode.get());
         if (game == null) {
             player.sendMessage(Text.of("There's no available arena at this time."));
             return CommandResult.empty();

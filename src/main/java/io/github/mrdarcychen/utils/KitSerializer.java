@@ -29,11 +29,7 @@ import java.util.Map;
 
 public class KitSerializer implements TypeSerializer<Kit> {
 
-    public static BlockyArena plugin;
-
-    public KitSerializer(BlockyArena plugin) {
-        KitSerializer.plugin = plugin;
-    }
+    public KitSerializer() {}
 
     @Override
     public Kit deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {

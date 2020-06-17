@@ -44,7 +44,7 @@ public class ClientConnectionEventListener {
         gamer.setName(user.getName());
         gamer.setPlayer(user.getPlayer().get());
 
-        BlockyArena.getInstance().getLogger().debug("A new player logged in !");
+        BlockyArena.getLogger().debug("A new player logged in !");
     }
 
     @Listener

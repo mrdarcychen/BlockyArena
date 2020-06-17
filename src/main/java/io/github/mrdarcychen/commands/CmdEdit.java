@@ -16,8 +16,9 @@
 
 package io.github.mrdarcychen.commands;
 
+import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.arenas.Arena;
-import io.github.mrdarcychen.arenas.ArenaManager;
+import io.github.mrdarcychen.ArenaManager;
 import io.github.mrdarcychen.arenas.SpawnPoint;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -65,7 +66,7 @@ public class CmdEdit implements CommandExecutor {
                 player.sendMessage(of("Saving failed: " + e.getMessage()));
                 return CommandResult.empty();
             }
-            ArenaManager.getInstance().add(arena);
+            BlockyArena.getArenaManager().add(arena);
             player.sendMessage(of("Success! Arena " + arena.getName() + " is now in operation."));
         } else {
                 switch (param) {

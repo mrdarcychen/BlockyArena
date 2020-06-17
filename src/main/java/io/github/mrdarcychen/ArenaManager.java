@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package io.github.mrdarcychen.arenas;
+package io.github.mrdarcychen;
 
 import com.google.common.reflect.TypeToken;
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.arenas.Arena;
+import io.github.mrdarcychen.arenas.SpawnPoint;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -41,67 +42,56 @@ import java.util.stream.Collectors;
  */
 public class ArenaManager {
 
-    private static ArenaManager INSTANCE;
+    private final List<Arena> arenas = new ArrayList<>();
+    private final Path configDirectory;
 
-    private final List<Arena> arenas; // the list of Arenas available in the server
-    private final Path configDir;
-
-
-    public ArenaManager() {
-        arenas = new ArrayList<>();
-        configDir = BlockyArena.getInstance().getArenaDir();
+    ArenaManager(Path configDirectory) {
+        this.configDirectory = configDirectory;
         loadArenas();
     }
 
-    public static ArenaManager getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new ArenaManager();
-        }
-        return INSTANCE;
-    }
-
-    /**
-     * Reconstructs arenas from all arena config files in standard format.
-     */
-    public void loadArenas() {
+    // load all arenas from config files
+    void loadArenas() {
         try {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(
-                    BlockyArena.getInstance().getArenaDir(), "*.conf");
+            DirectoryStream<Path> stream = Files.newDirectoryStream(configDirectory, "*.conf");
             for (Path file : stream) {
                 ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                         .builder().setPath(file).build();
-                try {
-                    ConfigurationNode rootNode = loader.load();
-                    String name = rootNode.getNode("name").getString();
-                    Arena.Builder builder = new Arena.Builder(name);
-                    builder.setLobbySpawn(rootNode.getNode("lobbySpawn")
-                            .getValue(TypeToken.of(SpawnPoint.class)));
-                    builder.setSpectatorSpawn(rootNode.getNode("spectatorSpawn")
-                            .getValue(TypeToken.of(SpawnPoint.class)));
-                    for (ConfigurationNode node : rootNode.getNode("startPoints").getChildrenList()) {
-                        builder.addStartPoint(node.getValue(TypeToken.of(SpawnPoint.class)));
-                    }
-                    loader.save(rootNode);
-                    Arena arena = builder.build();
-                    arenas.add(arena);
-                } catch (ObjectMappingException e) {
-                    BlockyArena.getInstance().getLogger().warn("Error reading arena config.");
-                }
+                ConfigurationNode rootNode = loader.load();
+                parseArenaFrom(rootNode).ifPresent(arenas::add);
             }
         } catch (IOException e) {
-        	BlockyArena.getInstance().getLogger().warn("Error loading existing arena configs.");
+            BlockyArena.getLogger().warn("An I/O error occurred while loading arena configs.");
         }
     }
 
-    public Optional<Arena> findArena() {
-        return arenas.stream().filter(it -> !it.isBusy()).findAny();
+    private Optional<Arena> parseArenaFrom(ConfigurationNode rootNode) {
+        TypeToken<SpawnPoint> spawnToken = TypeToken.of(SpawnPoint.class);
+        String name = rootNode.getNode("name").getString();
+        Arena.Builder builder = new Arena.Builder(name);
+        Arena output = null;
+        try {
+            builder.setLobbySpawn(rootNode.getNode("lobbySpawn").getValue(spawnToken));
+            builder.setSpectatorSpawn(rootNode.getNode("spectatorSpawn").getValue(spawnToken));
+            for (ConfigurationNode node : rootNode.getNode("startPoints").getChildrenList()) {
+                builder.addStartPoint(node.getValue(spawnToken));
+            }
+            output = builder.build();
+        } catch (ObjectMappingException | IllegalStateException e) {
+            BlockyArena.getLogger().warn("Failed to load arena " + name + " : " + e.getMessage());
+        }
+        return Optional.ofNullable(output);
     }
-    
+
     public Optional<Arena> findArena(String mode) {
         Predicate<Arena> criteria;
         switch (mode.toLowerCase()) {
-            case "1v1": case "2v2": criteria = (it -> !it.isBusy()); break;
-            case "ffa": criteria = (it) -> !it.isBusy() && it.getStartPoints().count() > 2;
+            case "1v1":
+            case "2v2":
+                criteria = (it -> !it.isBusy());
+                break;
+            case "ffa":
+                criteria = (it) -> !it.isBusy() && it.getStartPoints().count() > 2;
                 break;
             default:
                 criteria = (it) -> false;
@@ -115,16 +105,19 @@ public class ArenaManager {
         return arenas.stream().filter(it -> it.getName().equals(name)).findFirst();
     }
 
+    public Optional<Arena> findArena() {
+        return arenas.stream().filter(it -> !it.isBusy()).findAny();
+    }
+
     // will overwrite existing arena if same name provided
     public void add(Arena arena) {
-        Path file = Paths.get(configDir.toString() + File.separator + arena.getName() + ".conf");
+        Path file = Paths.get(configDirectory + File.separator + arena.getName() + ".conf");
         try {
             if (!file.toFile().exists()) {
                 Files.createFile(file);
             }
         } catch (IOException e) {
-            BlockyArena.getInstance().getLogger()
-                    .warn("Error creating arena config file for " + arena.getName());
+            BlockyArena.getLogger().warn("Error creating arena config file for " + arena.getName());
             return;
         }
 
@@ -142,14 +135,14 @@ public class ArenaManager {
             rootNode.getNode("spectatorSpawn").setValue(TypeToken.of(SpawnPoint.class), arena.getSpectatorSpawn());
             loader.save(rootNode);
         } catch (IOException | ObjectMappingException e) {
-            BlockyArena.getInstance().getLogger().warn("Error writing arena config.");
+            BlockyArena.getLogger().warn("Error writing arena config.");
         }
         arenas.add(arena);
     }
 
     public void remove(String name) {
         arenas.removeIf(it -> it.getName().equals(name));
-        Path path = Paths.get(configDir.toString() + File.separator + name + ".conf");
+        Path path = Paths.get(configDirectory + File.separator + name + ".conf");
         try {
             Files.delete(path);
         } catch (IOException e) {

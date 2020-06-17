@@ -30,17 +30,14 @@ import java.util.UUID;
 
 public class SpawnSerializer implements TypeSerializer<SpawnPoint> {
 
-    public static BlockyArena plugin;
-
-    public SpawnSerializer(BlockyArena plugin) {
-        SpawnSerializer.plugin = plugin;
+    public SpawnSerializer() {
     }
 
     @Override
     public SpawnPoint deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
         if (!Sponge.getServer().getWorld(extentUUID).isPresent()) {
-            plugin.getLogger().warn("Cannot find extent with UUID " + extentUUID.toString());
+            BlockyArena.getLogger().warn("Cannot find extent with UUID " + extentUUID.toString());
         }
         World extent = Sponge.getServer().getWorld(extentUUID).get();
         Vector3d position = value.getNode("position").getValue(TypeToken.of(Vector3d.class));

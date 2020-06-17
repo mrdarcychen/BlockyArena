@@ -33,6 +33,6 @@ public class LeavingState extends MatchState {
             it.spectate(false);
         });
         game.getArena().setBusy(false);
-        GameManager.getInstance().remove(game);
+        GameManager.remove(game);
     }
 }

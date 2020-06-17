@@ -18,16 +18,14 @@ package io.github.mrdarcychen;
 
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
-import io.github.mrdarcychen.arenas.ArenaManager;
 import io.github.mrdarcychen.arenas.SpawnPoint;
 import io.github.mrdarcychen.arenas.SpawnSerializer;
 import io.github.mrdarcychen.listeners.ClientConnectionEventListener;
 import io.github.mrdarcychen.listeners.EntityListener;
 import io.github.mrdarcychen.listeners.ServerListener;
-import io.github.mrdarcychen.managers.CommandManager;
+import io.github.mrdarcychen.commands.CommandManager;
 import io.github.mrdarcychen.managers.ConfigManager;
 import io.github.mrdarcychen.utils.Kit;
-import io.github.mrdarcychen.utils.KitManager;
 import io.github.mrdarcychen.utils.KitSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
@@ -50,16 +48,18 @@ import java.util.List;
 public final class BlockyArena {
 
 	private static BlockyArena PLUGIN;
+	private static KitManager kitManager;
+	private static ArenaManager arenaManager;
 
 	@Inject
-	private Logger logger;
+	private static Logger logger;
 
 	@Inject
 	@ConfigDir(sharedRoot = false)
 	//The path to config/BlockyArena
-	private Path configDir;
+	private Path configDirectory;
 
-	private Path arenaDir, kitDir;
+	private Path arenaDirectory, kitDirectory;
 
 
 	@Inject
@@ -68,8 +68,7 @@ public final class BlockyArena {
 	private Path defaultConfig;
 
     @Inject
-    private BlockyArena() {
-    }
+    private BlockyArena() {}
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
@@ -81,12 +80,11 @@ public final class BlockyArena {
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
-       
-    	CommandManager.getInstance().registerCommands();
+    	Sponge.getCommandManager().register(this, CommandManager.getInstance().getCommandCallable(),
+                "blockyarena", "ba"); // TODO: need refactoring
         ConfigManager.getInstance().load();
-        ArenaManager am = ArenaManager.getInstance();
-        am.loadArenas();
-        KitManager.getInstance().loadKits();
+        arenaManager = new ArenaManager(arenaDirectory);
+        kitManager = new KitManager(kitDirectory);
     }
 
     /*
@@ -94,10 +92,10 @@ public final class BlockyArena {
     pre: plugin config directory exists (throws IOException if not)
      */
     private void createDirectories() {
-        arenaDir = Paths.get(getConfigDir().toString() + "/arenas");
-        kitDir = Paths.get(getConfigDir().toString() + "/kits");
+        arenaDirectory = Paths.get(configDirectory + "/arenas");
+        kitDirectory = Paths.get(configDirectory + "/kits");
 
-        List<Path> directories = Arrays.asList(arenaDir, kitDir);
+        List<Path> directories = Arrays.asList(arenaDirectory, kitDirectory);
         for (Path dir : directories) {
             try {
                 if (!dir.toFile().exists()) {
@@ -126,31 +124,25 @@ public final class BlockyArena {
      * Registers all custom TypeSerializers.
      */
     private void registerTypeSerializers() {
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(SpawnPoint.class), new SpawnSerializer(this));
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer(this));
-    }
-
-    public Logger getLogger() {
-        return logger;
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(SpawnPoint.class), new SpawnSerializer());
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer());
     }
 
     public Path getDefaultConfig() {
         return defaultConfig;
     }
 
-    public Path getConfigDir() {
-        return configDir;
+	public static KitManager getKitManager() {
+        return kitManager;
     }
-    
-	public Path getArenaDir() {
-		return arenaDir;
-	}
 
-	public Path getKitDir() {
-		return kitDir;
-	}
+    public static ArenaManager getArenaManager() {
+        return arenaManager;
+    }
 
-
+    public static Logger getLogger() {
+        return logger;
+    }
 
 	public static BlockyArena getInstance() {
 		return PLUGIN;

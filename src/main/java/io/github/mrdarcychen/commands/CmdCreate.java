@@ -16,8 +16,9 @@
 
 package io.github.mrdarcychen.commands;
 
+import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.utils.Kit;
-import io.github.mrdarcychen.utils.KitManager;
+import io.github.mrdarcychen.KitManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -60,7 +61,7 @@ public class CmdCreate implements CommandExecutor {
                 return CommandResult.success();
             case "kit":
                 Kit kit = new Kit(player, id);
-                KitManager.getInstance().add(kit, id);
+                BlockyArena.getKitManager().add(kit, id);
                 player.sendMessage(Text.of("A new kit has been created, and players will be able " +
                         "to retrieve an exact copy of your current inventory with /ba kit " + id +
                         " when they're in an active game session. To overwrite, simply execute" +

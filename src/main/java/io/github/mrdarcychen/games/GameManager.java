@@ -16,8 +16,9 @@
 
 package io.github.mrdarcychen.games;
 
+import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.arenas.Arena;
-import io.github.mrdarcychen.arenas.ArenaManager;
+import io.github.mrdarcychen.ArenaManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,17 +30,9 @@ import java.util.function.Predicate;
  */
 public class GameManager {
 
-    private static final GameManager INSTANCE = new GameManager();
+    private static final List<Game> games = new ArrayList<>();
 
-    private final List<Game> games; // a list of active games in the server
-
-    private GameManager() {
-        games = new ArrayList<>();
-    }
-
-    public static GameManager getInstance() {
-        return INSTANCE;
-    }
+    private GameManager() {}
 
     /**
      * Gets an available active Game from the list based on the given team mode.
@@ -48,14 +41,14 @@ public class GameManager {
      *
      * @return null if no Game is available
      */
-    public Game getGame(String str) {
+    public static Game getGame(String str) {
         String mode = str.toLowerCase();
         Predicate<Game> criteria = (it) -> it.canJoin() && it.getTeamMode().toString().equals(mode);
         Optional<Game> optGame = games.stream().filter(criteria).findAny();
         if (optGame.isPresent()) {
             return optGame.get();
         }
-        Optional<Arena> optArena = ArenaManager.getInstance().findArena(mode);
+        Optional<Arena> optArena = BlockyArena.getArenaManager().findArena(mode);
         if (optArena.isPresent()) {
             Arena arena = optArena.get();
             int teamSize = 1;
@@ -79,7 +72,7 @@ public class GameManager {
      *
      * @param game the Game to be removed
      */
-    public void remove(Game game) {
+    public static void remove(Game game) {
         games.remove(game);
     }
 }

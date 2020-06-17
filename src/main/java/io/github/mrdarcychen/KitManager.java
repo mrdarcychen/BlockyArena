@@ -14,10 +14,10 @@
  * limitations under the License.
  */
 
-package io.github.mrdarcychen.utils;
+package io.github.mrdarcychen;
 
 import com.google.common.reflect.TypeToken;
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.utils.Kit;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
 import ninja.leaping.configurate.hocon.HoconConfigurationLoader;
@@ -35,26 +35,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * A KitManager manages all predefined gaming Kits.
+ * Manages all custom kits defined by server admin.
  */
 public class KitManager {
-	
-	private static final KitManager INSTANCE = new KitManager();
-
-    private final Map<String, Kit> kits;
+    private final Map<String, Kit> kits = new HashMap<>();
+    private final Path configDirectory;
     
-    private KitManager() {
-    	 kits = new HashMap<>();
+    KitManager(Path configDirectory) {
+    	 this.configDirectory = configDirectory;
+    	 loadKits();
     }
 
-	public static KitManager getInstance() {
-		return INSTANCE;
-	}
-
-	
     public void loadKits() {
         try {
-            DirectoryStream<Path> stream = Files.newDirectoryStream(BlockyArena.getInstance().getKitDir(), "*.conf");
+            DirectoryStream<Path> stream = Files.newDirectoryStream(configDirectory, "*.conf");
             for (Path path : stream) {
                 ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                         .builder().setPath(path).build();
@@ -64,14 +58,12 @@ public class KitManager {
                     Kit kit = rootNode.getValue(TypeToken.of(Kit.class));
                     kits.put(kit.getId(), kit);
                 } catch (InvalidDataException e) {
-                	BlockyArena.getInstance().getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
+                	BlockyArena.getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
                             "unknown items.");
                 }
                 loader.save(rootNode);
             }
-        } catch (ObjectMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
+        } catch (ObjectMappingException | IOException e) {
             e.printStackTrace();
         }
     }
@@ -84,17 +76,15 @@ public class KitManager {
      */
     public void add(Kit kit, String id) {
         kits.put(id, kit);
-        BlockyArena.getInstance().getLogger().warn(id + " has been added to kit manager.");
-        Path path = Paths.get(BlockyArena.getInstance().getKitDir().toString() + File.separator + id + ".conf");
+        BlockyArena.getLogger().warn(id + " has been added to kit manager.");
+        Path path = Paths.get(configDirectory + File.separator + id + ".conf");
         ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                 .builder().setPath(path).build();
         try {
             ConfigurationNode rootNode = loader.load();
             rootNode.setValue(TypeToken.of(Kit.class), kit);
             loader.save(rootNode);
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (ObjectMappingException e) {
+        } catch (IOException | ObjectMappingException e) {
             e.printStackTrace();
         }
     }
@@ -116,7 +106,7 @@ public class KitManager {
      */
     public void remove(String id) {
         kits.remove(id);
-        Path path = Paths.get(BlockyArena.getInstance().getKitDir().toString() + File.separator + id + ".conf");
+        Path path = Paths.get(configDirectory + File.separator + id + ".conf");
         try {
             Files.delete(path);
         } catch (IOException e) {
