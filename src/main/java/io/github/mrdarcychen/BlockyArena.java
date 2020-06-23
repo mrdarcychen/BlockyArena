@@ -20,10 +20,10 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import io.github.mrdarcychen.arenas.SpawnPoint;
 import io.github.mrdarcychen.arenas.SpawnSerializer;
+import io.github.mrdarcychen.commands.CommandManager;
 import io.github.mrdarcychen.listeners.ClientConnectionEventListener;
 import io.github.mrdarcychen.listeners.EntityListener;
 import io.github.mrdarcychen.listeners.ServerListener;
-import io.github.mrdarcychen.commands.CommandManager;
 import io.github.mrdarcychen.managers.ConfigManager;
 import io.github.mrdarcychen.utils.Kit;
 import io.github.mrdarcychen.utils.KitSerializer;
@@ -47,28 +47,29 @@ import java.util.List;
 @Plugin(id = "blockyarena", name = "BlockyArena")
 public final class BlockyArena {
 
-	private static BlockyArena PLUGIN;
-	private static KitManager kitManager;
-	private static ArenaManager arenaManager;
-
-	@Inject
-	private static Logger logger;
-
-	@Inject
-	@ConfigDir(sharedRoot = false)
-	//The path to config/BlockyArena
-	private Path configDirectory;
-
-	private Path arenaDirectory, kitDirectory;
-
-
-	@Inject
-	@DefaultConfig(sharedRoot = false)
-	// The path to the default.conf file
-	private Path defaultConfig;
+    private static BlockyArena PLUGIN;
+    private static KitManager kitManager;
+    private static ArenaManager arenaManager;
 
     @Inject
-    private BlockyArena() {}
+    private static Logger logger;
+
+    @Inject
+    @ConfigDir(sharedRoot = false)
+    //The path to config/BlockyArena
+    private Path configDirectory;
+
+    private Path arenaDirectory, kitDirectory;
+
+
+    @Inject
+    @DefaultConfig(sharedRoot = false)
+    // The path to the default.conf file
+    private Path defaultConfig;
+
+    @Inject
+    private BlockyArena() {
+    }
 
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
@@ -80,7 +81,7 @@ public final class BlockyArena {
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
-    	Sponge.getCommandManager().register(this, CommandManager.getInstance().getCommandCallable(),
+        Sponge.getCommandManager().register(this, CommandManager.getInstance().getCommandCallable(),
                 "blockyarena", "ba"); // TODO: need refactoring
         ConfigManager.getInstance().load();
         arenaManager = new ArenaManager(arenaDirectory);
@@ -132,7 +133,7 @@ public final class BlockyArena {
         return defaultConfig;
     }
 
-	public static KitManager getKitManager() {
+    public static KitManager getKitManager() {
         return kitManager;
     }
 
@@ -144,7 +145,7 @@ public final class BlockyArena {
         return logger;
     }
 
-	public static BlockyArena getInstance() {
-		return PLUGIN;
-	}
+    public static BlockyArena getInstance() {
+        return PLUGIN;
+    }
 }

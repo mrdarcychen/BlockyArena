@@ -17,8 +17,7 @@
 package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.games.Game;
-import io.github.mrdarcychen.games.GamersManager;
-import io.github.mrdarcychen.utils.Gamer;
+import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -34,7 +33,8 @@ public class CmdQuit implements CommandExecutor {
     private static final CmdQuit INSTANCE = new CmdQuit();
 
     /* enforce the singleton property with a private constructor */
-    private CmdQuit() {}
+    private CmdQuit() {
+    }
 
     public static CmdQuit getInstance() {
         return INSTANCE;
@@ -43,14 +43,12 @@ public class CmdQuit implements CommandExecutor {
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
-        Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
-        Optional<Game> optGame = gamer.getGame();
-        if (optGame.isPresent()) {
-            optGame.get().remove(gamer);
-            player.sendMessage(Text.of("You left the minigame."));
-            return CommandResult.success();
+        if (!PlayerManager.isPlaying(player.getUniqueId())) {
+            player.sendMessage(Text.of("You're not in any minigame."));
+            return CommandResult.empty();
         }
-        player.sendMessage(Text.of("You're not in any minigame."));
-        return CommandResult.empty();
+        PlayerManager.getGame(player.getUniqueId()).ifPresent(game -> game.remove(player));
+        player.sendMessage(Text.of("You left the minigame."));
+        return CommandResult.success();
     }
 }

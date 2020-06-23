@@ -17,7 +17,6 @@
 package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.BlockyArena;
-import io.github.mrdarcychen.ArenaManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -30,7 +29,8 @@ public class CmdRemove implements CommandExecutor {
     private static final CmdRemove instance = new CmdRemove();
 
     /* enforce the singleton property with a private constructor */
-    private CmdRemove() {}
+    private CmdRemove() {
+    }
 
     public static CmdRemove getInstance() {
         return instance;
@@ -44,7 +44,7 @@ public class CmdRemove implements CommandExecutor {
 
             case "arena":
                 try {
-                	BlockyArena.getArenaManager().remove(id);
+                    BlockyArena.getArenaManager().remove(id);
                     break;
                 } catch (IllegalArgumentException e) {
                     src.sendMessage(Text.of(e.getMessage()));

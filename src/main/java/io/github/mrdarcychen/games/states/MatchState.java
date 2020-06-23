@@ -17,83 +17,77 @@
 package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.arenas.Arena;
-import io.github.mrdarcychen.arenas.SpawnPoint;
 import io.github.mrdarcychen.games.Game;
+import io.github.mrdarcychen.games.PlayerManager;
 import io.github.mrdarcychen.games.TeamMode;
 import io.github.mrdarcychen.utils.DamageData;
-import io.github.mrdarcychen.utils.Gamer;
+import io.github.mrdarcychen.utils.PlayerSnapshot;
 import org.spongepowered.api.data.key.Keys;
+import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.gamemode.GameModes;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
+import org.spongepowered.api.world.World;
 
 import java.util.List;
 
 public abstract class MatchState {
 
     protected final Game game;
-    protected List<Gamer> gamers; // only store active gamers
+    protected List<Player> players;
     protected TeamMode teamMode;
 
-    public MatchState(Game game, List<Gamer> gamers) {
+    public MatchState(Game game, List<Player> players) {
         this.game = game;
+        this.players = players;
         teamMode = game.getTeamMode();
-        this.gamers = gamers;
     }
 
-    /*
-     * Called when a new player try to join an arena.
-     */
-    public void recruit(Gamer gamer) {
-        // execute only if the gamer is accepted to the game
-        gamers.add(gamer);
-        game.addSnapshot(gamer.takeSnapshot());
-        gamer.setGame(game);
-        Player player = gamer.getPlayer();
+    public void recruit(Player player) {
+        players.add(player);
+        game.addSnapshot(new PlayerSnapshot(player));
+        PlayerManager.setGame(player.getUniqueId(), game);
+        // TODO: set player status as active
         player.getInventory().clear();  // TODO: allow bringing personal kit
-        player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
+        double initialHealth = player.health().getMaxValue(); // TODO: to be customized
+        player.offer(Keys.HEALTH, initialHealth);
+        setSpectate(player, false);
+
+        // send player to lobby
         Arena arena = game.getArena();
-        SpawnPoint spawnPoint = arena.getLobbySpawn();
-        player.setTransform(spawnPoint.getTransform());
-        player.offer(Keys.HEALTH, player.health().getMaxValue());
-        gamer.spectate(false);
+        player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
+        Transform<World> lobby = arena.getLobbySpawn().getTransform();
+        player.setTransform(lobby);
     }
 
-    /*
-     * Called when you quit the game
-     */
-    public void dismiss(Gamer gamer) {
-        game.restoreSnapshotOf(gamer.getPlayer());
-        gamer.setGame(null);
-        gamer.spectate(false);
+    public void dismiss(Player player) {
+        game.restoreSnapshotOf(player);
+        PlayerManager.clearGame(player.getUniqueId());
+        setSpectate(player, false);
     }
 
-    /*
-     * Called when you kill a @Gamer gamer
-     */
-    public void eliminate(Gamer gamer, Text cause) {
+    public void eliminate(Player player, Text cause) {
         broadcast(cause);
-        gamer.spectate(true);
-        Player player = gamer.getPlayer();
+        setSpectate(player, true);
         player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
-        showEliminateScreen(gamer);
+        showEliminateScreen(player);
     }
 
-    private void showEliminateScreen(Gamer gamer) {
+    private void showEliminateScreen(Player player) {
         Text deathText = Text.builder("YOU DIED!")
                 .color(TextColors.RED).build();
         Title deathTitle = Title.builder()
                 .title(deathText).fadeOut(2).stay(16).build();
-        gamer.getPlayer().sendTitle(deathTitle);
+        player.sendTitle(deathTitle);
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
         if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {
-            damageData.getVictim().getPlayer().setTransform(game.getArena().getLobbySpawn().getTransform());
+            damageData.getVictim().setTransform(game.getArena().getLobbySpawn().getTransform());
         }
         event.setCancelled(true);
     }
@@ -104,6 +98,21 @@ public abstract class MatchState {
      * @param msg the message to be delivered
      */
     public void broadcast(Text msg) {
-        gamers.forEach(it -> it.getPlayer().sendMessage(msg));
+        players.forEach(it -> it.sendMessage(msg));
+    }
+
+    /**
+     * Toggles custom spectator mode on the player.
+     *
+     * @param i true to enable spectator mode, false to disable
+     */
+    void setSpectate(Player player, boolean i) {
+        player.offer(Keys.HEALTH, player.health().getMaxValue());
+        player.offer(Keys.FOOD_LEVEL, player.foodLevel().getMaxValue());
+        player.offer(Keys.VANISH, i);
+        player.offer(Keys.VANISH_IGNORES_COLLISION, i);
+        player.offer(Keys.CAN_FLY, i);
+        player.offer(Keys.IS_FLYING, i);
+        player.offer(Keys.INVULNERABLE, i);
     }
 }

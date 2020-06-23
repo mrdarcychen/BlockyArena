@@ -17,8 +17,7 @@
 package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.BlockyArena;
-import io.github.mrdarcychen.games.GamersManager;
-import io.github.mrdarcychen.KitManager;
+import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -34,7 +33,8 @@ public class CmdKit implements CommandExecutor {
     private static final CmdKit INSTANCE = new CmdKit();
 
     /* enforce the singleton property with a private constructor */
-    private CmdKit() {}
+    private CmdKit() {
+    }
 
     public static CmdKit getInstance() {
         return INSTANCE;
@@ -50,14 +50,14 @@ public class CmdKit implements CommandExecutor {
                 src.sendMessage(Text.of("This must be executed using a command block."));
                 return CommandResult.empty();
             }
-            player = (Player)src;
+            player = (Player) src;
         } else {
             if (!playerArg.isPresent()) {
                 return CommandResult.empty();
             }
             player = playerArg.get();
         }
-        if (!inGame(player)) {
+        if (!PlayerManager.isPlaying(player.getUniqueId())) {
             player.sendMessage(Text.of("You must be in an active game session to get a kit."));
             return CommandResult.empty();
         }
@@ -68,9 +68,5 @@ public class CmdKit implements CommandExecutor {
         }
         BlockyArena.getKitManager().get(id).equip(player);
         return CommandResult.success();
-    }
-
-    private boolean inGame(Player player) {
-        return GamersManager.getGamer(player.getUniqueId()).get().getGame().isPresent();
     }
 }

@@ -20,7 +20,6 @@ import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.games.states.EnteringState;
 import io.github.mrdarcychen.games.states.MatchState;
 import io.github.mrdarcychen.utils.DamageData;
-import io.github.mrdarcychen.utils.Gamer;
 import io.github.mrdarcychen.utils.PlayerSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -33,10 +32,10 @@ import java.util.List;
  */
 public class Game {
 
-    protected Arena arena;
-    private MatchState state;
     private final List<PlayerSnapshot> snapshots;
     private final TeamMode teamMode;
+    protected Arena arena;
+    private MatchState state;
 
     public Game(TeamMode teamMode, Arena arena) {
         this.arena = arena;
@@ -46,12 +45,12 @@ public class Game {
         state = new EnteringState(this, new ArrayList<>());
     }
 
-    public void add(Gamer gamer) {
-        state.recruit(gamer);
+    public void add(Player player) {
+        state.recruit(player);
     }
 
-    public void remove(Gamer gamer) {
-        state.dismiss(gamer);
+    public void remove(Player player) {
+        state.dismiss(player);
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {

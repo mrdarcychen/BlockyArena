@@ -28,7 +28,8 @@ public class Timer {
 
     /**
      * A timer that fires an action on each second.
-     *  @param timeInterval the number of seconds
+     *
+     * @param timeInterval the number of seconds
      * @param action the action to be performed on the given second
      */
     public Timer(int timeInterval, IntConsumer action) {

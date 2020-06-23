@@ -18,19 +18,21 @@ package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.games.Game;
 import io.github.mrdarcychen.games.GameManager;
-import io.github.mrdarcychen.utils.Gamer;
+import io.github.mrdarcychen.games.PlayerManager;
+import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.List;
 
 public class LeavingState extends MatchState {
 
-    public LeavingState(Game game, List<Gamer> gamers) {
-        super(game, gamers);
+    public LeavingState(Game game, List<Player> players) {
+        super(game, players);
 
         game.restoreSnapshots();
-        gamers.forEach(it -> {
-            it.setGame(null);
-            it.spectate(false);
+        players.forEach(it -> {
+            // TODO: set player status as inactive
+            PlayerManager.clearGame(it.getUniqueId());
+            setSpectate(it, false);
         });
         game.getArena().setBusy(false);
         GameManager.remove(game);

@@ -19,8 +19,8 @@ package io.github.mrdarcychen.games.states;
 import io.github.mrdarcychen.games.Game;
 import io.github.mrdarcychen.games.Team;
 import io.github.mrdarcychen.games.Timer;
-import io.github.mrdarcychen.utils.Gamer;
 import org.spongepowered.api.effect.sound.SoundTypes;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
@@ -30,14 +30,14 @@ import java.util.List;
 
 public class StoppingState extends MatchState {
 
-    public StoppingState(Game game, List<Gamer> gamers, Team winner, List<Team> losers) {
-        super(game, gamers);
+    public StoppingState(Game game, List<Player> players, Team winner, List<Team> losers) {
+        super(game, players);
         Title victory = Title.builder()
                 .title(Text.builder("VICTORY!")
                         .color(TextColors.GOLD)
                         .style(TextStyles.BOLD)
                         .build())
-                .subtitle(Text.of(winner+ " won the game."))
+                .subtitle(Text.of(winner + " won the game."))
                 .fadeIn(1).stay(60).fadeOut(2)
                 .build();
         Title gameOver = Title.builder()
@@ -50,19 +50,19 @@ public class StoppingState extends MatchState {
                 .build();
 
         winner.broadcast(victory);
-        winner.getGamers().stream().map(Gamer::getPlayer).forEach(it -> it.playSound(
+        winner.getPlayers().forEach(it -> it.playSound(
                 SoundTypes.ENTITY_PLAYER_LEVELUP, it.getLocation().getPosition(), 100
         ));
         losers.forEach(it -> {
             it.broadcast(gameOver);
-            it.getGamers().forEach(gamer -> {
-                gamer.getPlayer().playSound(SoundTypes.BLOCK_GLASS_BREAK, gamer.getPlayer().getHeadRotation(), 100);
+            it.getPlayers().forEach(player -> {
+                player.playSound(SoundTypes.BLOCK_GLASS_BREAK, player.getHeadRotation(), 100);
             });
         });
 
         new Timer(5, (tMinus) -> {
             if (tMinus == 0) {
-                game.setMatchState(new LeavingState(game, gamers));
+                game.setMatchState(new LeavingState(game, players));
             }
         });
     }

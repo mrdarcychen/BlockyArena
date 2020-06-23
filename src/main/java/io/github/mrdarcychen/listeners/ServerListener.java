@@ -25,9 +25,9 @@ public class ServerListener {
 
     public ServerListener() {
     }
-    
+
     @Listener
     public void onReload(GameReloadEvent event) {
-    	ConfigManager.getInstance().reloadConfiguration();
+        ConfigManager.getInstance().reloadConfiguration();
     }
 }

@@ -16,7 +16,6 @@
 
 package io.github.mrdarcychen.utils;
 
-import io.github.mrdarcychen.games.GamersManager;
 import org.spongepowered.api.entity.Entity;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.cause.Cause;
@@ -33,11 +32,11 @@ import java.util.Optional;
  */
 public class DamageData {
 
-    private final Gamer victim;
-    private Gamer attacker;
+    private final Player victim;
+    private Player attacker;
     private DamageType damageType;
 
-    public DamageData(Gamer victim, Cause cause) {
+    public DamageData(Player victim, Cause cause) {
         this.victim = victim;
         Optional<DamageSource> optDamageSourcecause = cause.first(DamageSource.class);
         if (optDamageSourcecause.isPresent()) {
@@ -48,9 +47,7 @@ public class DamageData {
                         (IndirectEntityDamageSource) damageSource;
                 Entity indirectSource = indirectEntityDamageSource.getIndirectSource();
                 if (indirectSource instanceof Player) {
-                    Player player = (Player) indirectSource;
-
-                    attacker = GamersManager.getGamer(player.getUniqueId()).get();
+                    attacker = (Player) indirectSource;
                 }
 //                Optional<Player> owner = cause.getContext().get(EventContextKeys.OWNER).get()
 //                        .getPlayer();
@@ -59,8 +56,7 @@ public class DamageData {
                 EntityDamageSource entityDamageSource = (EntityDamageSource) damageSource;
                 Entity directSource = entityDamageSource.getSource();
                 if (directSource instanceof Player) {
-                    Player player = (Player) directSource;
-                    attacker = GamersManager.getGamer(player.getUniqueId()).get();
+                    attacker = (Player) directSource;
                 }
             } else if (damageSource instanceof BlockDamageSource) {
                 // TODO
@@ -83,11 +79,11 @@ public class DamageData {
         return victim.getName() + " died.";
     }
 
-    public Optional<Gamer> getAttacker() {
+    public Optional<Player> getAttacker() {
         return Optional.ofNullable(attacker);
     }
 
-    public Gamer getVictim() {
+    public Player getVictim() {
         return victim;
     }
 

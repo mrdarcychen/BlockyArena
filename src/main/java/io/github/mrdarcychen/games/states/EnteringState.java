@@ -19,7 +19,7 @@ package io.github.mrdarcychen.games.states;
 import io.github.mrdarcychen.games.Game;
 import io.github.mrdarcychen.managers.ConfigManager;
 import io.github.mrdarcychen.utils.DamageData;
-import io.github.mrdarcychen.utils.Gamer;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
 
@@ -27,51 +27,51 @@ import java.util.List;
 
 public class EnteringState extends MatchState {
 
-    public EnteringState(Game game, List<Gamer> gamers) {
-        super(game, gamers);
+    public EnteringState(Game game, List<Player> players) {
+        super(game, players);
     }
 
     @Override
-    public void recruit(Gamer gamer) {
+    public void recruit(Player player) {
         if (fullCapacityReached()) {
-            notifyPlayerFailedToJoin(gamer);
+            notifyPlayerFailedToJoin(player);
             return;
         }
-        super.recruit(gamer);
+        super.recruit(player);
         //Utils.broadcastToEveryone("the arena : " + game.getArena().getID() +" is used !!", TextColors.GREEN);
-        broadcastRecruitMessage(gamer);
+        broadcastRecruitMessage(player);
         if (fullCapacityReached()) {
-            game.setMatchState(new StartingState(game, gamers, ConfigManager.getInstance().getLobbyCountdown()));
+            game.setMatchState(new StartingState(game, players, ConfigManager.getInstance().getLobbyCountdown()));
         }
     }
 
-    private void notifyPlayerFailedToJoin(Gamer gamer) {
-        gamer.getPlayer().sendMessage(Text.of("Unable to join the game at this time."));
+    private void notifyPlayerFailedToJoin(Player player) {
+        player.sendMessage(Text.of("Unable to join the game at this time."));
     }
 
     private boolean fullCapacityReached() {
-        return gamers.size() == teamMode.getTotalCapacity();
+        return players.size() == teamMode.getTotalCapacity();
     }
 
-    private void broadcastRecruitMessage(Gamer gamer) {
-        broadcast(Text.of(gamer.getName() + " joined the game. " + "(" +
-                gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
+    private void broadcastRecruitMessage(Player player) {
+        broadcast(Text.of(player.getName() + " joined the game. " + "(" +
+                players.size() + "/" + teamMode.getTotalCapacity() + ")"));
     }
 
     @Override
-    public void dismiss(Gamer gamer) {
-        super.dismiss(gamer);
-        gamers.remove(gamer);
-        broadcastDismissMessage(gamer);
+    public void dismiss(Player player) {
+        super.dismiss(player);
+        players.remove(player);
+        broadcastDismissMessage(player);
         // if no one is left, cancel timer and go directly to leaving
-        if (gamers.isEmpty()) {
-            game.setMatchState(new LeavingState(game, gamers));
+        if (players.isEmpty()) {
+            game.setMatchState(new LeavingState(game, players));
         }
     }
 
-    private void broadcastDismissMessage(Gamer gamer) {
-        broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
+    private void broadcastDismissMessage(Player player) {
+        broadcast(Text.of(player.getName() + " left the game." +
+                "(" + players.size() + "/" + teamMode.getTotalCapacity() + ")"));
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {

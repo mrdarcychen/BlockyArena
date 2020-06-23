@@ -49,7 +49,7 @@ public class SpawnSerializer implements TypeSerializer<SpawnPoint> {
     public void serialize(TypeToken<?> type, SpawnPoint obj, ConfigurationNode value) throws ObjectMappingException {
         Transform<World> transform = obj.getTransform();
         value.getNode("extent").setValue(TypeToken.of(UUID.class), transform.getExtent().getUniqueId());
-        value.getNode("position").setValue(TypeToken.of(Vector3d.class),transform.getPosition());
+        value.getNode("position").setValue(TypeToken.of(Vector3d.class), transform.getPosition());
         value.getNode("rotation").setValue(TypeToken.of(Vector3d.class), transform.getRotation());
     }
 }

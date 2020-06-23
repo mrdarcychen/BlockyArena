@@ -17,7 +17,6 @@
 package io.github.mrdarcychen.utils;
 
 import com.google.common.reflect.TypeToken;
-import io.github.mrdarcychen.BlockyArena;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
@@ -29,7 +28,8 @@ import java.util.Map;
 
 public class KitSerializer implements TypeSerializer<Kit> {
 
-    public KitSerializer() {}
+    public KitSerializer() {
+    }
 
     @Override
     public Kit deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {

@@ -26,6 +26,7 @@ public class TeamMode {
 
     /**
      * Create a team mode with uniform configuration.
+     *
      * @param teamSize the number of players on each team
      * @param teamCount the number of teams
      */

@@ -17,7 +17,7 @@
 package io.github.mrdarcychen.games;
 
 import io.github.mrdarcychen.arenas.SpawnPoint;
-import io.github.mrdarcychen.utils.Gamer;
+import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.title.Title;
 
@@ -31,71 +31,59 @@ import java.util.Set;
  */
 public class Team {
 
-    private final Map<Gamer, Boolean> gamers; // gamers and whether eliminated or not
+    private final Map<Player, Boolean> players; // gamers and whether eliminated or not
     private final SpawnPoint startPoint;
 
     public Team(SpawnPoint startPoint) {
         this.startPoint = startPoint;
-        gamers = new HashMap<>();
+        players = new HashMap<>();
     }
 
-    /**
-     * Adds the given Gamer to this Team.
-     *
-     * @param gamer the Gamer to be added to this Team
-     */
-    public void add(Gamer gamer) {
-        gamers.put(gamer, false);
+    public void add(Player player) {
+        players.put(player, false);
     }
 
-    public void eliminate(Gamer gamer) {
-        gamers.replace(gamer, true);
+    public void eliminate(Player player) {
+        players.replace(player, true);
     }
 
     public void sendAllToSpawn() {
-        gamers.keySet().forEach(it -> it.getPlayer().setTransform(startPoint.getTransform()));
+        players.keySet().forEach(it -> it.setTransform(startPoint.getTransform()));
     }
 
     public boolean hasGamerLeft() {
-        return gamers.values().stream().anyMatch(it -> !it);
+        return players.values().stream().anyMatch(it -> !it);
     }
 
     public void broadcast(Text text) {
-        gamers.keySet().forEach(it -> it.getPlayer().sendMessage(text));
+        players.keySet().forEach(it -> it.sendMessage(text));
     }
 
     public void broadcast(Title title) {
-        gamers.keySet().forEach(it -> it.getPlayer().sendTitle(title));
+        players.keySet().forEach(it -> it.sendTitle(title));
     }
 
-    // returns false if gamer is not on this team
-    public boolean isEliminated(Gamer gamer) {
-        return gamers.getOrDefault(gamer, false);
+    public boolean isEliminated(Player player) {
+        return players.getOrDefault(player, false);
     }
 
-    /**
-     * Gets if the Game contains the given Gamer.
-     *
-     * @param gamer the Gamer to be inspected
-     * @return true if the Gamer is on this Team, false otherwise
-     */
-    public boolean contains(Gamer gamer) {
-        return gamers.containsKey(gamer);
+    public boolean contains(Player player) {
+        return players.containsKey(player);
     }
 
-    public Set<Gamer> getGamers() {
-        return gamers.keySet();
+    public Set<Player> getPlayers() {
+        return players.keySet();
     }
 
     public String toString() {
-        String str = "";
-        Iterator<Gamer> gamersItr = gamers.keySet().iterator();
-        while (gamersItr.hasNext()) {
-            str += gamersItr.next().getName();
-            if (gamersItr.hasNext()) {
-                str += ", ";
+        StringBuilder str = new StringBuilder();
+        Iterator<Player> playersItr = players.keySet().iterator();
+        while (playersItr.hasNext()) {
+            str.append(playersItr.next().getName());
+            if (playersItr.hasNext()) {
+                str.append(", ");
             }
         }
-        return str;
+        return str.toString();
     }
 }

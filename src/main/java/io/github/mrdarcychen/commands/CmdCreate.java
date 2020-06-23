@@ -18,7 +18,6 @@ package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.utils.Kit;
-import io.github.mrdarcychen.KitManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;

@@ -19,7 +19,6 @@ package io.github.mrdarcychen.games.states;
 import io.github.mrdarcychen.games.Game;
 import io.github.mrdarcychen.games.Team;
 import io.github.mrdarcychen.games.Timer;
-import io.github.mrdarcychen.utils.Gamer;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -33,35 +32,38 @@ public class StartingState extends MatchState {
 
     private final Timer timer;
 
-    public StartingState(Game game, List<Gamer> gamers, int countdown) {
-        super(game, gamers);
+    public StartingState(Game game, List<Player> players, int countdown) {
+        super(game, players);
         timer = new Timer(countdown, tMinus -> {
             if (tMinus == 0) {
-                game.setMatchState(new PlayingState(game, gamers, partition()));
+                game.setMatchState(new PlayingState(game, players, partition()));
                 return;
             }
             Title title = Title.builder().title(Text.of(tMinus)).fadeIn(2)
                     .fadeOut(2).stay(16).build();
-            for (Gamer gamer : gamers) {
-                Player player = gamer.getPlayer();
+            players.forEach(player -> {
                 player.sendTitle(title);
                 player.playSound(SoundTypes.BLOCK_NOTE_HAT, player.getLocation().getPosition(), 100);
-            }
+            });
         });
     }
 
     @Override
-    public void dismiss(Gamer gamer) {
-        super.dismiss(gamer);
-        gamers.remove(gamer);
-        broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
+    public void dismiss(Player player) {
+        super.dismiss(player);
+        players.remove(player);
+        announcePlayerDismissal(player.getName());
         // if fall below min requirement, new entering state
-        if (gamers.size() <= teamMode.getTotalCapacity()) {
+        if (players.size() <= teamMode.getTotalCapacity()) {
             timer.cancel();
             broadcast(Text.of("Waiting for more players to join ..."));
-            game.setMatchState(new EnteringState(game, gamers));
+            game.setMatchState(new EnteringState(game, players));
         }
+    }
+
+    private void announcePlayerDismissal(String playerName) {
+        broadcast(Text.of(playerName + " left the game." +
+                "(" + players.size() + "/" + teamMode.getTotalCapacity() + ")"));
     }
 
     private List<Team> partition() {
@@ -69,12 +71,12 @@ public class StartingState extends MatchState {
         game.getArena().getStartPoints()
                 .limit(teamMode.getTeamCount())
                 .forEach(point -> teams.add(new Team(point)));
-        Iterator<Gamer> gamersItr = gamers.iterator();
-        int gamersLeft = gamers.size();
-        while (gamersItr.hasNext()) {
-            int teamNum = gamersLeft % teams.size();
-            teams.get(teamNum).add(gamersItr.next());
-            gamersLeft--;
+        Iterator<Player> playersItr = players.iterator();
+        int playersLeft = players.size();
+        while (playersItr.hasNext()) {
+            int teamNum = playersLeft % teams.size();
+            teams.get(teamNum).add(playersItr.next());
+            playersLeft--;
         }
         return teams;
     }

@@ -17,9 +17,9 @@
 package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.games.Game;
+import io.github.mrdarcychen.games.PlayerManager;
 import io.github.mrdarcychen.games.Team;
 import io.github.mrdarcychen.utils.DamageData;
-import io.github.mrdarcychen.utils.Gamer;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
 import org.spongepowered.api.effect.sound.SoundTypes;
@@ -35,35 +35,40 @@ public class PlayingState extends MatchState {
 
     private final List<Team> teams;
 
-    public PlayingState(Game game, List<Gamer> gamers, List<Team> teams) {
-        super(game, gamers);
+    public PlayingState(Game game, List<Player> players, List<Team> teams) {
+        super(game, players);
         this.teams = teams;
         teams.forEach(Team::sendAllToSpawn);
     }
 
     @Override
-    public void dismiss(Gamer gamer) {
-        gamers.remove(gamer);
-        broadcast(Text.of(gamer.getName() + " left the game." +
-                "(" + gamers.size() + "/" + teamMode.getTotalCapacity() + ")"));
-        eliminate(gamer, Text.of(gamer.getPlayer().getName() + " has left the game."));
-        super.dismiss(gamer);
+    public void dismiss(Player player) {
+        players.remove(player);
+        announcePlayerDismissal(player.getName());
+        eliminate(player, Text.of(player.getName() + " has left the game."));
+        super.dismiss(player);
     }
 
+    private void announcePlayerDismissal(String playerName) {
+        broadcast(Text.of(playerName + " left the game." +
+                "(" + players.size() + "/" + teamMode.getTotalCapacity() + ")"));
+    }
+
+
     @Override
-    public void eliminate(Gamer gamer, Text cause) {
-        super.eliminate(gamer, cause);
-        teams.forEach(it -> it.eliminate(gamer));
+    public void eliminate(Player player, Text cause) {
+        super.eliminate(player, cause);
+        teams.forEach(it -> it.eliminate(player));
         List<Team> teamsAlive = teams.stream().filter(Team::hasGamerLeft).collect(Collectors.toList());
         if (teamsAlive.size() == 1) {
             Team winner = teamsAlive.get(0);
             List<Team> losers = teams.stream().filter(it -> it != winner).collect(Collectors.toList());
-            game.setMatchState(new StoppingState(game, gamers, winner, losers));
+            game.setMatchState(new StoppingState(game, players, winner, losers));
         }
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
-        Gamer victim = damageData.getVictim();
+        Player victim = damageData.getVictim();
         // if fell into the void, eliminate
         if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {
             event.setCancelled(true);
@@ -73,13 +78,13 @@ public class PlayingState extends MatchState {
         }
         // if attacked by teammates, cancel
         if (damageData.getAttacker().isPresent()) {
-            Gamer attacker = damageData.getAttacker().get();
+            Player attacker = damageData.getAttacker().get();
             if (areTeammates(victim, attacker)) {
-                attacker.getPlayer().playSound(SoundTypes.ITEM_SHIELD_BLOCK,
-                        attacker.getPlayer().getLocation().getPosition(), 50);
+                attacker.playSound(SoundTypes.ITEM_SHIELD_BLOCK,
+                        attacker.getLocation().getPosition(), 50);
                 event.setCancelled(true);
             }
-            Optional<Game> optGame = attacker.getGame();
+            Optional<Game> optGame = PlayerManager.getGame(attacker.getUniqueId());
             if (!optGame.isPresent() || !optGame.get().equals(game)) {
                 event.setCancelled(true);
             }
@@ -90,25 +95,24 @@ public class PlayingState extends MatchState {
         if (event.willCauseDeath()) {
             event.setCancelled(true);
             showDeathEffect(victim);
-            damageData.getAttacker().ifPresent(it -> it.getPlayer().playSound(
-                    SoundTypes.ENTITY_BAT_DEATH, it.getPlayer().getLocation().getPosition(), 100
+            damageData.getAttacker().ifPresent(it -> it.playSound(
+                    SoundTypes.ENTITY_BAT_DEATH, it.getLocation().getPosition(), 100
             ));
             // eliminate the victim
             eliminate(victim, Text.of(damageData.getDeathMessage()));
         }
     }
 
-    private void showDeathEffect(Gamer gamer) {
+    private void showDeathEffect(Player player) {
         ParticleEffect effect = ParticleEffect.builder()
                 .type(ParticleTypes.FIREWORKS_SPARK)
                 .quantity(200)
                 .build();
-        Player player = gamer.getPlayer();
         player.playSound(SoundTypes.ENTITY_BAT_DEATH, player.getLocation().getPosition(), 100);
         player.spawnParticles(effect, player.getLocation().getPosition());
     }
 
-    private boolean areTeammates(Gamer a, Gamer b) {
+    private boolean areTeammates(Player a, Player b) {
         for (Team team : teams) {
             if (team.contains(a) && team.contains(b)) {
                 return true;

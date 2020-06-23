@@ -16,9 +16,7 @@
 
 package io.github.mrdarcychen.listeners;
 
-import io.github.mrdarcychen.BlockyArena;
-import io.github.mrdarcychen.games.GamersManager;
-import io.github.mrdarcychen.utils.Gamer;
+import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
@@ -35,26 +33,14 @@ public class ClientConnectionEventListener {
     public void onGamerLogin(ClientConnectionEvent.Login event) {
         User user = event.getTargetUser();
         UUID uniqueId = user.getUniqueId();
-        if (!GamersManager.getGamer(uniqueId).isPresent()) {
-            GamersManager.register(uniqueId);
-
-        }
-        Gamer gamer = GamersManager.getGamer(uniqueId).get();
-        gamer.setOnline(true);
-        gamer.setName(user.getName());
-        gamer.setPlayer(user.getPlayer().get());
-
-        BlockyArena.getLogger().debug("A new player logged in !");
+        PlayerManager.register(uniqueId);
     }
 
     @Listener
     public void onGamerLogout(ClientConnectionEvent.Disconnect event) {
         Player player = event.getTargetEntity();
-        Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
-        gamer.setOnline(false);
-        gamer.getGame().ifPresent(game -> {
-            game.remove(gamer);
-        });
+        PlayerManager.getGame(player.getUniqueId()).ifPresent(game -> game.remove(player));
+        PlayerManager.unregister(player.getUniqueId());
     }
 
 }

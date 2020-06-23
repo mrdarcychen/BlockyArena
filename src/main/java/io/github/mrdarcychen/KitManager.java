@@ -40,10 +40,10 @@ import java.util.Map;
 public class KitManager {
     private final Map<String, Kit> kits = new HashMap<>();
     private final Path configDirectory;
-    
+
     KitManager(Path configDirectory) {
-    	 this.configDirectory = configDirectory;
-    	 loadKits();
+        this.configDirectory = configDirectory;
+        loadKits();
     }
 
     public void loadKits() {
@@ -58,7 +58,7 @@ public class KitManager {
                     Kit kit = rootNode.getValue(TypeToken.of(Kit.class));
                     kits.put(kit.getId(), kit);
                 } catch (InvalidDataException e) {
-                	BlockyArena.getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
+                    BlockyArena.getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
                             "unknown items.");
                 }
                 loader.save(rootNode);

@@ -18,8 +18,7 @@ package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.games.Game;
 import io.github.mrdarcychen.games.GameManager;
-import io.github.mrdarcychen.games.GamersManager;
-import io.github.mrdarcychen.utils.Gamer;
+import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -30,12 +29,13 @@ import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
-public class CmdJoin implements CommandExecutor{
+public class CmdJoin implements CommandExecutor {
 
     private static final CmdJoin INSTANCE = new CmdJoin();
 
     /* enforce the singleton property with a private constructor */
-    private CmdJoin() {}
+    private CmdJoin() {
+    }
 
     public static CmdJoin getInstance() {
         return INSTANCE;
@@ -53,20 +53,19 @@ public class CmdJoin implements CommandExecutor{
                 src.sendMessage(Text.of("This must be executed using a command block."));
                 return CommandResult.empty();
             }
-            player = (Player)src;
+            player = (Player) src;
         } else {
             if (!playerArg.isPresent()) {
                 return CommandResult.empty();
             }
             player = playerArg.get();
         }
-        Gamer gamer = GamersManager.getGamer(player.getUniqueId()).get();
         Optional<String> optMode = args.getOne("mode");
 
         if (!optMode.isPresent()) {
             return CommandResult.empty();
         }
-        if (GamersManager.isInGame(player)) {
+        if (PlayerManager.isPlaying(player.getUniqueId())) {
             player.sendMessage(Text.of("You're already in a game. Use /ba" +
                     " quit to leave the current game session."));
             return CommandResult.empty();
@@ -76,7 +75,7 @@ public class CmdJoin implements CommandExecutor{
             player.sendMessage(Text.of("There's no available arena at this time."));
             return CommandResult.empty();
         }
-        game.add(gamer);
+        game.add(player);
         return CommandResult.success();
     }
 }

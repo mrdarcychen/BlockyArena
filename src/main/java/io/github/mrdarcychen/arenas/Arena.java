@@ -16,10 +16,6 @@
 
 package io.github.mrdarcychen.arenas;
 
-import ninja.leaping.configurate.ConfigurationNode;
-import ninja.leaping.configurate.commented.CommentedConfigurationNode;
-import ninja.leaping.configurate.loader.ConfigurationLoader;
-
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.stream.Stream;

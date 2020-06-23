@@ -18,7 +18,6 @@ package io.github.mrdarcychen.games;
 
 import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.arenas.Arena;
-import io.github.mrdarcychen.ArenaManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,7 +31,8 @@ public class GameManager {
 
     private static final List<Game> games = new ArrayList<>();
 
-    private GameManager() {}
+    private GameManager() {
+    }
 
     /**
      * Gets an available active Game from the list based on the given team mode.
