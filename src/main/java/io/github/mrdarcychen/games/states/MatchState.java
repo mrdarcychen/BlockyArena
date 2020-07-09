@@ -17,9 +17,9 @@
 package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.arenas.Arena;
-import io.github.mrdarcychen.games.Game;
+import io.github.mrdarcychen.games.Match;
+import io.github.mrdarcychen.games.MatchRules;
 import io.github.mrdarcychen.games.PlayerManager;
-import io.github.mrdarcychen.games.TeamMode;
 import io.github.mrdarcychen.utils.DamageData;
 import io.github.mrdarcychen.utils.PlayerSnapshot;
 import org.spongepowered.api.data.key.Keys;
@@ -36,20 +36,20 @@ import java.util.List;
 
 public abstract class MatchState {
 
-    protected final Game game;
+    protected final Match match;
     protected List<Player> players;
-    protected TeamMode teamMode;
+    protected MatchRules matchRules;
 
-    public MatchState(Game game, List<Player> players) {
-        this.game = game;
+    public MatchState(Match match, List<Player> players) {
+        this.match = match;
         this.players = players;
-        teamMode = game.getTeamMode();
+        matchRules = match.getTeamMode();
     }
 
     public void recruit(Player player) {
         players.add(player);
-        game.addSnapshot(new PlayerSnapshot(player));
-        PlayerManager.setGame(player.getUniqueId(), game);
+        match.addSnapshot(new PlayerSnapshot(player));
+        PlayerManager.setGame(player.getUniqueId(), match);
         // TODO: set player status as active
         player.getInventory().clear();  // TODO: allow bringing personal kit
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
@@ -58,14 +58,14 @@ public abstract class MatchState {
         setSpectate(player, false);
 
         // send player to lobby
-        Arena arena = game.getArena();
-        player.sendMessage(Text.of("Sending you to " + game.getArena().getName() + " ..."));
+        Arena arena = match.getArena();
+        player.sendMessage(Text.of("Sending you to " + match.getArena().getName() + " ..."));
         Transform<World> lobby = arena.getLobbySpawn().getTransform();
         player.setTransform(lobby);
     }
 
     public void dismiss(Player player) {
-        game.restoreSnapshotOf(player);
+        match.restoreSnapshotOf(player);
         PlayerManager.clearGame(player.getUniqueId());
         setSpectate(player, false);
     }
@@ -73,7 +73,7 @@ public abstract class MatchState {
     public void eliminate(Player player, Text cause) {
         broadcast(cause);
         setSpectate(player, true);
-        player.setTransform(game.getArena().getSpectatorSpawn().getTransform());
+        player.setTransform(match.getArena().getSpectatorSpawn().getTransform());
         showEliminateScreen(player);
     }
 
@@ -87,7 +87,7 @@ public abstract class MatchState {
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
         if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {
-            damageData.getVictim().setTransform(game.getArena().getLobbySpawn().getTransform());
+            damageData.getVictim().setTransform(match.getArena().getLobbySpawn().getTransform());
         }
         event.setCancelled(true);
     }

@@ -16,7 +16,6 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.games.Game;
 import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -25,8 +24,6 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
-
-import java.util.Optional;
 
 public class CmdQuit implements CommandExecutor {
 

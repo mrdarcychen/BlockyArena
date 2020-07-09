@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.games.Game;
+import io.github.mrdarcychen.games.Match;
 import io.github.mrdarcychen.managers.ConfigManager;
 import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -27,8 +27,8 @@ import java.util.List;
 
 public class EnteringState extends MatchState {
 
-    public EnteringState(Game game, List<Player> players) {
-        super(game, players);
+    public EnteringState(Match match, List<Player> players) {
+        super(match, players);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class EnteringState extends MatchState {
         //Utils.broadcastToEveryone("the arena : " + game.getArena().getID() +" is used !!", TextColors.GREEN);
         broadcastRecruitMessage(player);
         if (fullCapacityReached()) {
-            game.setMatchState(new StartingState(game, players, ConfigManager.getInstance().getLobbyCountdown()));
+            match.setMatchState(new StartingState(match, players, ConfigManager.getInstance().getLobbyCountdown()));
         }
     }
 
@@ -50,12 +50,12 @@ public class EnteringState extends MatchState {
     }
 
     private boolean fullCapacityReached() {
-        return players.size() == teamMode.getTotalCapacity();
+        return players.size() == matchRules.getTotalCapacity();
     }
 
     private void broadcastRecruitMessage(Player player) {
         broadcast(Text.of(player.getName() + " joined the game. " + "(" +
-                players.size() + "/" + teamMode.getTotalCapacity() + ")"));
+                players.size() + "/" + matchRules.getTotalCapacity() + ")"));
     }
 
     @Override
@@ -65,13 +65,13 @@ public class EnteringState extends MatchState {
         broadcastDismissMessage(player);
         // if no one is left, cancel timer and go directly to leaving
         if (players.isEmpty()) {
-            game.setMatchState(new LeavingState(game, players));
+            match.setMatchState(new LeavingState(match, players));
         }
     }
 
     private void broadcastDismissMessage(Player player) {
         broadcast(Text.of(player.getName() + " left the game." +
-                "(" + players.size() + "/" + teamMode.getTotalCapacity() + ")"));
+                "(" + players.size() + "/" + matchRules.getTotalCapacity() + ")"));
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {

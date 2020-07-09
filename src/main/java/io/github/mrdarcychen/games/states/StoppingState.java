@@ -16,9 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.games.Game;
-import io.github.mrdarcychen.games.Team;
-import io.github.mrdarcychen.games.Timer;
+import io.github.mrdarcychen.games.Match;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -30,8 +28,8 @@ import java.util.List;
 
 public class StoppingState extends MatchState {
 
-    public StoppingState(Game game, List<Player> players, Team winner, List<Team> losers) {
-        super(game, players);
+    public StoppingState(Match match, List<Player> players, Team winner, List<Team> losers) {
+        super(match, players);
         Title victory = Title.builder()
                 .title(Text.builder("VICTORY!")
                         .color(TextColors.GOLD)
@@ -62,7 +60,7 @@ public class StoppingState extends MatchState {
 
         new Timer(5, (tMinus) -> {
             if (tMinus == 0) {
-                game.setMatchState(new LeavingState(game, players));
+                match.setMatchState(new LeavingState(match, players));
             }
         });
     }

@@ -15,6 +15,6 @@ Please refer to the **[Guide](https://ore.spongepowered.org/Darcy_Chen/BlockyAre
 
 ### Communication
 
-Our development team and users are active on **[Discord](https://discord.gg/5jxJ82K)**! This is the place to ask questions, make suggestions, and get the latest development updates. If you want to contribute to the project, reach out to us on DIscord first.
+Our development team and users are active on **[Discord](https://discord.gg/5jxJ82K)**! This is the place to ask questions, make suggestions, and get the latest development updates. If you want to contribute to the project, reach out to us on Discord first.
 
 [![Discord](https://img.shields.io/badge/Discord-Join-color.svg?style=for-the-badge&logo=discord&colorB=7289da)](https://discord.gg/5jxJ82K)

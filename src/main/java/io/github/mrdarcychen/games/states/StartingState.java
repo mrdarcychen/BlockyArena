@@ -16,9 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.games.Game;
-import io.github.mrdarcychen.games.Team;
-import io.github.mrdarcychen.games.Timer;
+import io.github.mrdarcychen.games.Match;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -32,11 +30,11 @@ public class StartingState extends MatchState {
 
     private final Timer timer;
 
-    public StartingState(Game game, List<Player> players, int countdown) {
-        super(game, players);
+    public StartingState(Match match, List<Player> players, int countdown) {
+        super(match, players);
         timer = new Timer(countdown, tMinus -> {
             if (tMinus == 0) {
-                game.setMatchState(new PlayingState(game, players, partition()));
+                match.setMatchState(new PlayingState(match, players, partition()));
                 return;
             }
             Title title = Title.builder().title(Text.of(tMinus)).fadeIn(2)
@@ -54,22 +52,22 @@ public class StartingState extends MatchState {
         players.remove(player);
         announcePlayerDismissal(player.getName());
         // if fall below min requirement, new entering state
-        if (players.size() <= teamMode.getTotalCapacity()) {
+        if (players.size() <= matchRules.getTotalCapacity()) {
             timer.cancel();
             broadcast(Text.of("Waiting for more players to join ..."));
-            game.setMatchState(new EnteringState(game, players));
+            match.setMatchState(new EnteringState(match, players));
         }
     }
 
     private void announcePlayerDismissal(String playerName) {
         broadcast(Text.of(playerName + " left the game." +
-                "(" + players.size() + "/" + teamMode.getTotalCapacity() + ")"));
+                "(" + players.size() + "/" + matchRules.getTotalCapacity() + ")"));
     }
 
     private List<Team> partition() {
         List<Team> teams = new ArrayList<>();
-        game.getArena().getStartPoints()
-                .limit(teamMode.getTeamCount())
+        match.getArena().getStartPoints()
+                .limit(matchRules.getTeamCount())
                 .forEach(point -> teams.add(new Team(point)));
         Iterator<Player> playersItr = players.iterator();
         int playersLeft = players.size();

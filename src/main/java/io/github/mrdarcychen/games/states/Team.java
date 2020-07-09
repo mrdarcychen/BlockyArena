@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.mrdarcychen.games;
+package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.arenas.SpawnPoint;
 import org.spongepowered.api.entity.living.player.Player;

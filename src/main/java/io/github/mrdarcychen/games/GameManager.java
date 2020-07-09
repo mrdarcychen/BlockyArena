@@ -29,7 +29,7 @@ import java.util.function.Predicate;
  */
 public class GameManager {
 
-    private static final List<Game> games = new ArrayList<>();
+    private static final List<Match> MATCHES = new ArrayList<>();
 
     private GameManager() {
     }
@@ -41,10 +41,10 @@ public class GameManager {
      *
      * @return null if no Game is available
      */
-    public static Game getGame(String str) {
+    public static Match getGame(String str) {
         String mode = str.toLowerCase();
-        Predicate<Game> criteria = (it) -> it.canJoin() && it.getTeamMode().toString().equals(mode);
-        Optional<Game> optGame = games.stream().filter(criteria).findAny();
+        Predicate<Match> criteria = (it) -> it.canJoin() && it.getTeamMode().toString().equals(mode);
+        Optional<Match> optGame = MATCHES.stream().filter(criteria).findAny();
         if (optGame.isPresent()) {
             return optGame.get();
         }
@@ -59,10 +59,10 @@ public class GameManager {
             if ("ffa".equals(mode)) {
                 teamCount = (int) arena.getStartPoints().count();
             }
-            TeamMode teamMode = new TeamMode(teamSize, teamCount);
-            Game game = new Game(teamMode, optArena.get());
-            games.add(game);
-            return game;
+            MatchRules matchRules = new TeamMode(teamSize, teamCount);
+            Match match = new SimpleMatch(matchRules, optArena.get());
+            MATCHES.add(match);
+            return match;
         }
         return null;
     }
@@ -70,9 +70,9 @@ public class GameManager {
     /**
      * Removes the given Game from the database.
      *
-     * @param game the Game to be removed
+     * @param match the Game to be removed
      */
-    public static void remove(Game game) {
-        games.remove(game);
+    public static void remove(Match match) {
+        MATCHES.remove(match);
     }
 }

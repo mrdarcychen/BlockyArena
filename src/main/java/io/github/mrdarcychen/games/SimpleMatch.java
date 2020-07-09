@@ -30,59 +30,69 @@ import java.util.List;
 /**
  * A Game represents a specific session dedicated to a single duel.
  */
-public class Game {
+public class SimpleMatch implements Match {
 
     private final List<PlayerSnapshot> snapshots;
-    private final TeamMode teamMode;
+    private final MatchRules matchRules;
     protected Arena arena;
     private MatchState state;
 
-    public Game(TeamMode teamMode, Arena arena) {
+    public SimpleMatch(MatchRules matchRules, Arena arena) {
         this.arena = arena;
-        this.teamMode = teamMode;
+        this.matchRules = matchRules;
         arena.setBusy(true);
         snapshots = new ArrayList<>();
         state = new EnteringState(this, new ArrayList<>());
     }
 
+    @Override
     public void add(Player player) {
         state.recruit(player);
     }
 
+    @Override
     public void remove(Player player) {
         state.dismiss(player);
     }
 
+    @Override
     public void analyze(DamageEntityEvent event, DamageData damageData) {
         state.analyze(event, damageData);
     }
 
+    @Override
     public void addSnapshot(PlayerSnapshot snapshot) {
         snapshots.add(snapshot);
     }
 
+    @Override
     public void restoreSnapshotOf(Player player) {
         snapshots.stream().filter(it -> it.getPlayer().equals(player)).findAny()
                 .ifPresent(PlayerSnapshot::restore);
     }
 
+    @Override
     public void restoreSnapshots() {
         snapshots.forEach(PlayerSnapshot::restore);
     }
 
+    @Override
     public boolean canJoin() {
         return state instanceof EnteringState;
     }
 
+    @Override
     public Arena getArena() {
         return arena;
     }
 
+    @Override
     public void setMatchState(MatchState state) {
         this.state = state;
     }
 
-    public TeamMode getTeamMode() {
-        return teamMode;
+    @Override
+    public MatchRules getTeamMode() {
+        return matchRules;
     }
 }

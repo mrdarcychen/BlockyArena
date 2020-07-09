@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.listeners;
 
-import io.github.mrdarcychen.games.Game;
+import io.github.mrdarcychen.games.Match;
 import io.github.mrdarcychen.games.PlayerManager;
 import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -59,7 +59,7 @@ public class EntityListener {
     public void onDamageEntity(DamageEntityEvent event) {
         if (event.getTargetEntity() instanceof Player) {
             Player victim = (Player) event.getTargetEntity();
-            Optional<Game> optGame = PlayerManager.getGame(victim.getUniqueId());
+            Optional<Match> optGame = PlayerManager.getGame(victim.getUniqueId());
             if (!optGame.isPresent()) {
                 return;
             }

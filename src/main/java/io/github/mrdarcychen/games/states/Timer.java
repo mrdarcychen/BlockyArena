@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package io.github.mrdarcychen.games;
+package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.BlockyArena;
 import org.spongepowered.api.scheduler.Task;

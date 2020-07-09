@@ -19,7 +19,7 @@ package io.github.mrdarcychen.games;
 /**
  * A TeamMode represents the mode of a Team based on the number of gamers on a Team.
  */
-public class TeamMode {
+public class TeamMode implements MatchRules {
 
     private final int teamSize; // the capacity of each team in this mode
     private final int teamCount;
@@ -37,10 +37,12 @@ public class TeamMode {
         this.teamCount = teamCount;
     }
 
+    @Override
     public int getTotalCapacity() {
         return teamSize * teamCount;
     }
 
+    @Override
     public int getTeamCount() {
         return teamCount;
     }

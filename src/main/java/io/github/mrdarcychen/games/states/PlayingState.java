@@ -16,9 +16,8 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.games.Game;
+import io.github.mrdarcychen.games.Match;
 import io.github.mrdarcychen.games.PlayerManager;
-import io.github.mrdarcychen.games.Team;
 import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
 import org.spongepowered.api.effect.particle.ParticleTypes;
@@ -35,8 +34,8 @@ public class PlayingState extends MatchState {
 
     private final List<Team> teams;
 
-    public PlayingState(Game game, List<Player> players, List<Team> teams) {
-        super(game, players);
+    public PlayingState(Match match, List<Player> players, List<Team> teams) {
+        super(match, players);
         this.teams = teams;
         teams.forEach(Team::sendAllToSpawn);
     }
@@ -51,7 +50,7 @@ public class PlayingState extends MatchState {
 
     private void announcePlayerDismissal(String playerName) {
         broadcast(Text.of(playerName + " left the game." +
-                "(" + players.size() + "/" + teamMode.getTotalCapacity() + ")"));
+                "(" + players.size() + "/" + matchRules.getTotalCapacity() + ")"));
     }
 
 
@@ -63,7 +62,7 @@ public class PlayingState extends MatchState {
         if (teamsAlive.size() == 1) {
             Team winner = teamsAlive.get(0);
             List<Team> losers = teams.stream().filter(it -> it != winner).collect(Collectors.toList());
-            game.setMatchState(new StoppingState(game, players, winner, losers));
+            match.setMatchState(new StoppingState(match, players, winner, losers));
         }
     }
 
@@ -84,8 +83,8 @@ public class PlayingState extends MatchState {
                         attacker.getLocation().getPosition(), 50);
                 event.setCancelled(true);
             }
-            Optional<Game> optGame = PlayerManager.getGame(attacker.getUniqueId());
-            if (!optGame.isPresent() || !optGame.get().equals(game)) {
+            Optional<Match> optGame = PlayerManager.getGame(attacker.getUniqueId());
+            if (!optGame.isPresent() || !optGame.get().equals(match)) {
                 event.setCancelled(true);
             }
             if (teams.stream().anyMatch(team -> team.isEliminated(attacker))) {

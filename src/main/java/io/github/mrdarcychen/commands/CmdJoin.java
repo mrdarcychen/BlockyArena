@@ -16,8 +16,8 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.games.Game;
 import io.github.mrdarcychen.games.GameManager;
+import io.github.mrdarcychen.games.Match;
 import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -70,12 +70,12 @@ public class CmdJoin implements CommandExecutor {
                     " quit to leave the current game session."));
             return CommandResult.empty();
         }
-        Game game = GameManager.getGame(optMode.get());
-        if (game == null) {
+        Match match = GameManager.getGame(optMode.get());
+        if (match == null) {
             player.sendMessage(Text.of("There's no available arena at this time."));
             return CommandResult.empty();
         }
-        game.add(player);
+        match.add(player);
         return CommandResult.success();
     }
 }
