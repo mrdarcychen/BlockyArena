@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.PlatformRegistry;
 import org.spongepowered.api.scheduler.Task;
 
 import java.util.concurrent.TimeUnit;
@@ -34,15 +34,14 @@ public class Timer {
      */
     public Timer(int timeInterval, IntConsumer action) {
         tMinus = timeInterval;
-        task = Task.builder()
-                .interval(1, TimeUnit.SECONDS)
-                .execute(() -> {
+        task = PlatformRegistry.schedule(
+                Task.builder().interval(1, TimeUnit.SECONDS).execute(() -> {
                     action.accept(tMinus--);
                     if (tMinus < 0) {
                         task.cancel();
                     }
                 })
-                .submit(BlockyArena.getInstance());
+        );
     }
 
     /**

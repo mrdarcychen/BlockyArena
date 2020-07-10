@@ -22,19 +22,17 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 public class CmdQuit implements CommandExecutor {
 
-    private static final CmdQuit INSTANCE = new CmdQuit();
+    public static final CommandSpec SPEC = CommandSpec.builder()
+            .executor(new CmdQuit())
+            .build();
 
-    /* enforce the singleton property with a private constructor */
     private CmdQuit() {
-    }
-
-    public static CmdQuit getInstance() {
-        return INSTANCE;
     }
 
     @Override

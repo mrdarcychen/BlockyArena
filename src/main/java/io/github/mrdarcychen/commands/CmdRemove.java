@@ -22,18 +22,23 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
+
+import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
+import static org.spongepowered.api.command.args.GenericArguments.string;
 
 public class CmdRemove implements CommandExecutor {
 
-    private static final CmdRemove instance = new CmdRemove();
+    public static final CommandSpec SPEC = CommandSpec.builder()
+            .arguments(
+                    onlyOne(string(Text.of("type"))),
+                    onlyOne(string(Text.of("id"))))
+            .executor(new CmdRemove())
+            .permission("blockyarena.remove")
+            .build();
 
-    /* enforce the singleton property with a private constructor */
     private CmdRemove() {
-    }
-
-    public static CmdRemove getInstance() {
-        return instance;
     }
 
     @Override

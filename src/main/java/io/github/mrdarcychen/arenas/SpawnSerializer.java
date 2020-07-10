@@ -18,7 +18,7 @@ package io.github.mrdarcychen.arenas;
 
 import com.flowpowered.math.vector.Vector3d;
 import com.google.common.reflect.TypeToken;
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.Utility;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
@@ -37,7 +37,7 @@ public class SpawnSerializer implements TypeSerializer<SpawnPoint> {
     public SpawnPoint deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
         if (!Sponge.getServer().getWorld(extentUUID).isPresent()) {
-            BlockyArena.getLogger().warn("Cannot find extent with UUID " + extentUUID.toString());
+            Utility.warn("Cannot find extent with UUID " + extentUUID.toString());
         }
         World extent = Sponge.getServer().getWorld(extentUUID).get();
         Vector3d position = value.getNode("position").getValue(TypeToken.of(Vector3d.class));

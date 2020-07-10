@@ -24,21 +24,27 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
+import static org.spongepowered.api.command.args.GenericArguments.*;
+
 public class CmdJoin implements CommandExecutor {
 
-    private static final CmdJoin INSTANCE = new CmdJoin();
+    public static final CommandSpec SPEC = CommandSpec.builder()
+            .arguments(
+                    onlyOne(string(Text.of("mode"))),
+                    optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
+                            .buildWith(none()))
+            )
+            .executor(new CmdJoin())
+            .build();
 
     /* enforce the singleton property with a private constructor */
     private CmdJoin() {
-    }
-
-    public static CmdJoin getInstance() {
-        return INSTANCE;
     }
 
     /**

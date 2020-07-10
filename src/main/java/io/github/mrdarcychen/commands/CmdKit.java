@@ -23,23 +23,27 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import java.util.Optional;
 
+import static org.spongepowered.api.command.args.GenericArguments.*;
+
 public class CmdKit implements CommandExecutor {
 
-    private static final CmdKit INSTANCE = new CmdKit();
+    public static final CommandSpec SPEC = CommandSpec.builder()
+            .arguments(
+                    onlyOne(string(Text.of("id"))),
+                    optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
+                            .buildWith(none()))
+            )
+            .executor(new CmdKit())
+            .build();
 
-    /* enforce the singleton property with a private constructor */
     private CmdKit() {
     }
-
-    public static CmdKit getInstance() {
-        return INSTANCE;
-    }
-
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {

@@ -16,86 +16,21 @@
 
 package io.github.mrdarcychen.commands;
 
+import io.github.mrdarcychen.PlatformRegistry;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.text.Text;
-
-import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class CommandManager {
-    private static final CommandManager INSTANCE = new CommandManager();
 
-    private CommandManager() {
-        registerCommands();
-    }
-
-    public static CommandManager getInstance() {
-        return INSTANCE;
-    }
-
-    private CommandSpec rootCmd;
-
-    // registers user commands to CommandManager
-
-    private void registerCommands() {
-        CommandSpec cmdCreate = CommandSpec.builder()
-                .arguments(
-                        onlyOne(string(Text.of("type"))),
-                        onlyOne(string(Text.of("id"))))
-                .executor(CmdCreate.getInstance())
-                .permission("blockyarena.create")
+    public static void init() {
+        CommandSpec rootCmd = CommandSpec.builder()
+                .child(CmdEdit.SPEC, "edit")
+                .child(CmdCreate.SPEC, "create")
+                .child(CmdRemove.SPEC, "remove")
+                .child(CmdJoin.SPEC, "join")
+                .child(CmdQuit.SPEC, "quit")
+                .child(CmdKit.SPEC, "kit")
                 .build();
 
-        CommandSpec cmdRemove = CommandSpec.builder()
-                .arguments(
-                        onlyOne(string(Text.of("type"))),
-                        onlyOne(string(Text.of("id"))))
-                .executor(CmdRemove.getInstance())
-                .permission("blockyarena.remove")
-                .build();
-
-        CommandSpec cmdJoin = CommandSpec.builder()
-                .arguments(
-                        onlyOne(string(Text.of("mode"))),
-                        optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
-                                .buildWith(none()))
-                )
-                .executor(CmdJoin.getInstance())
-                .build();
-
-        CommandSpec cmdQuit = CommandSpec.builder()
-                .executor(CmdQuit.getInstance())
-                .build();
-
-        CommandSpec cmdEdit = CommandSpec.builder()
-                .arguments(
-                        onlyOne(string(Text.of("id"))),
-                        onlyOne(string(Text.of("type"))),
-                        optional(onlyOne(string(Text.of("param"))))
-                )
-                .executor(CmdEdit.getInstance())
-                .permission("blockyarena.edit")
-                .build();
-
-        CommandSpec cmdKit = CommandSpec.builder()
-                .arguments(
-                        onlyOne(string(Text.of("id"))),
-                        optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
-                                .buildWith(none()))
-                )
-                .executor(CmdKit.getInstance())
-                .build();
-
-        rootCmd = CommandSpec.builder()
-                .child(cmdEdit, "edit")
-                .child(cmdCreate, "create")
-                .child(cmdRemove, "remove")
-                .child(cmdJoin, "join")
-                .child(cmdQuit, "quit")
-                .child(cmdKit, "kit")
-                .build();
-    }
-
-    public CommandSpec getCommandCallable() {
-        return rootCmd;
+        PlatformRegistry.registerCommands(rootCmd);
     }
 }

@@ -14,18 +14,20 @@
  * limitations under the License.
  */
 
-package io.github.mrdarcychen.utils;
+package io.github.mrdarcychen;
 
-import io.github.mrdarcychen.BlockyArena;
-import org.spongepowered.api.text.Text;
-import org.spongepowered.api.text.channel.MessageChannel;
-import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.CommandCallable;
+import org.spongepowered.api.scheduler.Task;
 
-public class Utils {
+public class PlatformRegistry {
 
-    public static void broadcastToEveryone(String message, TextColor color) {
-        Text coloredText = Text.builder("[" + BlockyArena.getLogger().getName() + "] " + message).color(color).build();
-        MessageChannel.TO_ALL.send(coloredText, ChatTypes.CHAT);
+    public static Task schedule(Task.Builder builder) {
+        return builder.submit(BlockyArena.getInstance());
+    }
+
+    public static void registerCommands(CommandCallable callable) {
+        Sponge.getCommandManager().register(BlockyArena.getInstance(), callable,
+                "blockyarena", "ba");
     }
 }

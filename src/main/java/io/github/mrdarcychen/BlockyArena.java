@@ -24,7 +24,6 @@ import io.github.mrdarcychen.commands.CommandManager;
 import io.github.mrdarcychen.listeners.ClientConnectionEventListener;
 import io.github.mrdarcychen.listeners.EntityListener;
 import io.github.mrdarcychen.listeners.ServerListener;
-import io.github.mrdarcychen.managers.ConfigManager;
 import io.github.mrdarcychen.utils.Kit;
 import io.github.mrdarcychen.utils.KitSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
@@ -44,6 +43,8 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
+// entry point of the plugin; responsible for initializing the rest of the components
+// nothing should depend on this class
 @Plugin(id = "blockyarena", name = "BlockyArena")
 public final class BlockyArena {
 
@@ -74,6 +75,7 @@ public final class BlockyArena {
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         PLUGIN = this;
+        Utility.init(logger);
         registerTypeSerializers();
         registerListeners();
         createDirectories();
@@ -81,9 +83,8 @@ public final class BlockyArena {
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
-        Sponge.getCommandManager().register(this, CommandManager.getInstance().getCommandCallable(),
-                "blockyarena", "ba"); // TODO: need refactoring
-        ConfigManager.getInstance().load();
+        CommandManager.init();
+        ConfigManager.getInstance().load(defaultConfig);
         arenaManager = new ArenaManager(arenaDirectory);
         kitManager = new KitManager(kitDirectory);
     }
@@ -103,7 +104,7 @@ public final class BlockyArena {
                     Files.createDirectory(dir);
                 }
             } catch (IOException e) {
-                logger.warn("Error creating directory for "
+                Utility.warn("Error creating directory for "
                         + dir.getFileName().toString());
             }
         }
@@ -139,10 +140,6 @@ public final class BlockyArena {
 
     public static ArenaManager getArenaManager() {
         return arenaManager;
-    }
-
-    public static Logger getLogger() {
-        return logger;
     }
 
     public static BlockyArena getInstance() {

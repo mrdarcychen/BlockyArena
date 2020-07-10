@@ -16,8 +16,8 @@
 
 package io.github.mrdarcychen.games.states;
 
+import io.github.mrdarcychen.ConfigManager;
 import io.github.mrdarcychen.games.Match;
-import io.github.mrdarcychen.managers.ConfigManager;
 import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -38,7 +38,6 @@ public class EnteringState extends MatchState {
             return;
         }
         super.recruit(player);
-        //Utils.broadcastToEveryone("the arena : " + game.getArena().getID() +" is used !!", TextColors.GREEN);
         broadcastRecruitMessage(player);
         if (fullCapacityReached()) {
             match.setMatchState(new StartingState(match, players, ConfigManager.getInstance().getLobbyCountdown()));

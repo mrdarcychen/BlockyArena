@@ -23,19 +23,24 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
+import static org.spongepowered.api.command.args.GenericArguments.string;
+
 public class CmdCreate implements CommandExecutor {
 
-    private static final CmdCreate INSTANCE = new CmdCreate();
+    public static final CommandSpec SPEC = CommandSpec.builder()
+            .arguments(
+                    onlyOne(string(Text.of("type"))),
+                    onlyOne(string(Text.of("id"))))
+            .executor(new CmdCreate())
+            .permission("blockyarena.create")
+            .build();
 
-    /* enforce the singleton property with a private constructor */
     private CmdCreate() {
-    }
-
-    public static CmdCreate getInstance() {
-        return INSTANCE;
     }
 
     @Override
@@ -50,7 +55,7 @@ public class CmdCreate implements CommandExecutor {
 
         switch (type) {
             case "arena":
-                CmdEdit.getInstance().expectBuilder(player, id);
+                CmdEdit.expectBuilder(player, id);
                 player.sendMessage(Text.of("Start configuring interactively with /ba edit " + id +
                         " spawn <type>."));
                 player.sendMessage(Text.of("For detailed instructions, please visit the GitHub" +

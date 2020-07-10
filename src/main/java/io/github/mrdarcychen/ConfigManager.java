@@ -14,10 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.mrdarcychen.managers;
+package io.github.mrdarcychen;
 
 import com.google.inject.Inject;
-import io.github.mrdarcychen.BlockyArena;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.ConfigurationOptions;
 import ninja.leaping.configurate.commented.CommentedConfigurationNode;
@@ -26,6 +25,7 @@ import ninja.leaping.configurate.loader.ConfigurationLoader;
 import org.spongepowered.api.config.DefaultConfig;
 
 import java.io.IOException;
+import java.nio.file.Path;
 
 public class ConfigManager {
 
@@ -47,12 +47,12 @@ public class ConfigManager {
     @DefaultConfig(sharedRoot = true)
     private ConfigurationLoader<CommentedConfigurationNode> loader;
 
-    public void load() {
-        loader = HoconConfigurationLoader.builder().setPath(BlockyArena.getInstance().getDefaultConfig()).build();
+    public void load(Path defaultConfigDir) {
+        loader = HoconConfigurationLoader.builder().setPath(defaultConfigDir).build();
 
         //If file does not exist, we create it.
-        if (!BlockyArena.getInstance().getDefaultConfig().toFile().exists()) {
-            BlockyArena.getLogger().error("Creating a default config for BlockyArena.");
+        if (!defaultConfigDir.toFile().exists()) {
+            Utility.info("Creating a default config for BlockyArena.");
             this.rootNode = loader.createEmptyNode(ConfigurationOptions.defaults());
             this.rootNode.getNode("timers", "lobby", "cooldownSec").setValue(15);
 
@@ -88,7 +88,7 @@ public class ConfigManager {
             e.printStackTrace();
         }
 
-        BlockyArena.getLogger().info("Configuration reloaded for BlockyArena!");
+        Utility.info("Configuration reloaded for BlockyArena!");
     }
 
     /*

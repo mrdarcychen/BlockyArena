@@ -24,25 +24,31 @@ import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
 
 import java.util.HashMap;
 import java.util.Map;
 
+import static org.spongepowered.api.command.args.GenericArguments.*;
 import static org.spongepowered.api.text.Text.of;
 
 public class CmdEdit implements CommandExecutor {
 
-    private static final CmdEdit INSTANCE = new CmdEdit();
-    private final Map<Player, Arena.Builder> builders = new HashMap<>();
+    public static final CommandSpec SPEC = CommandSpec.builder()
+            .arguments(
+                    onlyOne(string(Text.of("id"))),
+                    onlyOne(string(Text.of("type"))),
+                    optional(onlyOne(string(Text.of("param"))))
+            )
+            .executor(new CmdEdit())
+            .permission("blockyarena.edit")
+            .build();
 
+    private static final Map<Player, Arena.Builder> builders = new HashMap<>();
 
-    /* enforce the singleton property with a private constructor */
     private CmdEdit() {
-    }
-
-    public static CmdEdit getInstance() {
-        return INSTANCE;
     }
 
     @Override
@@ -90,7 +96,7 @@ public class CmdEdit implements CommandExecutor {
         return CommandResult.success();
     }
 
-    public void expectBuilder(Player player, String arenaName) {
+    public static void expectBuilder(Player player, String arenaName) {
         Arena.Builder builder = new Arena.Builder(arenaName);
         builders.put(player, builder);
     }

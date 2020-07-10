@@ -58,7 +58,7 @@ public class KitManager {
                     Kit kit = rootNode.getValue(TypeToken.of(Kit.class));
                     kits.put(kit.getId(), kit);
                 } catch (InvalidDataException e) {
-                    BlockyArena.getLogger().warn("Kit " + id + " cannot be loaded because it contains " +
+                    Utility.warn("Kit " + id + " cannot be loaded because it contains " +
                             "unknown items.");
                 }
                 loader.save(rootNode);
@@ -76,7 +76,7 @@ public class KitManager {
      */
     public void add(Kit kit, String id) {
         kits.put(id, kit);
-        BlockyArena.getLogger().warn(id + " has been added to kit manager.");
+        Utility.warn(id + " has been added to kit manager.");
         Path path = Paths.get(configDirectory + File.separator + id + ".conf");
         ConfigurationLoader<CommentedConfigurationNode> loader = HoconConfigurationLoader
                 .builder().setPath(path).build();

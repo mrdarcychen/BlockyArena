@@ -61,7 +61,7 @@ public class ArenaManager {
                 parseArenaFrom(rootNode).ifPresent(arenas::add);
             }
         } catch (IOException e) {
-            BlockyArena.getLogger().warn("An I/O error occurred while loading arena configs.");
+            Utility.warn("An I/O error occurred while loading arena configs.");
         }
     }
 
@@ -78,7 +78,7 @@ public class ArenaManager {
             }
             output = builder.build();
         } catch (ObjectMappingException | IllegalStateException e) {
-            BlockyArena.getLogger().warn("Failed to load arena " + name + " : " + e.getMessage());
+            Utility.warn("Failed to load arena " + name + " : " + e.getMessage());
         }
         return Optional.ofNullable(output);
     }
@@ -117,7 +117,7 @@ public class ArenaManager {
                 Files.createFile(file);
             }
         } catch (IOException e) {
-            BlockyArena.getLogger().warn("Error creating arena config file for " + arena.getName());
+            Utility.warn("Error creating arena config file for " + arena.getName());
             return;
         }
 
@@ -135,7 +135,7 @@ public class ArenaManager {
             rootNode.getNode("spectatorSpawn").setValue(TypeToken.of(SpawnPoint.class), arena.getSpectatorSpawn());
             loader.save(rootNode);
         } catch (IOException | ObjectMappingException e) {
-            BlockyArena.getLogger().warn("Error writing arena config.");
+            Utility.warn("Error writing arena config.");
         }
         arenas.add(arena);
     }

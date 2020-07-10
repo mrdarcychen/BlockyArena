@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.listeners;
 
-import io.github.mrdarcychen.managers.ConfigManager;
+import io.github.mrdarcychen.ConfigManager;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.GameReloadEvent;
 
