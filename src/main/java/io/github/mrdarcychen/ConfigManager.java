@@ -52,7 +52,7 @@ public class ConfigManager {
 
         //If file does not exist, we create it.
         if (!defaultConfigDir.toFile().exists()) {
-            Utility.info("Creating a default config for BlockyArena.");
+            System.out.println("Creating a default config for BlockyArena.");
             this.rootNode = loader.createEmptyNode(ConfigurationOptions.defaults());
             this.rootNode.getNode("timers", "lobby", "cooldownSec").setValue(15);
 
@@ -87,8 +87,7 @@ public class ConfigManager {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
-
-        Utility.info("Configuration reloaded for BlockyArena!");
+        System.out.println("Configuration reloaded for BlockyArena!");
     }
 
     /*

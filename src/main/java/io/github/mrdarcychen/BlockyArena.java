@@ -72,7 +72,6 @@ public final class BlockyArena {
     @Listener
     public void onPreInit(GamePreInitializationEvent event) {
         PLUGIN = this;
-        Utility.init(logger);
         registerTypeSerializers();
         registerListeners();
         createDirectories();

@@ -61,7 +61,7 @@ public class ArenaManager {
                 parseArenaFrom(rootNode).ifPresent(arenas::add);
             }
         } catch (IOException e) {
-            Utility.warn("An I/O error occurred while loading arena configs.");
+            System.err.println("An I/O error occurred while loading arena configs.");
         }
     }
 
@@ -78,7 +78,7 @@ public class ArenaManager {
             }
             output = builder.build();
         } catch (ObjectMappingException | IllegalStateException e) {
-            Utility.warn("Failed to load arena " + name + " : " + e.getMessage());
+            System.err.println("Failed to load arena " + name + " : " + e.getMessage());
         }
         return Optional.ofNullable(output);
     }
@@ -117,7 +117,7 @@ public class ArenaManager {
                 Files.createFile(file);
             }
         } catch (IOException e) {
-            Utility.warn("Error creating arena config file for " + arena.getName());
+            System.err.println("Error creating arena config file for " + arena.getName());
             return;
         }
 
@@ -135,7 +135,7 @@ public class ArenaManager {
             rootNode.getNode("spectatorSpawn").setValue(TypeToken.of(SpawnPoint.class), arena.getSpectatorSpawn());
             loader.save(rootNode);
         } catch (IOException | ObjectMappingException e) {
-            Utility.warn("Error writing arena config.");
+            System.err.println("Error writing arena config.");
         }
         arenas.add(arena);
     }
