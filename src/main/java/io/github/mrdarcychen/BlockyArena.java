@@ -24,8 +24,6 @@ import io.github.mrdarcychen.commands.CommandManager;
 import io.github.mrdarcychen.listeners.ClientConnectionEventListener;
 import io.github.mrdarcychen.listeners.EntityListener;
 import io.github.mrdarcychen.listeners.ServerListener;
-import io.github.mrdarcychen.utils.Kit;
-import io.github.mrdarcychen.utils.KitSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -49,7 +47,6 @@ import java.util.List;
 public final class BlockyArena {
 
     private static BlockyArena PLUGIN;
-    private static KitManager kitManager;
     private static ArenaManager arenaManager;
 
     @Inject
@@ -60,7 +57,7 @@ public final class BlockyArena {
     //The path to config/BlockyArena
     private Path configDirectory;
 
-    private Path arenaDirectory, kitDirectory;
+    private Path arenaDirectory;
 
 
     @Inject
@@ -86,7 +83,6 @@ public final class BlockyArena {
         CommandManager.init();
         ConfigManager.getInstance().load(defaultConfig);
         arenaManager = new ArenaManager(arenaDirectory);
-        kitManager = new KitManager(kitDirectory);
     }
 
     /*
@@ -95,17 +91,11 @@ public final class BlockyArena {
      */
     private void createDirectories() {
         arenaDirectory = Paths.get(configDirectory + "/arenas");
-        kitDirectory = Paths.get(configDirectory + "/kits");
-
-        List<Path> directories = Arrays.asList(arenaDirectory, kitDirectory);
-        for (Path dir : directories) {
+        if (!arenaDirectory.toFile().exists()) {
             try {
-                if (!dir.toFile().exists()) {
-                    Files.createDirectory(dir);
-                }
+                Files.createDirectory(arenaDirectory);
             } catch (IOException e) {
-                Utility.warn("Error creating directory for "
-                        + dir.getFileName().toString());
+                e.printStackTrace();
             }
         }
     }
@@ -127,15 +117,10 @@ public final class BlockyArena {
      */
     private void registerTypeSerializers() {
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(SpawnPoint.class), new SpawnSerializer());
-        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer());
     }
 
     public Path getDefaultConfig() {
         return defaultConfig;
-    }
-
-    public static KitManager getKitManager() {
-        return kitManager;
     }
 
     public static ArenaManager getArenaManager() {

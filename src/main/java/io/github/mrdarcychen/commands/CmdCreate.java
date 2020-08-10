@@ -17,7 +17,6 @@
 package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.BlockyArena;
-import io.github.mrdarcychen.utils.Kit;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -63,16 +62,8 @@ public class CmdCreate implements CommandExecutor {
                 player.sendMessage(Text.of("Execute /ba edit " + id + " save when you're done."));
                 player.sendMessage(Text.of("Execute /ba create arena " + id + " to start over."));
                 return CommandResult.success();
-            case "kit":
-                Kit kit = new Kit(player, id);
-                BlockyArena.getKitManager().add(kit, id);
-                player.sendMessage(Text.of("A new kit has been created, and players will be able " +
-                        "to retrieve an exact copy of your current inventory with /ba kit " + id +
-                        " when they're in an active game session. To overwrite, simply execute" +
-                        " this command again with the same id."));
-                return CommandResult.success();
             default:
-                player.sendMessage(Text.of("Invalid argument <type>. Must be either arena or kit."));
+                player.sendMessage(Text.of("Invalid argument <type>. Must be arena."));
         }
         return CommandResult.empty();
     }

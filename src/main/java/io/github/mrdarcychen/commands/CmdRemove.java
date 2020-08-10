@@ -46,7 +46,6 @@ public class CmdRemove implements CommandExecutor {
         String type = args.<String>getOne("type").get().toLowerCase();
         String id = args.<String>getOne("id").get().toLowerCase();
         switch (type) {
-
             case "arena":
                 try {
                     BlockyArena.getArenaManager().remove(id);
@@ -55,18 +54,8 @@ public class CmdRemove implements CommandExecutor {
                     src.sendMessage(Text.of(e.getMessage()));
                     return CommandResult.empty();
                 }
-
-            case "kit":
-                try {
-                    BlockyArena.getKitManager().remove(id);
-                    break;
-                } catch (IllegalArgumentException e) {
-                    src.sendMessage(Text.of(e.getMessage()));
-                    return CommandResult.empty();
-                }
-
             default:
-                src.sendMessage(Text.of("<type> must be either arena or kit."));
+                src.sendMessage(Text.of("<type> must be arena."));
                 return CommandResult.empty();
         }
         src.sendMessage(Text.of(id + " has been removed."));

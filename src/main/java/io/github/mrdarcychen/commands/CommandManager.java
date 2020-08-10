@@ -28,7 +28,6 @@ public class CommandManager {
                 .child(CmdRemove.SPEC, "remove")
                 .child(CmdJoin.SPEC, "join")
                 .child(CmdQuit.SPEC, "quit")
-                .child(CmdKit.SPEC, "kit")
                 .build();
 
         PlatformRegistry.registerCommands(rootCmd);
