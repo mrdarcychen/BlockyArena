@@ -32,16 +32,16 @@ import java.util.List;
  */
 public class SimpleMatch implements Match {
 
-    private final List<PlayerSnapshot> snapshots;
     private final MatchRules matchRules;
     protected Arena arena;
     private MatchState state;
+    private PlayerAssistant playerAssistant;
 
     public SimpleMatch(MatchRules matchRules, Arena arena) {
         this.arena = arena;
         this.matchRules = matchRules;
         arena.setBusy(true);
-        snapshots = new ArrayList<>();
+        playerAssistant = new SimplePlayerAssistant();
         state = new EnteringState(this, new ArrayList<>());
     }
 
@@ -58,22 +58,6 @@ public class SimpleMatch implements Match {
     @Override
     public void analyze(DamageEntityEvent event, DamageData damageData) {
         state.analyze(event, damageData);
-    }
-
-    @Override
-    public void addSnapshot(PlayerSnapshot snapshot) {
-        snapshots.add(snapshot);
-    }
-
-    @Override
-    public void restoreSnapshotOf(Player player) {
-        snapshots.stream().filter(it -> it.getPlayer().equals(player)).findAny()
-                .ifPresent(PlayerSnapshot::restore);
-    }
-
-    @Override
-    public void restoreSnapshots() {
-        snapshots.forEach(PlayerSnapshot::restore);
     }
 
     @Override
@@ -94,5 +78,10 @@ public class SimpleMatch implements Match {
     @Override
     public MatchRules getTeamMode() {
         return matchRules;
+    }
+
+    @Override
+    public PlayerAssistant getPlayerAssistant() {
+        return playerAssistant;
     }
 }

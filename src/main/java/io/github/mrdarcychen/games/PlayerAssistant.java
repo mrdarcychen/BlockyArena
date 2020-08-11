@@ -16,27 +16,21 @@
 
 package io.github.mrdarcychen.games;
 
-import io.github.mrdarcychen.arenas.Arena;
-import io.github.mrdarcychen.games.states.MatchState;
-import io.github.mrdarcychen.utils.DamageData;
-import io.github.mrdarcychen.utils.PlayerSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
 
-public interface Match {
-    void add(Player player);
+public interface PlayerAssistant {
+    /**
+     * Prepares the player for the game.
+     */
+    void prepare(Player player);
 
-    void remove(Player player);
+    /**
+     * Restores previous state of the player.
+     */
+    void restore(Player player);
 
-    void analyze(DamageEntityEvent event, DamageData damageData);
-
-    boolean canJoin();
-
-    Arena getArena();
-
-    void setMatchState(MatchState state);
-
-    MatchRules getTeamMode();
-
-    PlayerAssistant getPlayerAssistant();
+    /**
+     * Restores previous state of all players.
+     */
+    void restoreAll();
 }

@@ -19,6 +19,7 @@ package io.github.mrdarcychen.games.states;
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.games.Match;
 import io.github.mrdarcychen.games.MatchRules;
+import io.github.mrdarcychen.games.PlayerAssistant;
 import io.github.mrdarcychen.games.PlayerManager;
 import io.github.mrdarcychen.utils.DamageData;
 import io.github.mrdarcychen.utils.PlayerSnapshot;
@@ -39,21 +40,22 @@ public abstract class MatchState {
     protected final Match match;
     protected List<Player> players;
     protected MatchRules matchRules;
+    protected PlayerAssistant playerAssistant;
 
     public MatchState(Match match, List<Player> players) {
         this.match = match;
         this.players = players;
         matchRules = match.getTeamMode();
+        this.playerAssistant = match.getPlayerAssistant();
     }
 
     public void recruit(Player player) {
         players.add(player);
-        match.addSnapshot(new PlayerSnapshot(player));
+        playerAssistant.prepare(player);
         PlayerManager.setGame(player.getUniqueId(), match);
-        // TODO: set player status as active
-        player.getInventory().clear();  // TODO: allow bringing personal kit
+
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
-        double initialHealth = player.health().getMaxValue(); // TODO: to be customized
+        double initialHealth = player.health().getMaxValue();
         player.offer(Keys.HEALTH, initialHealth);
         setSpectate(player, false);
 
@@ -65,8 +67,8 @@ public abstract class MatchState {
     }
 
     public void dismiss(Player player) {
-        match.restoreSnapshotOf(player);
-        PlayerManager.clearGame(player.getUniqueId());
+        playerAssistant.restore(player);
+        PlayerManager.clearGame(player.getUniqueId()); // TODO
         setSpectate(player, false);
     }
 
