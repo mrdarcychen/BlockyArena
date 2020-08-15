@@ -28,12 +28,13 @@ public class LeavingState extends MatchState {
     public LeavingState(Match match, List<Player> players) {
         super(match, players);
 
-        match.getPlayerAssistant().restoreAll();
+        match.getPlayerAssistant().dismissAll();
 
+        playerAssistant.dismissAll();
         players.forEach(it -> {
             // TODO: set player status as inactive
             PlayerManager.clearGame(it.getUniqueId());
-            setSpectate(it, false);
+            playerAssistant.setSpectatorProperties(it, false);
         });
 
         match.getArena().setBusy(false);
