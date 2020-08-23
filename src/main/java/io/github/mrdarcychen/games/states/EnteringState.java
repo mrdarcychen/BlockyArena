@@ -17,7 +17,7 @@
 package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.ConfigManager;
-import io.github.mrdarcychen.games.Match;
+import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
@@ -27,8 +27,8 @@ import java.util.List;
 
 public class EnteringState extends MatchState {
 
-    public EnteringState(Match match, List<Player> players) {
-        super(match, players);
+    public EnteringState(GameSession gameSession, List<Player> players) {
+        super(gameSession, players);
     }
 
     @Override
@@ -40,7 +40,7 @@ public class EnteringState extends MatchState {
         super.recruit(player);
         broadcastRecruitMessage(player);
         if (fullCapacityReached()) {
-            match.setMatchState(new StartingState(match, players, ConfigManager.getInstance().getLobbyCountdown()));
+            gameSession.setMatchState(new StartingState(gameSession, players, ConfigManager.getInstance().getLobbyCountdown()));
         }
     }
 
@@ -64,7 +64,7 @@ public class EnteringState extends MatchState {
         broadcastDismissMessage(player);
         // if no one is left, cancel timer and go directly to leaving
         if (players.isEmpty()) {
-            match.setMatchState(new LeavingState(match, players));
+            gameSession.setMatchState(new LeavingState(gameSession, players));
         }
     }
 

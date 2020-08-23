@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.games.Match;
+import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.PlayerManager;
 import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.effect.particle.ParticleEffect;
@@ -34,8 +34,8 @@ public class PlayingState extends MatchState {
 
     private final List<Team> teams;
 
-    public PlayingState(Match match, List<Player> players, List<Team> teams) {
-        super(match, players);
+    public PlayingState(GameSession gameSession, List<Player> players, List<Team> teams) {
+        super(gameSession, players);
         this.teams = teams;
         teams.forEach(Team::sendAllToSpawn);
     }
@@ -62,7 +62,7 @@ public class PlayingState extends MatchState {
         if (teamsAlive.size() == 1) {
             Team winner = teamsAlive.get(0);
             List<Team> losers = teams.stream().filter(it -> it != winner).collect(Collectors.toList());
-            match.setMatchState(new StoppingState(match, players, winner, losers));
+            gameSession.setMatchState(new StoppingState(gameSession, players, winner, losers));
         }
     }
 
@@ -83,8 +83,8 @@ public class PlayingState extends MatchState {
                         attacker.getLocation().getPosition(), 50);
                 event.setCancelled(true);
             }
-            Optional<Match> optGame = PlayerManager.getGame(attacker.getUniqueId());
-            if (!optGame.isPresent() || !optGame.get().equals(match)) {
+            Optional<GameSession> optGame = PlayerManager.getGame(attacker.getUniqueId());
+            if (!optGame.isPresent() || !optGame.get().equals(gameSession)) {
                 event.setCancelled(true);
             }
             if (teams.stream().anyMatch(team -> team.isEliminated(attacker))) {

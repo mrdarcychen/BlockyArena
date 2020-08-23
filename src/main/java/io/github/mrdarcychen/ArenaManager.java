@@ -83,30 +83,24 @@ public class ArenaManager {
         return Optional.ofNullable(output);
     }
 
+    // Finds and reserves an available arena.
     public Optional<Arena> findArena(String mode) {
-        Predicate<Arena> criteria;
-        switch (mode.toLowerCase()) {
-            case "1v1":
-            case "2v2":
-                criteria = (it -> !it.isBusy());
-                break;
-            case "ffa":
-                criteria = (it) -> !it.isBusy() && it.getStartPoints().count() > 2;
-                break;
-            default:
-                criteria = (it) -> false;
+        Predicate<Arena> criteria = it -> false;
+        if (mode.equals("ffa")) {
+            criteria = it -> it.getStartPoints().count() > 2;
         }
-        return arenas.stream()
+        if (mode.equals("1v1") || mode.equals("2v2")) {
+            criteria = it -> true;
+        }
+        Optional<Arena> optArena = arenas.stream()
                 .filter(criteria)
                 .findAny();
+        optArena.ifPresent(arenas::remove);
+        return optArena;
     }
 
-    public Optional<Arena> getArena(String name) {
-        return arenas.stream().filter(it -> it.getName().equals(name)).findFirst();
-    }
-
-    public Optional<Arena> findArena() {
-        return arenas.stream().filter(it -> !it.isBusy()).findAny();
+    public void makeAvailable(Arena arena) {
+        arenas.add(arena);
     }
 
     // will overwrite existing arena if same name provided

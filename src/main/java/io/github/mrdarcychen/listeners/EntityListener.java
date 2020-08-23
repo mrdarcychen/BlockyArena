@@ -16,19 +16,14 @@
 
 package io.github.mrdarcychen.listeners;
 
-import io.github.mrdarcychen.games.Match;
 import io.github.mrdarcychen.games.PlayerManager;
-import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.command.SendCommandEvent;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.event.filter.cause.First;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
-
-import java.util.Optional;
 
 public class EntityListener {
 
@@ -52,20 +47,6 @@ public class EntityListener {
                     //ba or arena or blockyarena command is issued ! So we can move on and proceed event !
                 }
             }
-        }
-    }
-
-    @Listener
-    public void onDamageEntity(DamageEntityEvent event) {
-        if (event.getTargetEntity() instanceof Player) {
-            Player victim = (Player) event.getTargetEntity();
-            Optional<Match> optGame = PlayerManager.getGame(victim.getUniqueId());
-            if (!optGame.isPresent()) {
-                return;
-            }
-            // if the victim is in a game, proceed analysis
-            DamageData damageData = new DamageData(victim, event.getCause());
-            optGame.get().analyze(event, damageData);
         }
     }
 }

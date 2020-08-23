@@ -18,17 +18,12 @@ package io.github.mrdarcychen.games;
 
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.games.states.MatchState;
-import io.github.mrdarcychen.utils.DamageData;
-import io.github.mrdarcychen.utils.PlayerSnapshot;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
 
-public interface Match {
+public interface GameSession {
     void add(Player player);
 
     void remove(Player player);
-
-    void analyze(DamageEntityEvent event, DamageData damageData);
 
     boolean canJoin();
 

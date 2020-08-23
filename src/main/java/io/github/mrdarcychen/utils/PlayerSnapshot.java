@@ -27,14 +27,12 @@ import org.spongepowered.api.world.World;
  */
 public class PlayerSnapshot {
 
-    private final Player player;
     private final Transform<World> transform;
     private final GameMode gameMode;
     private final double health;
     private final int food;
 
     public PlayerSnapshot(Player player) {
-        this.player = player;
         this.transform = player.getTransform();
         gameMode = player.gameMode().get();
         health = player.health().get();
@@ -44,14 +42,10 @@ public class PlayerSnapshot {
     /**
      * Restores the player with this state.
      */
-    public void restore() {
+    public void restore(Player player) {
         player.setTransform(transform);
         player.offer(Keys.GAME_MODE, gameMode);
         player.offer(Keys.HEALTH, health);
         player.offer(Keys.FOOD_LEVEL, food);
-    }
-
-    public Player getPlayer() {
-        return player;
     }
 }

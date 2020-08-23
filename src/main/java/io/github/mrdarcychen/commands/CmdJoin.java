@@ -16,9 +16,12 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.games.GameManager;
-import io.github.mrdarcychen.games.Match;
+import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.arenas.Arena;
+import io.github.mrdarcychen.games.GameSession;
+import io.github.mrdarcychen.games.MatchRules;
 import io.github.mrdarcychen.games.PlayerManager;
+import io.github.mrdarcychen.games.SimpleGameSession;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -28,11 +31,16 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class CmdJoin implements CommandExecutor {
+
+    private static final List<GameSession> GAME_SESSIONS = new ArrayList<>();
 
     public static final CommandSpec SPEC = CommandSpec.builder()
             .arguments(
@@ -45,6 +53,37 @@ public class CmdJoin implements CommandExecutor {
 
     /* enforce the singleton property with a private constructor */
     private CmdJoin() {
+    }
+
+    private static GameSession getGame(String str) {
+        String mode = str.toLowerCase();
+        Predicate<GameSession> criteria = (it) -> it.canJoin() && it.getTeamMode().toString().equals(mode);
+        Optional<GameSession> optGame = GAME_SESSIONS.stream().filter(criteria).findAny();
+        if (optGame.isPresent()) {
+            return optGame.get();
+        }
+        Optional<Arena> optArena = BlockyArena.getArenaManager().findArena(mode);
+        if (optArena.isPresent()) {
+            Arena arena = optArena.get();
+            int teamSize = 1;
+            int teamCount = 2;
+            if ("2v2".equals(mode)) {
+                teamSize = 2;
+            }
+            if ("ffa".equals(mode)) {
+                teamCount = (int) arena.getStartPoints().count();
+            }
+            MatchRules matchRules = new TeamMode(teamSize, teamCount);
+            GameSession gameSession = new SimpleGameSession(matchRules, optArena.get());
+            GAME_SESSIONS.add(gameSession);
+            return gameSession;
+        }
+        return null;
+    }
+
+    public static void remove(GameSession gameSession) {
+        BlockyArena.getArenaManager().makeAvailable(gameSession.getArena());
+        GAME_SESSIONS.remove(gameSession);
     }
 
     /**
@@ -76,12 +115,12 @@ public class CmdJoin implements CommandExecutor {
                     " quit to leave the current game session."));
             return CommandResult.empty();
         }
-        Match match = GameManager.getGame(optMode.get());
-        if (match == null) {
+        GameSession gameSession = getGame(optMode.get());
+        if (gameSession == null) {
             player.sendMessage(Text.of("There's no available arena at this time."));
             return CommandResult.empty();
         }
-        match.add(player);
+        gameSession.add(player);
         return CommandResult.success();
     }
 }

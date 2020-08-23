@@ -16,8 +16,8 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.games.GameManager;
-import io.github.mrdarcychen.games.Match;
+import io.github.mrdarcychen.commands.CmdJoin;
+import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.entity.living.player.Player;
 
@@ -25,10 +25,10 @@ import java.util.List;
 
 public class LeavingState extends MatchState {
 
-    public LeavingState(Match match, List<Player> players) {
-        super(match, players);
+    public LeavingState(GameSession gameSession, List<Player> players) {
+        super(gameSession, players);
 
-        match.getPlayerAssistant().dismissAll();
+        gameSession.getPlayerAssistant().dismissAll();
 
         playerAssistant.dismissAll();
         players.forEach(it -> {
@@ -36,8 +36,6 @@ public class LeavingState extends MatchState {
             PlayerManager.clearGame(it.getUniqueId());
             playerAssistant.setSpectatorProperties(it, false);
         });
-
-        match.getArena().setBusy(false);
-        GameManager.remove(match);
+        CmdJoin.remove(gameSession);
     }
 }

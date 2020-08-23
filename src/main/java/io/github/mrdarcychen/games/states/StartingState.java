@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.games.Match;
+import io.github.mrdarcychen.games.GameSession;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -30,11 +30,11 @@ public class StartingState extends MatchState {
 
     private final Timer timer;
 
-    public StartingState(Match match, List<Player> players, int countdown) {
-        super(match, players);
+    public StartingState(GameSession gameSession, List<Player> players, int countdown) {
+        super(gameSession, players);
         timer = new Timer(countdown, tMinus -> {
             if (tMinus == 0) {
-                match.setMatchState(new PlayingState(match, players, partition()));
+                gameSession.setMatchState(new PlayingState(gameSession, players, partition()));
                 return;
             }
             Title title = Title.builder().title(Text.of(tMinus)).fadeIn(2)
@@ -55,7 +55,7 @@ public class StartingState extends MatchState {
         if (players.size() <= matchRules.getTotalCapacity()) {
             timer.cancel();
             broadcast(Text.of("Waiting for more players to join ..."));
-            match.setMatchState(new EnteringState(match, players));
+            gameSession.setMatchState(new EnteringState(gameSession, players));
         }
     }
 
@@ -66,7 +66,7 @@ public class StartingState extends MatchState {
 
     private List<Team> partition() {
         List<Team> teams = new ArrayList<>();
-        match.getArena().getStartPoints()
+        gameSession.getArena().getStartPoints()
                 .limit(matchRules.getTeamCount())
                 .forEach(point -> teams.add(new Team(point)));
         Iterator<Player> playersItr = players.iterator();

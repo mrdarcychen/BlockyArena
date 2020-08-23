@@ -14,7 +14,9 @@
  * limitations under the License.
  */
 
-package io.github.mrdarcychen.games;
+package io.github.mrdarcychen.commands;
+
+import io.github.mrdarcychen.games.MatchRules;
 
 /**
  * A TeamMode represents the mode of a Team based on the number of gamers on a Team.

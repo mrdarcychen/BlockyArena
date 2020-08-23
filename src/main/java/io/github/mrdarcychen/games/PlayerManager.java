@@ -23,7 +23,7 @@ import java.util.UUID;
 
 public class PlayerManager {
 
-    private static final Map<UUID, Match> players = new HashMap<>();
+    private static final Map<UUID, GameSession> players = new HashMap<>();
 
     /**
      * Registers a new Gamer with the given {@link UUID}.
@@ -38,12 +38,12 @@ public class PlayerManager {
         players.remove(uniqueId);
     }
 
-    public static Optional<Match> getGame(UUID uniqueId) {
+    public static Optional<GameSession> getGame(UUID uniqueId) {
         return Optional.ofNullable(players.getOrDefault(uniqueId, null));
     }
 
-    public static void setGame(UUID uniqueId, Match match) {
-        players.putIfAbsent(uniqueId, match);
+    public static void setGame(UUID uniqueId, GameSession gameSession) {
+        players.putIfAbsent(uniqueId, gameSession);
     }
 
     public static void clearGame(UUID uniqueId) {
