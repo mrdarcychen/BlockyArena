@@ -20,13 +20,14 @@ import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import io.github.mrdarcychen.arenas.SpawnPoint;
 import io.github.mrdarcychen.arenas.SpawnSerializer;
-import io.github.mrdarcychen.commands.CommandManager;
+import io.github.mrdarcychen.commands.*;
 import io.github.mrdarcychen.listeners.ClientConnectionEventListener;
 import io.github.mrdarcychen.listeners.EntityListener;
 import io.github.mrdarcychen.listeners.ServerListener;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
@@ -38,8 +39,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
 // entry point of the plugin; responsible for initializing the rest of the components
 // nothing should depend on this class
@@ -79,7 +78,17 @@ public final class BlockyArena {
 
     @Listener
     public void onServerStarting(GameStartingServerEvent event) {
-        CommandManager.init();
+        ChallengeService challengeService = new ChallengeService();
+        CommandSpec rootCmd = CommandSpec.builder()
+                .child(CmdEdit.SPEC, "edit")
+                .child(CmdCreate.SPEC, "create")
+                .child(CmdRemove.SPEC, "remove")
+                .child(CmdJoin.SPEC, "join")
+                .child(CmdQuit.SPEC, "quit")
+                .child(challengeService.getCommandCallable(), "challenge")
+                .build();
+
+        PlatformRegistry.registerCommands(rootCmd);
         ConfigManager.getInstance().load(defaultConfig);
         arenaManager = new ArenaManager(arenaDirectory);
     }
