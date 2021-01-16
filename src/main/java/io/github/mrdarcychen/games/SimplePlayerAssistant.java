@@ -18,6 +18,7 @@ package io.github.mrdarcychen.games;
 
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.utils.PlayerSnapshot;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -39,7 +40,6 @@ public class SimplePlayerAssistant implements PlayerAssistant {
         snapshots = new HashMap<>();
         this.gameSession = gameSession;
     }
-
 
     @Override
     public void recruit(Player player) {

@@ -34,4 +34,6 @@ public interface GameSession {
     MatchRules getTeamMode();
 
     PlayerAssistant getPlayerAssistant();
+    
+    void stopListener();
 }

@@ -37,6 +37,7 @@ public class SimpleGameSession implements GameSession {
     protected Arena arena;
     private MatchState state;
     private final PlayerAssistant playerAssistant;
+    private EventListener listener = new EventListener();
 
     public SimpleGameSession(MatchRules matchRules, Arena arena) {
         this.arena = arena;
@@ -44,7 +45,7 @@ public class SimpleGameSession implements GameSession {
         arena.setBusy(true);
         playerAssistant = new SimplePlayerAssistant(this);
         state = new EnteringState(this, new ArrayList<>());
-        Sponge.getEventManager().registerListeners(BlockyArena.getInstance(), new EventListener());
+        Sponge.getEventManager().registerListeners(BlockyArena.getInstance(), listener);
     }
 
     @Override
@@ -82,13 +83,17 @@ public class SimpleGameSession implements GameSession {
         return playerAssistant;
     }
 
+    @Override
+    public void stopListener() {
+        Sponge.getEventManager().unregisterListeners(listener);
+    }
+
     public class EventListener {
         @Listener
         public void onDamageEntity(DamageEntityEvent event) {
             if (event.getTargetEntity() instanceof Player) {
                 Player player = (Player) event.getTargetEntity();
                 if (playerAssistant.contains(player)) {
-                    System.out.println("Proceed to analysis of " + player.getName());
                     state.analyze(event, new DamageData(player, event.getCause()));
                 }
             }

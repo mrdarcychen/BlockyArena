@@ -16,7 +16,12 @@
 
 package io.github.mrdarcychen.commands;
 
+import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.PlatformRegistry;
+import io.github.mrdarcychen.arenas.Arena;
+import io.github.mrdarcychen.games.GameSession;
+import io.github.mrdarcychen.games.MatchRules;
+import io.github.mrdarcychen.games.SimpleGameSession;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandExecutor;
@@ -35,6 +40,8 @@ import static org.spongepowered.api.command.args.GenericArguments.player;
 import static org.spongepowered.api.text.Text.of;
 
 public class ChallengeService {
+
+    private static final MatchRules teamMode = new TeamMode(1, 2);
 
     private final List<ChallengeData> requests = new ArrayList<>();
     private final CommandExecutor requestExec = (src, args) -> {
@@ -147,8 +154,19 @@ public class ChallengeService {
         }
 
         void notifySuccessfulRespond() {
+            Optional<Arena> optArena = BlockyArena.getArenaManager().findArena("1v1");
+            if (!optArena.isPresent()) {
+                String msg = "No arena is available at this time.";
+                challenger.sendMessage(of(msg));
+                rival.sendMessage(of(msg));
+                return;
+            }
             challenger.sendMessage(of(rival.getName(), " has accepted your challenge!"));
             rival.sendMessage(of("You've accepted the challenge from ", challenger.getName(), "!"));
+            GameSession session = new SimpleGameSession(teamMode, optArena.get());
+            CmdJoin.register(session);
+            session.add(challenger);
+            session.add(rival);
         }
 
         void notifyExpiry() {

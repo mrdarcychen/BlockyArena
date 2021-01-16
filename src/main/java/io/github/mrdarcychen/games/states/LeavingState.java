@@ -36,6 +36,7 @@ public class LeavingState extends MatchState {
             PlayerManager.clearGame(it.getUniqueId());
             playerAssistant.setSpectatorProperties(it, false);
         });
+        gameSession.stopListener();
         CmdJoin.remove(gameSession);
     }
 }

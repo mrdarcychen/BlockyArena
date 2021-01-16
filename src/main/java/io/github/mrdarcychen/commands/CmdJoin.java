@@ -85,6 +85,10 @@ public class CmdJoin implements CommandExecutor {
         BlockyArena.getArenaManager().makeAvailable(gameSession.getArena());
         GAME_SESSIONS.remove(gameSession);
     }
+    
+    public static void register(GameSession gameSession) {
+        GAME_SESSIONS.add(gameSession);
+    }
 
     /**
      * Sends the given player to an active Game.

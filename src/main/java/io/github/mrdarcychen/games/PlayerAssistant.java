@@ -41,4 +41,6 @@ public interface PlayerAssistant {
     void maxFoodAndHealth(Player player);
 
     boolean contains(Player player);
+
+
 }
