@@ -16,36 +16,31 @@
 
 package io.github.mrdarcychen.games;
 
-import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.games.states.EnteringState;
 import io.github.mrdarcychen.games.states.MatchState;
-import io.github.mrdarcychen.utils.DamageData;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.entity.DamageEntityEvent;
 
 import java.util.ArrayList;
 
 /**
  * A Game represents a specific session dedicated to a single duel.
  */
-public class SimpleGameSession implements GameSession {
+public class FullFledgedGameSession implements GameSession {
 
     private final MatchRules matchRules;
     protected Arena arena;
     private MatchState state;
     private final PlayerAssistant playerAssistant;
-    private EventListener listener = new EventListener();
+    private final AssaultMonitor assaultMonitor;
 
-    public SimpleGameSession(MatchRules matchRules, Arena arena) {
+    public FullFledgedGameSession(MatchRules matchRules, Arena arena) {
         this.arena = arena;
         this.matchRules = matchRules;
         arena.setBusy(true);
         playerAssistant = new SimplePlayerAssistant(this);
         state = new EnteringState(this, new ArrayList<>());
-        Sponge.getEventManager().registerListeners(BlockyArena.getInstance(), listener);
+        assaultMonitor = new AssaultMonitor(this);
     }
 
     @Override
@@ -85,18 +80,11 @@ public class SimpleGameSession implements GameSession {
 
     @Override
     public void stopListener() {
-        Sponge.getEventManager().unregisterListeners(listener);
+        assaultMonitor.terminate();
     }
 
-    public class EventListener {
-        @Listener
-        public void onDamageEntity(DamageEntityEvent event) {
-            if (event.getTargetEntity() instanceof Player) {
-                Player player = (Player) event.getTargetEntity();
-                if (playerAssistant.contains(player)) {
-                    state.analyze(event, new DamageData(player, event.getCause()));
-                }
-            }
-        }
+    @Override
+    public MatchState getState() {
+        return state;
     }
 }

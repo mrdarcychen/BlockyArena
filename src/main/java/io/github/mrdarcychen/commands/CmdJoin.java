@@ -18,10 +18,10 @@ package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.arenas.Arena;
+import io.github.mrdarcychen.games.FullFledgedGameSession;
 import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.MatchRules;
 import io.github.mrdarcychen.games.PlayerManager;
-import io.github.mrdarcychen.games.SimpleGameSession;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -46,6 +46,8 @@ public class CmdJoin implements CommandExecutor {
             .arguments(
                     onlyOne(string(Text.of("mode"))),
                     optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
+                            .buildWith(none())),
+                    optionalWeak(flags().valueFlag(string(Text.of("arena_name")), "n")
                             .buildWith(none()))
             )
             .executor(new CmdJoin())
@@ -53,32 +55,6 @@ public class CmdJoin implements CommandExecutor {
 
     /* enforce the singleton property with a private constructor */
     private CmdJoin() {
-    }
-
-    private static GameSession getGame(String str) {
-        String mode = str.toLowerCase();
-        Predicate<GameSession> criteria = (it) -> it.canJoin() && it.getTeamMode().toString().equals(mode);
-        Optional<GameSession> optGame = GAME_SESSIONS.stream().filter(criteria).findAny();
-        if (optGame.isPresent()) {
-            return optGame.get();
-        }
-        Optional<Arena> optArena = BlockyArena.getArenaManager().findArena(mode);
-        if (optArena.isPresent()) {
-            Arena arena = optArena.get();
-            int teamSize = 1;
-            int teamCount = 2;
-            if ("2v2".equals(mode)) {
-                teamSize = 2;
-            }
-            if ("ffa".equals(mode)) {
-                teamCount = (int) arena.getStartPoints().count();
-            }
-            MatchRules matchRules = new TeamMode(teamSize, teamCount);
-            GameSession gameSession = new SimpleGameSession(matchRules, optArena.get());
-            GAME_SESSIONS.add(gameSession);
-            return gameSession;
-        }
-        return null;
     }
 
     public static void remove(GameSession gameSession) {
@@ -110,7 +86,8 @@ public class CmdJoin implements CommandExecutor {
             player = playerArg.get();
         }
         Optional<String> optMode = args.getOne("mode");
-
+        String arenaName = (String) args.getOne(Text.of("arena_name")).orElse("");
+        
         if (!optMode.isPresent()) {
             return CommandResult.empty();
         }
@@ -119,12 +96,32 @@ public class CmdJoin implements CommandExecutor {
                     " quit to leave the current game session."));
             return CommandResult.empty();
         }
-        GameSession gameSession = getGame(optMode.get());
+        GameSession gameSession = getGame(optMode.get(), arenaName);
         if (gameSession == null) {
             player.sendMessage(Text.of("There's no available arena at this time."));
             return CommandResult.empty();
         }
         gameSession.add(player);
         return CommandResult.success();
+    }
+    
+    private static GameSession getGame(String mode, String arenaName) {
+        Predicate<GameSession> criteria = (it) -> 
+                it.canJoin() && it.getTeamMode().toString().equals(mode.toLowerCase());
+        
+        Optional<GameSession> optGame = GAME_SESSIONS.stream().filter(criteria).findAny();
+        if (optGame.isPresent()) {
+            return optGame.get();
+        }
+        
+        Optional<Arena> optArena = BlockyArena.getArenaManager().findArena(mode, arenaName);
+        if (optArena.isPresent()) {
+            Arena arena = optArena.get();
+            MatchRules matchRules = TeamMode.parse(mode, (int) arena.getStartPoints().count());
+            GameSession gameSession = new FullFledgedGameSession(matchRules, optArena.get());
+            GAME_SESSIONS.add(gameSession);
+            return gameSession;
+        }
+        return null;
     }
 }

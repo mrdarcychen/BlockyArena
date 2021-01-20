@@ -36,4 +36,6 @@ public interface GameSession {
     PlayerAssistant getPlayerAssistant();
     
     void stopListener();
+    
+    MatchState getState();
 }

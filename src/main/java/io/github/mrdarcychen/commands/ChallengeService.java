@@ -19,9 +19,9 @@ package io.github.mrdarcychen.commands;
 import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.PlatformRegistry;
 import io.github.mrdarcychen.arenas.Arena;
+import io.github.mrdarcychen.games.FullFledgedGameSession;
 import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.MatchRules;
-import io.github.mrdarcychen.games.SimpleGameSession;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandExecutor;
@@ -163,7 +163,7 @@ public class ChallengeService {
             }
             challenger.sendMessage(of(rival.getName(), " has accepted your challenge!"));
             rival.sendMessage(of("You've accepted the challenge from ", challenger.getName(), "!"));
-            GameSession session = new SimpleGameSession(teamMode, optArena.get());
+            GameSession session = new FullFledgedGameSession(teamMode, optArena.get());
             CmdJoin.register(session);
             session.add(challenger);
             session.add(rival);

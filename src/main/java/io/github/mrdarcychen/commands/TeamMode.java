@@ -23,6 +23,8 @@ import io.github.mrdarcychen.games.MatchRules;
  */
 public class TeamMode implements MatchRules {
 
+    private static final TeamMode ONE_VERSUS_ONE = new TeamMode(1, 2);
+    private static final TeamMode TWO_VERSUS_TWO = new TeamMode(2, 2);
     private final int teamSize; // the capacity of each team in this mode
     private final int teamCount;
 
@@ -32,7 +34,7 @@ public class TeamMode implements MatchRules {
      * @param teamSize the number of players on each team
      * @param teamCount the number of teams
      */
-    TeamMode(int teamSize, int teamCount) {
+    public TeamMode(int teamSize, int teamCount) {
         assert teamSize >= 1;
         assert teamCount >= 2;
         this.teamSize = teamSize;
@@ -57,5 +59,18 @@ public class TeamMode implements MatchRules {
             return "2v2";
         }
         return "ffa";
+    }
+
+    public static TeamMode parse(String mode, int startPointCount) {
+        switch (mode) {
+            case "1v1":
+            case "solo":
+                return ONE_VERSUS_ONE;
+            case "2v2":
+                return TWO_VERSUS_TWO;
+            case "ffa":
+            default:
+                return new TeamMode(1, startPointCount);
+        }
     }
 }

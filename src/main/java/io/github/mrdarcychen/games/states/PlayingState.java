@@ -53,7 +53,6 @@ public class PlayingState extends MatchState {
                 "(" + players.size() + "/" + matchRules.getTotalCapacity() + ")"));
     }
 
-
     @Override
     public void eliminate(Player player, Text cause) {
         super.eliminate(player, cause);
