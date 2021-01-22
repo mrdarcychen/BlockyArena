@@ -16,9 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.commands.CmdJoin;
 import io.github.mrdarcychen.games.GameSession;
-import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.entity.living.player.Player;
 
 import java.util.List;
@@ -27,16 +25,6 @@ public class LeavingState extends MatchState {
 
     public LeavingState(GameSession gameSession, List<Player> players) {
         super(gameSession, players);
-
-        gameSession.getPlayerAssistant().dismissAll();
-
-        playerAssistant.dismissAll();
-        players.forEach(it -> {
-            // TODO: set player status as inactive
-            PlayerManager.clearGame(it.getUniqueId());
-            playerAssistant.setSpectatorProperties(it, false);
-        });
-        gameSession.stopListener();
-        CmdJoin.remove(gameSession);
+        gameSession.terminate();
     }
 }

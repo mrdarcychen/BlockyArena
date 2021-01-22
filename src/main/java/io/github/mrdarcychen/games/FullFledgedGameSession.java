@@ -17,6 +17,7 @@
 package io.github.mrdarcychen.games;
 
 import io.github.mrdarcychen.arenas.Arena;
+import io.github.mrdarcychen.commands.CmdJoin;
 import io.github.mrdarcychen.games.states.EnteringState;
 import io.github.mrdarcychen.games.states.MatchState;
 import org.spongepowered.api.entity.living.player.Player;
@@ -79,12 +80,14 @@ public class FullFledgedGameSession implements GameSession {
     }
 
     @Override
-    public void stopListener() {
-        assaultMonitor.terminate();
+    public MatchState getState() {
+        return state;
     }
 
     @Override
-    public MatchState getState() {
-        return state;
+    public void terminate() {
+        playerAssistant.dismissAll();
+        assaultMonitor.terminate();
+        CmdJoin.remove(this);
     }
 }

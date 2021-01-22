@@ -18,7 +18,6 @@ package io.github.mrdarcychen.games;
 
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.utils.PlayerSnapshot;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.data.key.Keys;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.entity.living.player.Player;
@@ -48,19 +47,14 @@ public class SimplePlayerAssistant implements PlayerAssistant {
         maxFoodAndHealth(player);
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
         setSpectatorProperties(player, false);
-        // send player to lobby
+        moveToLobby(player);
+    }
+
+    private void moveToLobby(Player player) {
         Arena arena = gameSession.getArena();
         player.sendMessage(Text.of("Sending you to " + gameSession.getArena().getName() + " ..."));
         Transform<World> lobby = arena.getLobbySpawn().getTransform();
         player.setTransform(lobby);
-    }
-
-    @Override
-    public void dismiss(Player player) {
-        snapshots.get(player).restore(player);
-        PlayerManager.clearGame(player.getUniqueId()); // TODO
-        maxFoodAndHealth(player);
-        setSpectatorProperties(player, false);
     }
 
     @Override
@@ -80,11 +74,23 @@ public class SimplePlayerAssistant implements PlayerAssistant {
     }
 
     @Override
+    public void dismiss(Player player) {
+        snapshots.get(player).restore(player);
+        setLeaveGamePropertiesFor(player);
+    }
+
+    @Override
     public void dismissAll() {
         snapshots.forEach((player, playerSnapshot) -> {
             playerSnapshot.restore(player);
-            PlayerManager.clearGame(player.getUniqueId());
+            setLeaveGamePropertiesFor(player);
         });
+    }
+
+    private void setLeaveGamePropertiesFor(Player player) {
+        PlayerManager.clearGame(player.getUniqueId());
+        maxFoodAndHealth(player);
+        setSpectatorProperties(player, false);
     }
 
     @Override

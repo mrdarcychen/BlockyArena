@@ -99,6 +99,7 @@ public class ChallengeService {
     }
 
     private void request(ChallengeData request, int expireInSeconds) {
+        // TODO: handle situations where player is in a game or afk
         if (requests.contains(request)) {
             request.notifyDuplicateRequest();
             return;
