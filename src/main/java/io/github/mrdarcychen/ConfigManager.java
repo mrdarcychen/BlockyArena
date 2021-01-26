@@ -55,7 +55,7 @@ public class ConfigManager {
             System.out.println("Creating a default config for BlockyArena.");
             this.rootNode = loader.createEmptyNode(ConfigurationOptions.defaults());
             this.rootNode.getNode("timers", "lobby", "cooldownSec").setValue(15);
-
+            this.rootNode.getNode("reward").setValue("");
 
             try {
                 loader.save(rootNode);
@@ -101,4 +101,8 @@ public class ConfigManager {
     public int getLobbyCountdown() {
         return rootNode.getNode("timers", "lobby", "cooldownSec").getInt();
     }
-}
+
+    public String getRewardKitName() {
+        return rootNode.getNode("reward").getString();
+    }
+} 

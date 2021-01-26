@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "io.github.mrdarcychen"
-version = "0.6.1"
+version = "0.7.0-rc1"
 description = "A deathmatch plugin for Minecraft servers"
 
 dependencies {

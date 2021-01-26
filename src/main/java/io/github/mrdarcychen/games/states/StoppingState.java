@@ -16,6 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
+import io.github.mrdarcychen.commands.RewardService;
 import io.github.mrdarcychen.games.GameSession;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
@@ -61,6 +62,7 @@ public class StoppingState extends MatchState {
         new Timer(5, (tMinus) -> {
             if (tMinus == 0) {
                 gameSession.setMatchState(new LeavingState(gameSession, players));
+                winner.getPlayers().forEach(RewardService::offer);
             }
         });
     }

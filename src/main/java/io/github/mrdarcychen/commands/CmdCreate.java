@@ -16,6 +16,8 @@
 
 package io.github.mrdarcychen.commands;
 
+import io.github.mrdarcychen.ConfigManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -60,6 +62,12 @@ public class CmdCreate implements CommandExecutor {
                         " repo."));
                 player.sendMessage(Text.of("Execute /ba edit " + id + " save when you're done."));
                 player.sendMessage(Text.of("Execute /ba create arena " + id + " to start over."));
+                return CommandResult.success();
+            case "reward":
+                ConfigManager.getInstance().getConfNode("reward").setValue(id);
+                Sponge.getCommandManager().process(Sponge.getServer().getConsole(), "kit onetime " + id + " true");
+                player.sendMessage(Text.of("Reward has been set to " + id + ". Winners must have the permission \n" +
+                        "nucleus.kits." + id + " in order to receive this reward."));
                 return CommandResult.success();
             default:
                 player.sendMessage(Text.of("Invalid argument <type>. Must be arena."));
