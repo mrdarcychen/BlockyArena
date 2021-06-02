@@ -29,9 +29,16 @@ import java.util.List;
 public class StartingState extends MatchState {
 
     private final Timer timer;
+    private final int countdown;
 
     public StartingState(GameSession gameSession, List<Player> players, int countdown) {
         super(gameSession, players);
+        this.countdown = countdown;
+        timer = startCountdownTimer();
+    }
+
+    private Timer startCountdownTimer() {
+        final Timer timer;
         timer = new Timer(countdown, tMinus -> {
             if (tMinus == 0) {
                 gameSession.setMatchState(new PlayingState(gameSession, players, partition()));
@@ -44,6 +51,7 @@ public class StartingState extends MatchState {
                 player.playSound(SoundTypes.BLOCK_NOTE_HAT, player.getLocation().getPosition(), 100);
             });
         });
+        return timer;
     }
 
     @Override

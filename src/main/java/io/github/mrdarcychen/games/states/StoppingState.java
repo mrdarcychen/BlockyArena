@@ -21,6 +21,7 @@ import io.github.mrdarcychen.games.GameSession;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.format.TextStyles;
 import org.spongepowered.api.text.title.Title;
@@ -29,24 +30,30 @@ import java.util.List;
 
 public class StoppingState extends MatchState {
 
+    private final Team winner;
+    private final List<Team> losers;
+
     public StoppingState(GameSession gameSession, List<Player> players, Team winner, List<Team> losers) {
         super(gameSession, players);
-        Title victory = Title.builder()
-                .title(Text.builder("VICTORY!")
-                        .color(TextColors.GOLD)
-                        .style(TextStyles.BOLD)
-                        .build())
-                .subtitle(Text.of(winner + " won the game."))
-                .fadeIn(1).stay(60).fadeOut(2)
-                .build();
-        Title gameOver = Title.builder()
-                .title(Text.builder("GAME OVER!")
-                        .color(TextColors.RED)
-                        .style(TextStyles.BOLD)
-                        .build())
-                .subtitle(Text.of(winner + " won the game."))
-                .fadeIn(1).stay(60).fadeOut(2)
-                .build();
+        this.winner = winner;
+        this.losers = losers;
+
+        announceGameResult();
+        proceedToLeavingStateShortly();
+    }
+
+    private void proceedToLeavingStateShortly() {
+        new Timer(5, (tMinus) -> {
+            if (tMinus == 0) {
+                gameSession.setMatchState(new LeavingState(gameSession, players));
+                winner.getPlayers().forEach(RewardService::offer);
+            }
+        });
+    }
+
+    private void announceGameResult() {
+        Title victory = buildResultTitle("VICTORY!", TextColors.GOLD, winner.toString());
+        Title gameOver = buildResultTitle("GAME OVER!", TextColors.RED, winner.toString());
 
         winner.broadcast(victory);
         winner.getPlayers().forEach(it -> it.playSound(
@@ -58,12 +65,15 @@ public class StoppingState extends MatchState {
                 player.playSound(SoundTypes.BLOCK_GLASS_BREAK, player.getHeadRotation(), 100);
             });
         });
+    }
 
-        new Timer(5, (tMinus) -> {
-            if (tMinus == 0) {
-                gameSession.setMatchState(new LeavingState(gameSession, players));
-                winner.getPlayers().forEach(RewardService::offer);
-            }
-        });
+    private Title buildResultTitle(String title, TextColor color, String winner) {
+        return Title.builder()
+                .title(Text.builder(title)
+                        .color(color).style(TextStyles.BOLD)
+                        .build())
+                .subtitle(Text.of(winner + " won the game."))
+                .fadeIn(1).stay(60).fadeOut(2)
+                .build();
     }
 }

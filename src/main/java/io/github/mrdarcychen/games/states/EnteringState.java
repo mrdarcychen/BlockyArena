@@ -40,8 +40,12 @@ public class EnteringState extends MatchState {
         super.recruit(player);
         broadcastRecruitMessage(player);
         if (fullCapacityReached()) {
-            gameSession.setMatchState(new StartingState(gameSession, players, ConfigManager.getInstance().getLobbyCountdown()));
+            proceedToStartingState();
         }
+    }
+
+    private void proceedToStartingState() {
+        gameSession.setMatchState(new StartingState(gameSession, players, ConfigManager.getInstance().getLobbyCountdown()));
     }
 
     private void notifyPlayerFailedToJoin(Player player) {
