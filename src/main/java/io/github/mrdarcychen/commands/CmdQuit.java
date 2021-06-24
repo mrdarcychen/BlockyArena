@@ -25,6 +25,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatType;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 
 public class CmdQuit implements CommandExecutor {
 
@@ -39,11 +42,21 @@ public class CmdQuit implements CommandExecutor {
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         Player player = (Player) src;
         if (!PlayerManager.isPlaying(player.getUniqueId())) {
-            player.sendMessage(Text.of("You're not in any minigame."));
+            player.sendMessage(ChatTypes.ACTION_BAR, Messages.NOT_IN_GAME_SESSION);
             return CommandResult.empty();
         }
         PlayerManager.getGame(player.getUniqueId()).ifPresent(game -> game.remove(player));
-        player.sendMessage(Text.of("You left the minigame."));
+        player.sendMessage(ChatTypes.ACTION_BAR, Messages.LEFT_SESSION);
         return CommandResult.success();
+    }
+
+    private static class Messages {
+        static final Text NOT_IN_GAME_SESSION = Text
+                .builder("You are currently not in a minigame.")
+                .color(TextColors.RED).build();
+
+        static final Text LEFT_SESSION = Text
+                .builder("You have left the minigame.")
+                .color(TextColors.GREEN).build();
     }
 }

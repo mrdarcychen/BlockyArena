@@ -7,9 +7,6 @@ import org.spongepowered.api.entity.living.player.Player;
 public class RewardService {
     
     public static void offer(Player player) {
-        String kitName = ConfigManager.getInstance().getRewardKitName();
-        Sponge.getCommandManager().process(Sponge.getServer().getConsole(),
-                "kit resetusage " + player.getName() + " " + kitName);
-        Sponge.getCommandManager().process(player, "kit " + kitName);
+
     }
 }

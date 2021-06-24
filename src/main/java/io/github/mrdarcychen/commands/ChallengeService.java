@@ -22,18 +22,23 @@ import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.games.FullFledgedGameSession;
 import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.MatchRules;
+import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.command.args.GenericArguments.player;
@@ -52,12 +57,16 @@ public class ChallengeService {
         Player initiator = (Player) src;
         Optional<Player> optRival = args.getOne(of("player"));
         if (!optRival.isPresent()) {
-            initiator.sendMessage(of("The player you specified is invalid."));
+            initiator.sendMessage(ChatTypes.ACTION_BAR, Messages.INVALID_PLAYER);
             return CommandResult.empty();
         }
         Player rival = optRival.get();
         if (rival == src) {
-            initiator.sendMessage(of("You cannot challenge yourself."));
+            initiator.sendMessage(ChatTypes.ACTION_BAR, Messages.CHALLENGE_SELF);
+            return CommandResult.empty();
+        }
+        if (PlayerManager.isPlaying(rival.getUniqueId())) {
+            initiator.sendMessage(ChatTypes.ACTION_BAR, Messages.PLAYER_BUSY);
             return CommandResult.empty();
         }
         ChallengeData data = new ChallengeData(initiator, rival);
@@ -72,7 +81,7 @@ public class ChallengeService {
         Player you = (Player) src;
         Optional<Player> optChallenger = args.getOne(of("player"));
         if (!optChallenger.isPresent()) {
-            you.sendMessage(of("The player you specified is invalid."));
+            you.sendMessage(ChatTypes.ACTION_BAR, Messages.INVALID_PLAYER);
             return CommandResult.empty();
         }
         Player challenger = optChallenger.get();
@@ -81,7 +90,7 @@ public class ChallengeService {
             data.notifySuccessfulRespond();
             return CommandResult.success();
         }
-        you.sendMessage(of("You did not receive a challenge from that player."));
+        you.sendMessage(ChatTypes.ACTION_BAR, Messages.NO_CHALLENGE_RECEIVED);
         return CommandResult.empty();
     };
     private final CommandSpec respondSpec = CommandSpec.builder()
@@ -99,7 +108,6 @@ public class ChallengeService {
     }
 
     private void request(ChallengeData request, int expireInSeconds) {
-        // TODO: handle situations where player is in a game or afk
         if (requests.contains(request)) {
             request.notifyDuplicateRequest();
             return;
@@ -176,7 +184,29 @@ public class ChallengeService {
         }
 
         public void notifyDuplicateRequest() {
-            challenger.sendMessage(of("Please wait for your rival's acceptance."));
+            challenger.sendMessage(ChatTypes.ACTION_BAR, Messages.BE_PATIENT);
         }
+    }
+
+    private static final class Messages {
+        public static final Text PLAYER_BUSY = Text
+                .builder("That player is busy at the moment. Try again later.")
+                .color(TextColors.RED).build();
+
+        static final Text INVALID_PLAYER = Text
+                .builder("The player you specified is not a valid server player.")
+                .color(TextColors.RED).build();
+
+        static final Text CHALLENGE_SELF = Text
+                .builder("Nice try, but good spirit! Challenge someone else instead!")
+                .color(TextColors.RED).build();
+
+        static final Text NO_CHALLENGE_RECEIVED = Text
+                .builder("You did not receive a challenge from that player.")
+                .color(TextColors.RED).build();
+
+        static final Text BE_PATIENT = Text
+                .builder("Please wait for your rival's acceptance.")
+                .color(TextColors.RED).build();
     }
 }

@@ -16,6 +16,10 @@
 
 package io.github.mrdarcychen.games;
 
+import io.github.mrdarcychen.games.states.EnteringState;
+import io.github.mrdarcychen.games.states.MatchState;
+import io.github.mrdarcychen.games.states.StartingState;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -52,5 +56,18 @@ public class PlayerManager {
 
     public static boolean isPlaying(UUID uniqueId) {
         return players.containsKey(uniqueId);
+    }
+
+    /**
+     * Checks to see if the given player is waiting in the lobby.
+     * @param uniqueId the id of the player
+     * @return true if the player is waiting in the lobby
+     */
+    public static boolean isWaiting(UUID uniqueId) {
+        if (isPlaying(uniqueId)) {
+            MatchState state = players.get(uniqueId).getState();
+            return (state instanceof EnteringState || state instanceof StartingState);
+        }
+        return false;
     }
 }

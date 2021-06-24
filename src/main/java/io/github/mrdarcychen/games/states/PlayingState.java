@@ -25,9 +25,12 @@ import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class PlayingState extends MatchState {
@@ -38,19 +41,14 @@ public class PlayingState extends MatchState {
         super(gameSession, players);
         this.teams = teams;
         teams.forEach(Team::sendAllToSpawn);
+        players.forEach(player -> player.sendMessage(ChatTypes.ACTION_BAR, Messages.GAME_START));
     }
 
     @Override
     public void dismiss(Player player) {
         players.remove(player);
-        announcePlayerDismissal(player.getName());
-        eliminate(player, Text.of(player.getName() + " has left the game."));
+        eliminate(player, Text.of());
         super.dismiss(player);
-    }
-
-    private void announcePlayerDismissal(String playerName) {
-        broadcast(Text.of(playerName + " left the game." +
-                "(" + players.size() + "/" + matchRules.getTotalCapacity() + ")"));
     }
 
     @Override
@@ -71,7 +69,7 @@ public class PlayingState extends MatchState {
         if (damageData.getDamageType().getName().equalsIgnoreCase("void")) {
             event.setCancelled(true);
             showDeathEffect(damageData.getVictim());
-            eliminate(victim, Text.of(damageData.getDeathMessage()));
+            eliminate(victim, Messages.ELIMINATE_CAUSE.apply(damageData.getDeathMessage()));
             return;
         }
         // if attacked by teammates, cancel
@@ -97,7 +95,7 @@ public class PlayingState extends MatchState {
                     SoundTypes.ENTITY_BAT_DEATH, it.getLocation().getPosition(), 100
             ));
             // eliminate the victim
-            eliminate(victim, Text.of(damageData.getDeathMessage()));
+            eliminate(victim, Messages.ELIMINATE_CAUSE.apply(damageData.getDeathMessage()));
         }
     }
 
@@ -117,5 +115,13 @@ public class PlayingState extends MatchState {
             }
         }
         return false;
+    }
+
+    private static final class Messages {
+        static final Function<String, Text> ELIMINATE_CAUSE = (cause) ->
+                Text.builder(cause).color(TextColors.GRAY).build();
+        static final Text GAME_START = Text
+                .builder("The game is on. Good luck and have fun!")
+                .color(TextColors.GREEN).build();
     }
 }

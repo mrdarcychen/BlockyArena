@@ -18,13 +18,21 @@ package io.github.mrdarcychen.games.states;
 
 import io.github.mrdarcychen.games.GameSession;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
 
 public class LeavingState extends MatchState {
 
+    private static final Text GAME_CONCLUDED = Text
+            .builder("The minigame has concluded.")
+            .color(TextColors.GREEN).build();
+
     public LeavingState(GameSession gameSession, List<Player> players) {
         super(gameSession, players);
+        players.forEach((player -> player.sendMessage(ChatTypes.ACTION_BAR, GAME_CONCLUDED)));
         gameSession.terminate();
     }
 }

@@ -17,15 +17,12 @@
 package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.BlockyArena;
-import io.github.mrdarcychen.ConfigManager;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
-import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
@@ -46,10 +43,10 @@ public class CmdRemove implements CommandExecutor {
 
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
-        Player player = (Player) src;
         String type = args.<String>getOne("type").get().toLowerCase();
         String id = args.<String>getOne("id").get().toLowerCase();
         switch (type) {
+
             case "arena":
                 try {
                     BlockyArena.getArenaManager().remove(id);
@@ -58,12 +55,18 @@ public class CmdRemove implements CommandExecutor {
                     src.sendMessage(Text.of(e.getMessage()));
                     return CommandResult.empty();
                 }
-            case "reward":
-                ConfigManager.getInstance().getConfNode("reward").setValue("");
-                Sponge.getCommandManager().process(Sponge.getServer().getConsole(), "kit onetime " + id + " false");
-                player.sendMessage(Text.of("Winner(s) will no longer receive " + id + " as the reward."));
+
+            case "kit":
+                try {
+                    BlockyArena.getKitManager().remove(id);
+                    break;
+                } catch (IllegalArgumentException e) {
+                    src.sendMessage(Text.of(e.getMessage()));
+                    return CommandResult.empty();
+                }
+
             default:
-                src.sendMessage(Text.of("<type> must be arena."));
+                src.sendMessage(Text.of("<type> must be either arena or kit."));
                 return CommandResult.empty();
         }
         src.sendMessage(Text.of(id + " has been removed."));

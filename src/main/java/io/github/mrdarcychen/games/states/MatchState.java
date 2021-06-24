@@ -23,8 +23,10 @@ import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.List;
+import java.util.function.BiFunction;
 
 public abstract class MatchState {
 
@@ -47,11 +49,12 @@ public abstract class MatchState {
 
     public void dismiss(Player player) {
         playerAssistant.dismiss(player);
+        broadcast(Messages.BROADCAST_QUIT.apply(player.getName(), getCapacityIndication()));
     }
 
     public void eliminate(Player player, Text cause) {
-        broadcast(cause);
         playerAssistant.eliminate(player);
+        broadcast(cause);
     }
 
     public void analyze(DamageEntityEvent event, DamageData damageData) {
@@ -68,5 +71,16 @@ public abstract class MatchState {
      */
     public void broadcast(Text msg) {
         players.forEach(it -> it.sendMessage(msg));
+    }
+
+    protected String getCapacityIndication() {
+        return "(" + players.size() + "/" + matchRules.getTotalCapacity() + ")";
+    }
+
+
+    private static final class Messages {
+        static final BiFunction<String, String, Text> BROADCAST_QUIT = (name, indicator) -> Text
+                .builder(name + " has left the minigame. " + indicator)
+                .color(TextColors.GOLD).build();
     }
 }

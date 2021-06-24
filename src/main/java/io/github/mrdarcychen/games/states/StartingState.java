@@ -20,6 +20,7 @@ import io.github.mrdarcychen.games.GameSession;
 import org.spongepowered.api.effect.sound.SoundTypes;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 import org.spongepowered.api.text.title.Title;
 
 import java.util.ArrayList;
@@ -56,13 +57,12 @@ public class StartingState extends MatchState {
 
     @Override
     public void dismiss(Player player) {
-        super.dismiss(player);
         players.remove(player);
-        announcePlayerDismissal(player.getName());
+        super.dismiss(player);
         // if fall below min requirement, new entering state
         if (players.size() <= matchRules.getTotalCapacity()) {
             timer.cancel();
-            broadcast(Text.of("Waiting for more players to join ..."));
+            broadcast(Messages.WAITING_FOR_PLAYERS);
             gameSession.setMatchState(new EnteringState(gameSession, players));
         }
     }
@@ -85,5 +85,11 @@ public class StartingState extends MatchState {
             playersLeft--;
         }
         return teams;
+    }
+
+    private static final class Messages {
+        static final Text WAITING_FOR_PLAYERS = Text
+                .builder("Waiting for more players to join...")
+                .color(TextColors.GOLD).build();
     }
 }

@@ -24,6 +24,8 @@ import io.github.mrdarcychen.commands.*;
 import io.github.mrdarcychen.listeners.ClientConnectionEventListener;
 import io.github.mrdarcychen.listeners.EntityListener;
 import io.github.mrdarcychen.listeners.ServerListener;
+import io.github.mrdarcychen.utils.Kit;
+import io.github.mrdarcychen.utils.KitSerializer;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
@@ -39,6 +41,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 
 // entry point of the plugin; responsible for initializing the rest of the components
 // nothing should depend on this class
@@ -46,6 +50,7 @@ import java.nio.file.Paths;
 public final class BlockyArena {
 
     private static BlockyArena PLUGIN;
+    private static KitManager kitManager;
     private static ArenaManager arenaManager;
 
     @Inject
@@ -56,7 +61,7 @@ public final class BlockyArena {
     //The path to config/BlockyArena
     private Path configDirectory;
 
-    private Path arenaDirectory;
+    private Path arenaDirectory, kitDirectory;
 
 
     @Inject
@@ -84,6 +89,7 @@ public final class BlockyArena {
                 .child(CmdCreate.SPEC, "create")
                 .child(CmdRemove.SPEC, "remove")
                 .child(CmdJoin.SPEC, "join")
+                .child(CmdKit.SPEC, "kit")
                 .child(CmdQuit.SPEC, "quit")
                 .child(challengeService.getCommandCallable(), "challenge")
                 .build();
@@ -91,6 +97,7 @@ public final class BlockyArena {
         PlatformRegistry.registerCommands(rootCmd);
         ConfigManager.getInstance().load(defaultConfig);
         arenaManager = new ArenaManager(arenaDirectory);
+        kitManager = new KitManager(kitDirectory);
     }
 
     /*
@@ -99,11 +106,17 @@ public final class BlockyArena {
      */
     private void createDirectories() {
         arenaDirectory = Paths.get(configDirectory + "/arenas");
-        if (!arenaDirectory.toFile().exists()) {
+        kitDirectory = Paths.get(configDirectory + "/kits");
+
+        List<Path> directories = Arrays.asList(arenaDirectory, kitDirectory);
+        for (Path dir : directories) {
             try {
-                Files.createDirectory(arenaDirectory);
+                if (!dir.toFile().exists()) {
+                    Files.createDirectory(dir);
+                }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.warn("Error creating directory for "
+                        + dir.getFileName().toString());
             }
         }
     }
@@ -125,10 +138,15 @@ public final class BlockyArena {
      */
     private void registerTypeSerializers() {
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(SpawnPoint.class), new SpawnSerializer());
+        TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer());
     }
 
     public Path getDefaultConfig() {
         return defaultConfig;
+    }
+
+    public static KitManager getKitManager() {
+        return kitManager;
     }
 
     public static ArenaManager getArenaManager() {

@@ -6,6 +6,9 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.entity.DamageEntityEvent;
+import org.spongepowered.api.event.filter.cause.First;
+import org.spongepowered.api.event.item.inventory.ClickInventoryEvent;
+import org.spongepowered.api.event.item.inventory.DropItemEvent;
 
 // part of the officiating crew, referee
 class AssaultMonitor {
@@ -31,6 +34,13 @@ class AssaultMonitor {
                 if (gameSession.getPlayerAssistant().contains(player)) {
                     gameSession.getState().analyze(event, new DamageData(player, event.getCause()));
                 }
+            }
+        }
+
+        @Listener
+        public void onDropItem(final DropItemEvent event, @First Player player) {
+            if (gameSession.getPlayerAssistant().contains(player)) {
+                event.setCancelled(true);
             }
         }
     }

@@ -16,8 +16,8 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.ConfigManager;
-import org.spongepowered.api.Sponge;
+import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.utils.Kit;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -63,14 +63,16 @@ public class CmdCreate implements CommandExecutor {
                 player.sendMessage(Text.of("Execute /ba edit " + id + " save when you're done."));
                 player.sendMessage(Text.of("Execute /ba create arena " + id + " to start over."));
                 return CommandResult.success();
-            case "reward":
-                ConfigManager.getInstance().getConfNode("reward").setValue(id);
-                Sponge.getCommandManager().process(Sponge.getServer().getConsole(), "kit onetime " + id + " true");
-                player.sendMessage(Text.of("Reward has been set to " + id + ". Winners must have the permission \n" +
-                        "nucleus.kits." + id + " in order to receive this reward."));
+            case "kit":
+                Kit kit = new Kit(player, id);
+                BlockyArena.getKitManager().add(kit, id);
+                player.sendMessage(Text.of("A new kit has been created, and players will be able " +
+                        "to retrieve an exact copy of your current inventory with /ba kit " + id +
+                        " when they're in an active game session. To overwrite, simply execute" +
+                        " this command again with the same id."));
                 return CommandResult.success();
             default:
-                player.sendMessage(Text.of("Invalid argument <type>. Must be arena."));
+                player.sendMessage(Text.of("Invalid argument <type>. Must be either arena or kit."));
         }
         return CommandResult.empty();
     }

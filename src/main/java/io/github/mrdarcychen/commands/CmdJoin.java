@@ -30,6 +30,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColor;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -54,14 +57,14 @@ public class CmdJoin implements CommandExecutor {
             .build();
 
     /* enforce the singleton property with a private constructor */
+
     private CmdJoin() {
     }
-
     public static void remove(GameSession gameSession) {
         BlockyArena.getArenaManager().makeAvailable(gameSession.getArena());
         GAME_SESSIONS.remove(gameSession);
     }
-    
+
     public static void register(GameSession gameSession) {
         GAME_SESSIONS.add(gameSession);
     }
@@ -87,33 +90,32 @@ public class CmdJoin implements CommandExecutor {
         }
         Optional<String> optMode = args.getOne("mode");
         String arenaName = (String) args.getOne(Text.of("arena_name")).orElse("");
-        
+
         if (!optMode.isPresent()) {
             return CommandResult.empty();
         }
         if (PlayerManager.isPlaying(player.getUniqueId())) {
-            player.sendMessage(Text.of("You're already in a game. Use /ba" +
-                    " quit to leave the current game session."));
+            player.sendMessage(ChatTypes.ACTION_BAR, Messages.ALREADY_IN_GAME);
             return CommandResult.empty();
         }
         GameSession gameSession = getGame(optMode.get(), arenaName);
         if (gameSession == null) {
-            player.sendMessage(Text.of("There's no available arena at this time."));
+            player.sendMessage(ChatTypes.ACTION_BAR, Messages.NO_ARENA_AVAILABLE);
             return CommandResult.empty();
         }
         gameSession.add(player);
         return CommandResult.success();
     }
-    
+
     private static GameSession getGame(String mode, String arenaName) {
-        Predicate<GameSession> criteria = (it) -> 
+        Predicate<GameSession> criteria = (it) ->
                 it.canJoin() && it.getTeamMode().toString().equals(mode.toLowerCase());
-        
+
         Optional<GameSession> optGame = GAME_SESSIONS.stream().filter(criteria).findAny();
         if (optGame.isPresent()) {
             return optGame.get();
         }
-        
+
         Optional<Arena> optArena = BlockyArena.getArenaManager().findArena(mode, arenaName);
         if (optArena.isPresent()) {
             Arena arena = optArena.get();
@@ -123,5 +125,14 @@ public class CmdJoin implements CommandExecutor {
             return gameSession;
         }
         return null;
+    }
+
+    private static class Messages {
+        static final Text ALREADY_IN_GAME = Text
+                .builder("You must first leave the current game before joining another game.")
+                .color(TextColors.RED).build();
+        static final Text NO_ARENA_AVAILABLE = Text
+                .builder("No arena is available at this moment. Please try again later.")
+                .color(TextColors.RED).build();
     }
 }

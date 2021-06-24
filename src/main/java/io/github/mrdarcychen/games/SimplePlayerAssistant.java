@@ -29,11 +29,16 @@ import org.spongepowered.api.world.World;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
 
 public class SimplePlayerAssistant implements PlayerAssistant {
 
     private final Map<Player, PlayerSnapshot> snapshots;
     private final GameSession gameSession;
+    private static final Function<String, Text> SENDING_TO_ARENA = (arena) -> Text
+            .builder("Sending you to arena ")
+            .append(Text.builder(arena + "...").color(TextColors.GRAY).build())
+            .color(TextColors.GRAY).build();
 
     public SimplePlayerAssistant(GameSession gameSession) {
         snapshots = new HashMap<>();
@@ -43,6 +48,7 @@ public class SimplePlayerAssistant implements PlayerAssistant {
     @Override
     public void recruit(Player player) {
         snapshots.put(player, new PlayerSnapshot(player));
+        player.getInventory().clear();
         PlayerManager.setGame(player.getUniqueId(), gameSession);
         maxFoodAndHealth(player);
         player.offer(Keys.GAME_MODE, GameModes.SURVIVAL);
@@ -52,7 +58,7 @@ public class SimplePlayerAssistant implements PlayerAssistant {
 
     private void moveToLobby(Player player) {
         Arena arena = gameSession.getArena();
-        player.sendMessage(Text.of("Sending you to " + gameSession.getArena().getName() + " ..."));
+        player.sendMessage(SENDING_TO_ARENA.apply(arena.getName()));
         Transform<World> lobby = arena.getLobbySpawn().getTransform();
         player.setTransform(lobby);
     }
