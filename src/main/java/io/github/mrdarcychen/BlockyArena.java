@@ -23,54 +23,57 @@ import io.github.mrdarcychen.arenas.SpawnSerializer;
 import io.github.mrdarcychen.commands.*;
 import io.github.mrdarcychen.listeners.ClientConnectionEventListener;
 import io.github.mrdarcychen.listeners.EntityListener;
-import io.github.mrdarcychen.listeners.ServerListener;
-import io.github.mrdarcychen.utils.Kit;
-import io.github.mrdarcychen.utils.KitSerializer;
+import io.github.mrdarcychen.utils.*;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
-import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
+import org.spongepowered.api.event.game.state.GameStartedServerEvent;
 import org.spongepowered.api.event.game.state.GameStartingServerEvent;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.List;
 
-// entry point of the plugin; responsible for initializing the rest of the components
-// nothing should depend on this class
-@Plugin(id = "blockyarena", name = "BlockyArena")
+/**
+ * The entry point for the plugin, invoked by Sponge.
+ */
+@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.7.0")
 public final class BlockyArena {
 
     private static BlockyArena PLUGIN;
-    private static KitManager kitManager;
-    private static ArenaManager arenaManager;
 
     @Inject
     private static Logger logger;
+    private static ConfigManager configManager;
+    private static ArenaDispatcher arenaDispatcher;
+    private static KitDispatcher kitDispatcher;
 
     @Inject
     @ConfigDir(sharedRoot = false)
-    //The path to config/BlockyArena
     private Path configDirectory;
-
-    private Path arenaDirectory, kitDirectory;
-
-
-    @Inject
-    @DefaultConfig(sharedRoot = false)
-    // The path to the default.conf file
-    private Path defaultConfig;
 
     @Inject
     private BlockyArena() {
+    }
+
+    public static ConfigManager getConfigManager() {
+        return configManager;
+    }
+
+    public static ArenaDispatcher getArenaDispatcher() {
+        return arenaDispatcher;
+    }
+
+    public static KitDispatcher getKitDispatcher() {
+        return kitDispatcher;
+    }
+
+    public static BlockyArena getInstance() {
+        return PLUGIN;
     }
 
     @Listener
@@ -78,11 +81,13 @@ public final class BlockyArena {
         PLUGIN = this;
         registerTypeSerializers();
         registerListeners();
-        createDirectories();
+        configManager = new ConfigManager(configDirectory);
     }
 
     @Listener
-    public void onServerStarting(GameStartingServerEvent event) {
+    public void onServerStarted(GameStartedServerEvent event) {
+        arenaDispatcher = new ArenaDispatcher();
+        kitDispatcher = new KitDispatcher();
         ChallengeService challengeService = new ChallengeService();
         CommandSpec rootCmd = CommandSpec.builder()
                 .child(CmdEdit.SPEC, "edit")
@@ -95,30 +100,6 @@ public final class BlockyArena {
                 .build();
 
         PlatformRegistry.registerCommands(rootCmd);
-        ConfigManager.getInstance().load(defaultConfig);
-        arenaManager = new ArenaManager(arenaDirectory);
-        kitManager = new KitManager(kitDirectory);
-    }
-
-    /*
-    creates directories for arenas and classes if they do not exist
-    pre: plugin config directory exists (throws IOException if not)
-     */
-    private void createDirectories() {
-        arenaDirectory = Paths.get(configDirectory + "/arenas");
-        kitDirectory = Paths.get(configDirectory + "/kits");
-
-        List<Path> directories = Arrays.asList(arenaDirectory, kitDirectory);
-        for (Path dir : directories) {
-            try {
-                if (!dir.toFile().exists()) {
-                    Files.createDirectory(dir);
-                }
-            } catch (IOException e) {
-                logger.warn("Error creating directory for "
-                        + dir.getFileName().toString());
-            }
-        }
     }
 
     /*
@@ -129,31 +110,10 @@ public final class BlockyArena {
                 new EntityListener());
         Sponge.getEventManager().registerListeners(this,
                 new ClientConnectionEventListener());
-        Sponge.getEventManager().registerListeners(this,
-                new ServerListener());
     }
 
-    /**
-     * Registers all custom TypeSerializers.
-     */
     private void registerTypeSerializers() {
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(SpawnPoint.class), new SpawnSerializer());
         TypeSerializers.getDefaultSerializers().registerType(TypeToken.of(Kit.class), new KitSerializer());
-    }
-
-    public Path getDefaultConfig() {
-        return defaultConfig;
-    }
-
-    public static KitManager getKitManager() {
-        return kitManager;
-    }
-
-    public static ArenaManager getArenaManager() {
-        return arenaManager;
-    }
-
-    public static BlockyArena getInstance() {
-        return PLUGIN;
     }
 }

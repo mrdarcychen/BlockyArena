@@ -16,7 +16,6 @@
 
 package io.github.mrdarcychen.games.states;
 
-import io.github.mrdarcychen.ConfigManager;
 import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.utils.DamageData;
 import org.spongepowered.api.entity.living.player.Player;
@@ -48,7 +47,7 @@ public class EnteringState extends MatchState {
     }
 
     private void proceedToStartingState() {
-        gameSession.setMatchState(new StartingState(gameSession, players, ConfigManager.getInstance().getLobbyCountdown()));
+        gameSession.setMatchState(new StartingState(gameSession, players, 15));
     }
 
     private void notifyPlayerFailedToJoin(Player player) {

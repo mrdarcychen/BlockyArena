@@ -71,7 +71,7 @@ public class CmdEdit implements CommandExecutor {
                 player.sendMessage(of("Saving failed: " + e.getMessage()));
                 return CommandResult.empty();
             }
-            BlockyArena.getArenaManager().add(arena);
+            BlockyArena.getArenaDispatcher().register(arena);
             player.sendMessage(of("Success! Arena " + arena.getName() + " is now in operation."));
         } else {
             switch (param) {

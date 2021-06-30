@@ -16,6 +16,7 @@
 
 package io.github.mrdarcychen.games.states;
 
+import io.github.mrdarcychen.commands.CmdJoin;
 import io.github.mrdarcychen.games.GameSession;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
@@ -33,6 +34,6 @@ public class LeavingState extends MatchState {
     public LeavingState(GameSession gameSession, List<Player> players) {
         super(gameSession, players);
         players.forEach((player -> player.sendMessage(ChatTypes.ACTION_BAR, GAME_CONCLUDED)));
-        gameSession.terminate();
+        CmdJoin.remove(gameSession);
     }
 }

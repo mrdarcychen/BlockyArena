@@ -163,7 +163,7 @@ public class ChallengeService {
         }
 
         void notifySuccessfulRespond() {
-            Optional<Arena> optArena = BlockyArena.getArenaManager().findArena("1v1");
+            Optional<Arena> optArena = BlockyArena.getArenaDispatcher().findBy("1v1");
             if (!optArena.isPresent()) {
                 String msg = "No arena is available at this time.";
                 challenger.sendMessage(of(msg));

@@ -16,10 +16,13 @@
 
 package io.github.mrdarcychen.listeners;
 
+import io.github.mrdarcychen.commands.CmdJoin;
+import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
 import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.event.network.ClientConnectionEvent;
 
 import java.util.UUID;
@@ -41,6 +44,11 @@ public class ClientConnectionEventListener {
         Player player = event.getTargetEntity();
         PlayerManager.getGame(player.getUniqueId()).ifPresent(game -> game.remove(player));
         PlayerManager.unregister(player.getUniqueId());
+    }
+
+    @Listener
+    public void onServerStopping(GameStoppingServerEvent event) {
+        CmdJoin.terminateAll();
     }
 
 }

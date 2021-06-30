@@ -36,7 +36,7 @@ public class SpawnSerializer implements TypeSerializer<SpawnPoint> {
     public SpawnPoint deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
         if (!Sponge.getServer().getWorld(extentUUID).isPresent()) {
-            System.err.println("Cannot find extent with UUID " + extentUUID.toString());
+            System.err.println("Cannot find extent with UUID " + extentUUID);
         }
         World extent = Sponge.getServer().getWorld(extentUUID).get();
         Vector3d position = value.getNode("position").getValue(TypeToken.of(Vector3d.class));

@@ -49,7 +49,7 @@ public class CmdRemove implements CommandExecutor {
 
             case "arena":
                 try {
-                    BlockyArena.getArenaManager().remove(id);
+                    BlockyArena.getArenaDispatcher().unregister(id);
                     break;
                 } catch (IllegalArgumentException e) {
                     src.sendMessage(Text.of(e.getMessage()));
@@ -58,7 +58,7 @@ public class CmdRemove implements CommandExecutor {
 
             case "kit":
                 try {
-                    BlockyArena.getKitManager().remove(id);
+                    BlockyArena.getKitDispatcher().remove(id);
                     break;
                 } catch (IllegalArgumentException e) {
                     src.sendMessage(Text.of(e.getMessage()));

@@ -22,6 +22,7 @@ import io.github.mrdarcychen.games.FullFledgedGameSession;
 import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.MatchRules;
 import io.github.mrdarcychen.games.PlayerManager;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -29,6 +30,8 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
+import org.spongepowered.api.event.Listener;
+import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColor;
@@ -59,14 +62,19 @@ public class CmdJoin implements CommandExecutor {
     /* enforce the singleton property with a private constructor */
 
     private CmdJoin() {
+
     }
     public static void remove(GameSession gameSession) {
-        BlockyArena.getArenaManager().makeAvailable(gameSession.getArena());
         GAME_SESSIONS.remove(gameSession);
+        gameSession.terminate();
     }
 
     public static void register(GameSession gameSession) {
         GAME_SESSIONS.add(gameSession);
+    }
+
+    public static void terminateAll() {
+        GAME_SESSIONS.forEach(GameSession::terminate);
     }
 
     /**
@@ -98,7 +106,7 @@ public class CmdJoin implements CommandExecutor {
             player.sendMessage(ChatTypes.ACTION_BAR, Messages.ALREADY_IN_GAME);
             return CommandResult.empty();
         }
-        GameSession gameSession = getGame(optMode.get(), arenaName);
+        GameSession gameSession = getGame(optMode.get().toLowerCase(), arenaName);
         if (gameSession == null) {
             player.sendMessage(ChatTypes.ACTION_BAR, Messages.NO_ARENA_AVAILABLE);
             return CommandResult.empty();
@@ -116,7 +124,7 @@ public class CmdJoin implements CommandExecutor {
             return optGame.get();
         }
 
-        Optional<Arena> optArena = BlockyArena.getArenaManager().findArena(mode, arenaName);
+        Optional<Arena> optArena = BlockyArena.getArenaDispatcher().findBy(mode, arenaName);
         if (optArena.isPresent()) {
             Arena arena = optArena.get();
             MatchRules matchRules = TeamMode.parse(mode, (int) arena.getStartPoints().count());

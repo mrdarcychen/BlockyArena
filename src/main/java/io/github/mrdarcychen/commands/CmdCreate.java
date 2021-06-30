@@ -51,23 +51,23 @@ public class CmdCreate implements CommandExecutor {
         }
         Player player = (Player) src;
         String type = args.<String>getOne("type").get();
-        String id = args.<String>getOne("id").get();
+        String kitId = args.<String>getOne("id").get();
 
         switch (type) {
             case "arena":
-                CmdEdit.expectBuilder(player, id);
-                player.sendMessage(Text.of("Start configuring interactively with /ba edit " + id +
+                CmdEdit.expectBuilder(player, kitId);
+                player.sendMessage(Text.of("Start configuring interactively with /ba edit " + kitId +
                         " spawn <type>."));
                 player.sendMessage(Text.of("For detailed instructions, please visit the GitHub" +
                         " repo."));
-                player.sendMessage(Text.of("Execute /ba edit " + id + " save when you're done."));
-                player.sendMessage(Text.of("Execute /ba create arena " + id + " to start over."));
+                player.sendMessage(Text.of("Execute /ba edit " + kitId + " save when you're done."));
+                player.sendMessage(Text.of("Execute /ba create arena " + kitId + " to start over."));
                 return CommandResult.success();
             case "kit":
-                Kit kit = new Kit(player, id);
-                BlockyArena.getKitManager().add(kit, id);
+                Kit kit = new Kit(player, kitId);
+                BlockyArena.getKitDispatcher().add(kit);
                 player.sendMessage(Text.of("A new kit has been created, and players will be able " +
-                        "to retrieve an exact copy of your current inventory with /ba kit " + id +
+                        "to retrieve an exact copy of your current inventory with /ba kit " + kitId +
                         " when they're in an active game session. To overwrite, simply execute" +
                         " this command again with the same id."));
                 return CommandResult.success();

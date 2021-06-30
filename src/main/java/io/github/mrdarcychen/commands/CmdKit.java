@@ -18,6 +18,7 @@ package io.github.mrdarcychen.commands;
 
 import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.games.PlayerManager;
+import io.github.mrdarcychen.utils.Kit;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -29,7 +30,6 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.Optional;
-import java.util.function.Function;
 
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
@@ -75,11 +75,13 @@ public class CmdKit implements CommandExecutor {
             return CommandResult.empty();
         }
         String id = args.<String>getOne(Text.of("id")).get();
-        if (BlockyArena.getKitManager().get(id) == null) {
+
+        Optional<Kit> optKit = BlockyArena.getKitDispatcher().get(id);
+        if (!optKit.isPresent()) {
             player.sendMessage(NO_KIT_AVAILABLE);
             return CommandResult.empty();
         }
-        BlockyArena.getKitManager().get(id).equip(player);
+        optKit.get().equip(player);
         return CommandResult.success();
     }
 }

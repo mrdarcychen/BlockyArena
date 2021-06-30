@@ -88,6 +88,6 @@ public class FullFledgedGameSession implements GameSession {
     public void terminate() {
         playerAssistant.dismissAll();
         assaultMonitor.terminate();
-        CmdJoin.remove(this);
+        arena.setBusy(false);
     }
 }
