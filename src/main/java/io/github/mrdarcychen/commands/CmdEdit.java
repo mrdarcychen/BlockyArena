@@ -27,6 +27,8 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -68,28 +70,35 @@ public class CmdEdit implements CommandExecutor {
             try {
                 arena = builder.build();
             } catch (IllegalStateException e) {
-                player.sendMessage(of("Saving failed: " + e.getMessage()));
+                player.sendMessage(ChatTypes.ACTION_BAR, Text
+                        .builder("Saving failed due to some unknown reasons.")
+                        .color(TextColors.RED).build());
                 return CommandResult.empty();
             }
             BlockyArena.getArenaDispatcher().register(arena);
-            player.sendMessage(of("Success! Arena " + arena.getName() + " is now in operation."));
+            player.sendMessage(MessageBroker.wrap(Text.builder("\nA new arena has been " +
+                    "successfully created.\n")
+                    .color(TextColors.GREEN).build()));
+
         } else {
             switch (param) {
                 case "start":
                     builder.addStartPoint(SpawnPoint.of(player.getTransform()));
-                    player.sendMessage(of("Start point for team #" + builder
+                    player.sendMessage(ChatTypes.ACTION_BAR, of("Start point for team #" + builder
                             .getStartPointCount() + " has been added to " + id + "."));
                     break;
                 case "lobby":
                     builder.setLobbySpawn(SpawnPoint.of(player.getTransform()));
-                    player.sendMessage(of("Lobby spawn point has been set for " + id + "."));
+                    player.sendMessage(ChatTypes.ACTION_BAR, of("Lobby spawn point has been set for " + id + "."));
                     break;
                 case "spectator":
                     builder.setSpectatorSpawn(SpawnPoint.of(player.getTransform()));
-                    player.sendMessage(of("Spectator spawn point has been set for " + id + "."));
+                    player.sendMessage(ChatTypes.ACTION_BAR, of("Spectator spawn point has been set for " + id + "."));
                     break;
                 default:
-                    player.sendMessage(of("<type> must be lobby, spectator, or start."));
+                    player.sendMessage(ChatTypes.ACTION_BAR, Text
+                            .builder("<type> must be lobby, spectator, or start.")
+                            .color(TextColors.RED).build());
                     return CommandResult.empty();
             }
         }

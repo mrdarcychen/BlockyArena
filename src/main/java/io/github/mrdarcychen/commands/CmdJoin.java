@@ -57,6 +57,7 @@ public class CmdJoin implements CommandExecutor {
                             .buildWith(none()))
             )
             .executor(new CmdJoin())
+            .permission("blockyarena.play")
             .build();
 
     /* enforce the singleton property with a private constructor */

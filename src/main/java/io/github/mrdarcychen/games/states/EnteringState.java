@@ -65,7 +65,6 @@ public class EnteringState extends MatchState {
 
     @Override
     public void dismiss(Player player) {
-        players.remove(player);
         super.dismiss(player);
         // if no one is left, cancel timer and go directly to leaving
         if (players.isEmpty()) {

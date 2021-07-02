@@ -30,15 +30,17 @@ import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.scheduler.Task;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.action.TextActions;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.text.format.TextFormat;
+import org.spongepowered.api.text.format.TextStyles;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
-import java.util.function.Function;
 
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.command.args.GenericArguments.player;
@@ -96,11 +98,14 @@ public class ChallengeService {
     private final CommandSpec respondSpec = CommandSpec.builder()
             .arguments(onlyOne(player(of("player"))))
             .executor(respondExec)
+            .permission("blockyarena.play")
+
             .build();
     private final CommandSpec challenge = CommandSpec.builder()
             .child(respondSpec, "accept")
             .arguments(onlyOne(player(of("player"))))
             .executor(requestExec)
+            .permission("blockyarena.play")
             .build();
 
     public CommandCallable getCommandCallable() {
@@ -158,8 +163,17 @@ public class ChallengeService {
         }
 
         void notifySuccessfulRequest() {
-            challenger.sendMessage(of("You've challenged ", rival.getName(), ". Please wait for acceptance."));
-            rival.sendMessage(of("You're challenged by ", challenger.getName(), ". Accept in 15 seconds."));
+            Text delivered = Text
+                    .builder("\nYour challenge request has been delivered.")
+                    .color(TextColors.GREEN)
+                    .build();
+            Text wait = Text.of("\nPlease wait for " + rival.getName() + "'s acceptance.");
+            Text challengeSent = Text.builder()
+                    .append(delivered)
+                    .append(wait)
+                    .build();
+            challenger.sendMessage(of(MessageBroker.wrap(challengeSent)));
+            rival.sendMessage(Messages.invite(challenger.getName()));
         }
 
         void notifySuccessfulRespond() {
@@ -170,8 +184,10 @@ public class ChallengeService {
                 rival.sendMessage(of(msg));
                 return;
             }
-            challenger.sendMessage(of(rival.getName(), " has accepted your challenge!"));
-            rival.sendMessage(of("You've accepted the challenge from ", challenger.getName(), "!"));
+            challenger.sendMessage(ChatTypes.ACTION_BAR,
+                    of(rival.getName(), " has accepted your challenge!"));
+            rival.sendMessage(ChatTypes.ACTION_BAR,
+                    of("You've accepted the challenge from ", challenger.getName(), "!"));
             GameSession session = new FullFledgedGameSession(teamMode, optArena.get());
             CmdJoin.register(session);
             session.add(challenger);
@@ -179,8 +195,10 @@ public class ChallengeService {
         }
 
         void notifyExpiry() {
-            challenger.sendMessage(of("Your challenge to ", rival.getName(), " has expired."));
-            rival.sendMessage(of("The challenge from ", challenger.getName(), " has expired."));
+            challenger.sendMessage(ChatTypes.ACTION_BAR,
+                    of("Your challenge to ", rival.getName(), " has expired."));
+            rival.sendMessage(ChatTypes.ACTION_BAR,
+                    of("The challenge from ", challenger.getName(), " has expired."));
         }
 
         public void notifyDuplicateRequest() {
@@ -208,5 +226,17 @@ public class ChallengeService {
         static final Text BE_PATIENT = Text
                 .builder("Please wait for your rival's acceptance.")
                 .color(TextColors.RED).build();
+
+        static final Text invite(String name) {
+            Text click = Text.builder("Click here")
+                    .onClick(TextActions.runCommand("/ba challenge accept " + name))
+                    .format(TextFormat.of(TextStyles.UNDERLINE))
+                    .color(TextColors.GOLD).build();
+            Text post = Text.of(" to accept in the next 15 seconds.");
+            return MessageBroker.wrap(Text.builder()
+                    .append(Text.of("\n" + name + " wants to challenge you to a duel. \n"))
+                    .append(click).append(post).build());
+        }
+
     }
 }

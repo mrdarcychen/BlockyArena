@@ -33,6 +33,7 @@ public class CmdQuit implements CommandExecutor {
 
     public static final CommandSpec SPEC = CommandSpec.builder()
             .executor(new CmdQuit())
+            .permission("blockyarena.play")
             .build();
 
     private CmdQuit() {

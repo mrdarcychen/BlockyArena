@@ -46,7 +46,6 @@ public class PlayingState extends MatchState {
 
     @Override
     public void dismiss(Player player) {
-        players.remove(player);
         eliminate(player, Text.of());
         super.dismiss(player);
     }

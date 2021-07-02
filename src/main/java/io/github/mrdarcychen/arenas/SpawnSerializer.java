@@ -25,6 +25,7 @@ import org.spongepowered.api.Sponge;
 import org.spongepowered.api.entity.Transform;
 import org.spongepowered.api.world.World;
 
+import java.util.Optional;
 import java.util.UUID;
 
 public class SpawnSerializer implements TypeSerializer<SpawnPoint> {
@@ -35,13 +36,14 @@ public class SpawnSerializer implements TypeSerializer<SpawnPoint> {
     @Override
     public SpawnPoint deserialize(TypeToken<?> type, ConfigurationNode value) throws ObjectMappingException {
         UUID extentUUID = value.getNode("extent").getValue(TypeToken.of(UUID.class));
-        if (!Sponge.getServer().getWorld(extentUUID).isPresent()) {
-            System.err.println("Cannot find extent with UUID " + extentUUID);
+        Optional<World> optWorld = Sponge.getServer().loadWorld(extentUUID);
+        if (!optWorld.isPresent()) {
+            System.err.println("Failed to create an arena due to the unloaded world " + extentUUID);
+            throw new ObjectMappingException();
         }
-        World extent = Sponge.getServer().getWorld(extentUUID).get();
         Vector3d position = value.getNode("position").getValue(TypeToken.of(Vector3d.class));
         Vector3d rotation = value.getNode("rotation").getValue(TypeToken.of(Vector3d.class));
-        return SpawnPoint.of(new Transform<>(extent, position, rotation));
+        return SpawnPoint.of(new Transform<>(optWorld.get(), position, rotation));
     }
 
     @Override

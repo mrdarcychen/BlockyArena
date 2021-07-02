@@ -24,6 +24,7 @@ import org.spongepowered.api.command.args.CommandContext;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.format.TextColors;
 
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.command.args.GenericArguments.string;
@@ -69,7 +70,9 @@ public class CmdRemove implements CommandExecutor {
                 src.sendMessage(Text.of("<type> must be either arena or kit."));
                 return CommandResult.empty();
         }
-        src.sendMessage(Text.of(id + " has been removed."));
+        Text removal = Text.builder("\n" + id + " has been removed.")
+                .color(TextColors.GREEN).build();
+        src.sendMessage(MessageBroker.wrap(removal));
         return CommandResult.success();
     }
 }

@@ -48,6 +48,7 @@ public abstract class MatchState {
     }
 
     public void dismiss(Player player) {
+        players.remove(player);
         playerAssistant.dismiss(player);
         broadcast(Messages.BROADCAST_QUIT.apply(player.getName(), getCapacityIndication()));
     }

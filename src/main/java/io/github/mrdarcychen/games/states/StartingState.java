@@ -57,7 +57,6 @@ public class StartingState extends MatchState {
 
     @Override
     public void dismiss(Player player) {
-        players.remove(player);
         super.dismiss(player);
         // if fall below min requirement, new entering state
         if (players.size() <= matchRules.getTotalCapacity()) {

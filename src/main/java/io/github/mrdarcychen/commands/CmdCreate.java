@@ -26,6 +26,8 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
+import org.spongepowered.api.text.format.TextColors;
 
 import static org.spongepowered.api.command.args.GenericArguments.onlyOne;
 import static org.spongepowered.api.command.args.GenericArguments.string;
@@ -43,6 +45,11 @@ public class CmdCreate implements CommandExecutor {
     private CmdCreate() {
     }
 
+    private Text command(String id, String spawnType) {
+        return Text.builder("/ba edit " + id + " spawn " + spawnType)
+                .color(TextColors.AQUA).build();
+    }
+
     @Override
     public CommandResult execute(CommandSource src, CommandContext args) throws CommandException {
         if (!(src instanceof Player)) {
@@ -53,26 +60,37 @@ public class CmdCreate implements CommandExecutor {
         String type = args.<String>getOne("type").get();
         String kitId = args.<String>getOne("id").get();
 
+
+
         switch (type) {
             case "arena":
                 CmdEdit.expectBuilder(player, kitId);
-                player.sendMessage(Text.of("Start configuring interactively with /ba edit " + kitId +
-                        " spawn <type>."));
-                player.sendMessage(Text.of("For detailed instructions, please visit the GitHub" +
-                        " repo."));
-                player.sendMessage(Text.of("Execute /ba edit " + kitId + " save when you're done."));
-                player.sendMessage(Text.of("Execute /ba create arena " + kitId + " to start over."));
+                Text lobby = Text.builder("\nStand on the lobby spawn point and execute\n ")
+                        .append(command(kitId, "lobby")).build();
+                Text spectator = Text.builder("\nStand on the spectator spawn point and execute \n ")
+                        .append(command(kitId, "spectator")).build();
+                Text start = Text.builder("\nStand on a new team start point and execute \n ")
+                        .append(command(kitId, "start")).build();
+                Text done = Text.builder("\nOnce you're finished, execute ").append(
+                        Text.builder("/ba edit " + kitId + " save\n").color(TextColors.AQUA).build()
+                ).build();
+                Text instruction = Text.builder()
+                        .append(Text.of("\nYou're about to configure a new arena interactively."))
+                        .append(lobby).append(spectator).append(start).append(done).build();
+                player.sendMessage(MessageBroker.wrap(instruction));
                 return CommandResult.success();
             case "kit":
                 Kit kit = new Kit(player, kitId);
                 BlockyArena.getKitDispatcher().add(kit);
-                player.sendMessage(Text.of("A new kit has been created, and players will be able " +
-                        "to retrieve an exact copy of your current inventory with /ba kit " + kitId +
-                        " when they're in an active game session. To overwrite, simply execute" +
-                        " this command again with the same id."));
+                Text notification = Text
+                        .builder("\nA new kit has been created base on your current inventory.\n")
+                        .color(TextColors.GREEN).build();
+                player.sendMessage(MessageBroker.wrap(notification));
                 return CommandResult.success();
             default:
-                player.sendMessage(Text.of("Invalid argument <type>. Must be either arena or kit."));
+                player.sendMessage(ChatTypes.ACTION_BAR,
+                        Text.builder("Invalid argument <type>. Must be either arena or kit.")
+                                .color(TextColors.RED).build());
         }
         return CommandResult.empty();
     }

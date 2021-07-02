@@ -27,7 +27,9 @@ import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
+import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
+import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
 
@@ -35,21 +37,19 @@ import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class CmdKit implements CommandExecutor {
 
-    private static final Text CANNOT_PICK_KIT = Text.builder("You're not allowed to pick a kit at this moment.")
-            .color(TextColors.RED).build();
-
-    private static final Text NO_KIT_AVAILABLE = Text.builder("The kit you specified does not exist.")
-            .color(TextColors.RED).build();
-
-
     public static final CommandSpec SPEC = CommandSpec.builder()
             .arguments(
                     onlyOne(string(Text.of("id"))),
                     optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
                             .buildWith(none()))
             )
+            .permission("blockyarena.kit")
             .executor(new CmdKit())
             .build();
+    private static final Text CANNOT_PICK_KIT = Text.builder("You're not allowed to pick a kit at this moment.")
+            .color(TextColors.RED).build();
+    private static final Text NO_KIT_AVAILABLE = Text.builder("The kit you specified does not exist.")
+            .color(TextColors.RED).build();
 
     private CmdKit() {
     }
@@ -75,7 +75,15 @@ public class CmdKit implements CommandExecutor {
             return CommandResult.empty();
         }
         String id = args.<String>getOne(Text.of("id")).get();
-
+        boolean hasPermissionToRetrieveSpecifiedKit = player
+                .getPermissionValue(player.getActiveContexts(), "blockyarena.kit." + id)
+                .asBoolean();
+        if (!hasPermissionToRetrieveSpecifiedKit) {
+            Text noPerm = Text.builder("You don't have the permission to retrieve that kit.")
+                    .color(TextColors.RED).build();
+            player.sendMessage(ChatTypes.ACTION_BAR, noPerm);
+            return CommandResult.empty();
+        }
         Optional<Kit> optKit = BlockyArena.getKitDispatcher().get(id);
         if (!optKit.isPresent()) {
             player.sendMessage(NO_KIT_AVAILABLE);

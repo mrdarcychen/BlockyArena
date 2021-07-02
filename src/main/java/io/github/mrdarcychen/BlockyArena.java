@@ -41,7 +41,12 @@ import java.nio.file.Path;
 /**
  * The entry point for the plugin, invoked by Sponge.
  */
-@Plugin(id = "blockyarena", name = "BlockyArena", version = "0.7.0")
+@Plugin(
+        id = "blockyarena",
+        name = "BlockyArena",
+        version = "0.7.0",
+        description = "A deathmatch plugin for Minecraft servers"
+)
 public final class BlockyArena {
 
     private static BlockyArena PLUGIN;
@@ -57,7 +62,7 @@ public final class BlockyArena {
     private Path configDirectory;
 
     @Inject
-    private BlockyArena() {
+    public BlockyArena() {
     }
 
     public static ConfigManager getConfigManager() {

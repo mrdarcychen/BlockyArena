@@ -88,8 +88,8 @@ public class SimplePlayerAssistant implements PlayerAssistant {
     @Override
     public void dismissAll() {
         snapshots.forEach((player, playerSnapshot) -> {
-            playerSnapshot.restore(player);
             setLeaveGamePropertiesFor(player);
+            playerSnapshot.restore(player);
         });
     }
 
