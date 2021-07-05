@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.ServiceProvider;
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.arenas.SpawnPoint;
 import org.spongepowered.api.command.CommandException;
@@ -75,7 +75,7 @@ public class CmdEdit implements CommandExecutor {
                         .color(TextColors.RED).build());
                 return CommandResult.empty();
             }
-            BlockyArena.getArenaDispatcher().register(arena);
+            ServiceProvider.getArenaDispatcher().register(arena);
             player.sendMessage(MessageBroker.wrap(Text.builder("\nA new arena has been " +
                     "successfully created.\n")
                     .color(TextColors.GREEN).build()));

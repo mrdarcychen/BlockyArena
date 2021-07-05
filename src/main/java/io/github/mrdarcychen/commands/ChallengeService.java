@@ -16,8 +16,8 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.BlockyArena;
 import io.github.mrdarcychen.PlatformRegistry;
+import io.github.mrdarcychen.ServiceProvider;
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.games.FullFledgedGameSession;
 import io.github.mrdarcychen.games.GameSession;
@@ -177,7 +177,7 @@ public class ChallengeService {
         }
 
         void notifySuccessfulRespond() {
-            Optional<Arena> optArena = BlockyArena.getArenaDispatcher().findBy("1v1");
+            Optional<Arena> optArena = ServiceProvider.getArenaDispatcher().findBy("1v1");
             if (!optArena.isPresent()) {
                 String msg = "No arena is available at this time.";
                 challenger.sendMessage(of(msg));

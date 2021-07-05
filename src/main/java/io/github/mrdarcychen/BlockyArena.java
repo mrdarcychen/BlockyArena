@@ -32,8 +32,6 @@ import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.event.game.state.GameStartedServerEvent;
-import org.spongepowered.api.event.game.state.GameStartingServerEvent;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.plugin.Plugin;
 
 import java.nio.file.Path;
@@ -53,9 +51,6 @@ public final class BlockyArena {
 
     @Inject
     private static Logger logger;
-    private static ConfigManager configManager;
-    private static ArenaDispatcher arenaDispatcher;
-    private static KitDispatcher kitDispatcher;
 
     @Inject
     @ConfigDir(sharedRoot = false)
@@ -63,18 +58,6 @@ public final class BlockyArena {
 
     @Inject
     public BlockyArena() {
-    }
-
-    public static ConfigManager getConfigManager() {
-        return configManager;
-    }
-
-    public static ArenaDispatcher getArenaDispatcher() {
-        return arenaDispatcher;
-    }
-
-    public static KitDispatcher getKitDispatcher() {
-        return kitDispatcher;
     }
 
     public static BlockyArena getInstance() {
@@ -86,13 +69,13 @@ public final class BlockyArena {
         PLUGIN = this;
         registerTypeSerializers();
         registerListeners();
-        configManager = new ConfigManager(configDirectory);
+        ServiceProvider.configManager = new ConfigManager(configDirectory);
     }
 
     @Listener
     public void onServerStarted(GameStartedServerEvent event) {
-        arenaDispatcher = new ArenaDispatcher();
-        kitDispatcher = new KitDispatcher();
+        ServiceProvider.arenaDispatcher = new ArenaDispatcher();
+        ServiceProvider.kitDispatcher = new KitDispatcher();
         ChallengeService challengeService = new ChallengeService();
         CommandSpec rootCmd = CommandSpec.builder()
                 .child(CmdEdit.SPEC, "edit")
@@ -104,17 +87,15 @@ public final class BlockyArena {
                 .child(challengeService.getCommandCallable(), "challenge")
                 .build();
 
-        PlatformRegistry.registerCommands(rootCmd);
+        Sponge.getCommandManager().register(getInstance(), rootCmd, "blockyarena", "ba");
     }
 
     /*
     registers event listeners to EventManager
      */
     private void registerListeners() {
-        Sponge.getEventManager().registerListeners(this,
-                new EntityListener());
-        Sponge.getEventManager().registerListeners(this,
-                new ClientConnectionEventListener());
+        Sponge.getEventManager().registerListeners(this, new EntityListener());
+        Sponge.getEventManager().registerListeners(this, new ClientConnectionEventListener());
     }
 
     private void registerTypeSerializers() {

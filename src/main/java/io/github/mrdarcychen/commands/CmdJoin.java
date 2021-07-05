@@ -16,25 +16,22 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.ServiceProvider;
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.games.FullFledgedGameSession;
 import io.github.mrdarcychen.games.GameSession;
 import io.github.mrdarcychen.games.MatchRules;
 import io.github.mrdarcychen.games.PlayerManager;
-import org.spongepowered.api.Sponge;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
 import org.spongepowered.api.command.args.CommandContext;
+import org.spongepowered.api.command.args.CommandElement;
 import org.spongepowered.api.command.spec.CommandExecutor;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.entity.living.player.Player;
-import org.spongepowered.api.event.Listener;
-import org.spongepowered.api.event.game.state.GameStoppingServerEvent;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
-import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.format.TextColors;
 
 import java.util.ArrayList;
@@ -48,13 +45,16 @@ public class CmdJoin implements CommandExecutor {
 
     private static final List<GameSession> GAME_SESSIONS = new ArrayList<>();
 
+    private static CommandElement player = flags().valueFlag(playerOrSource(Text.of("player")), "p")
+            .buildWith(none());
+    private static CommandElement arenaName = flags().valueFlag(optionalWeak(onlyOne(string(Text.of("arena_name")))), "n")
+            .buildWith(none());
+
     public static final CommandSpec SPEC = CommandSpec.builder()
             .arguments(
-                    onlyOne(string(Text.of("mode"))),
-                    optionalWeak(flags().valueFlag(playerOrSource(Text.of("player")), "p")
-                            .buildWith(none())),
-                    optionalWeak(flags().valueFlag(string(Text.of("arena_name")), "n")
-                            .buildWith(none()))
+                    player,
+                    arenaName,
+                    onlyOne(string(Text.of("mode")))
             )
             .executor(new CmdJoin())
             .permission("blockyarena.play")
@@ -125,7 +125,7 @@ public class CmdJoin implements CommandExecutor {
             return optGame.get();
         }
 
-        Optional<Arena> optArena = BlockyArena.getArenaDispatcher().findBy(mode, arenaName);
+        Optional<Arena> optArena = ServiceProvider.getArenaDispatcher().findBy(mode, arenaName);
         if (optArena.isPresent()) {
             Arena arena = optArena.get();
             MatchRules matchRules = TeamMode.parse(mode, (int) arena.getStartPoints().count());

@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.ServiceProvider;
 import io.github.mrdarcychen.utils.Kit;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -81,7 +81,7 @@ public class CmdCreate implements CommandExecutor {
                 return CommandResult.success();
             case "kit":
                 Kit kit = new Kit(player, kitId);
-                BlockyArena.getKitDispatcher().add(kit);
+                ServiceProvider.getKitDispatcher().add(kit);
                 Text notification = Text
                         .builder("\nA new kit has been created base on your current inventory.\n")
                         .color(TextColors.GREEN).build();

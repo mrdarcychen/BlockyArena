@@ -16,8 +16,6 @@
 
 package io.github.mrdarcychen;
 
-import org.spongepowered.api.Sponge;
-import org.spongepowered.api.command.CommandCallable;
 import org.spongepowered.api.scheduler.Task;
 
 public class PlatformRegistry {
@@ -26,8 +24,4 @@ public class PlatformRegistry {
         return builder.submit(BlockyArena.getInstance());
     }
 
-    public static void registerCommands(CommandCallable callable) {
-        Sponge.getCommandManager().register(BlockyArena.getInstance(), callable,
-                "blockyarena", "ba");
-    }
 }

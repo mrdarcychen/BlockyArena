@@ -6,7 +6,7 @@
 package io.github.mrdarcychen.utils.storage;
 
 import com.google.common.reflect.TypeToken;
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.ServiceProvider;
 import io.github.mrdarcychen.arenas.Arena;
 import io.github.mrdarcychen.arenas.SpawnPoint;
 import ninja.leaping.configurate.ConfigurationNode;
@@ -25,7 +25,7 @@ public class ArenaFileLoader extends FileLoader<Arena> {
      * Constructs a new ArenaFileLoader for loading and writing arenas.
      */
     public ArenaFileLoader() {
-        super(BlockyArena.getConfigManager().getArenaDir());
+        super(ServiceProvider.getConfigManager().getArenaDir());
     }
 
     @Override

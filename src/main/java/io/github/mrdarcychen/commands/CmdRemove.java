@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.ServiceProvider;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
 import org.spongepowered.api.command.CommandSource;
@@ -50,7 +50,7 @@ public class CmdRemove implements CommandExecutor {
 
             case "arena":
                 try {
-                    BlockyArena.getArenaDispatcher().unregister(id);
+                    ServiceProvider.getArenaDispatcher().unregister(id);
                     break;
                 } catch (IllegalArgumentException e) {
                     src.sendMessage(Text.of(e.getMessage()));
@@ -59,7 +59,7 @@ public class CmdRemove implements CommandExecutor {
 
             case "kit":
                 try {
-                    BlockyArena.getKitDispatcher().remove(id);
+                    ServiceProvider.getKitDispatcher().remove(id);
                     break;
                 } catch (IllegalArgumentException e) {
                     src.sendMessage(Text.of(e.getMessage()));

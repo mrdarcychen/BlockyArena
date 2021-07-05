@@ -6,7 +6,7 @@
 package io.github.mrdarcychen.utils.storage;
 
 import com.google.common.reflect.TypeToken;
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.ServiceProvider;
 import io.github.mrdarcychen.utils.Kit;
 import ninja.leaping.configurate.ConfigurationNode;
 import ninja.leaping.configurate.objectmapping.ObjectMappingException;
@@ -19,7 +19,7 @@ public class KitFileLoader extends FileLoader<Kit> {
      * Constructs a new ArenaFileLoader for loading and writing arenas.
      */
     public KitFileLoader() {
-        super(BlockyArena.getConfigManager().getKitDir());
+        super(ServiceProvider.getConfigManager().getKitDir());
     }
 
     @Override

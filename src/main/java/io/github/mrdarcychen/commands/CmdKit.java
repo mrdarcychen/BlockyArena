@@ -16,7 +16,7 @@
 
 package io.github.mrdarcychen.commands;
 
-import io.github.mrdarcychen.BlockyArena;
+import io.github.mrdarcychen.ServiceProvider;
 import io.github.mrdarcychen.games.PlayerManager;
 import io.github.mrdarcychen.utils.Kit;
 import org.spongepowered.api.command.CommandException;
@@ -29,7 +29,6 @@ import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
-import org.spongepowered.api.util.Tristate;
 
 import java.util.Optional;
 
@@ -84,7 +83,7 @@ public class CmdKit implements CommandExecutor {
             player.sendMessage(ChatTypes.ACTION_BAR, noPerm);
             return CommandResult.empty();
         }
-        Optional<Kit> optKit = BlockyArena.getKitDispatcher().get(id);
+        Optional<Kit> optKit = ServiceProvider.getKitDispatcher().get(id);
         if (!optKit.isPresent()) {
             player.sendMessage(NO_KIT_AVAILABLE);
             return CommandResult.empty();
