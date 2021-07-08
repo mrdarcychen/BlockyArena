@@ -84,7 +84,7 @@ public final class BlockyArena {
                 .child(CmdJoin.SPEC, "join")
                 .child(CmdKit.SPEC, "kit")
                 .child(CmdQuit.SPEC, "quit")
-                .child(challengeService.getCommandCallable(), "challenge")
+                .child(CmdChallenge.SPEC, "challenge")
                 .build();
 
         Sponge.getCommandManager().register(getInstance(), rootCmd, "blockyarena", "ba");
