@@ -34,16 +34,12 @@ import org.spongepowered.api.text.Text;
 import org.spongepowered.api.text.chat.ChatTypes;
 import org.spongepowered.api.text.format.TextColors;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 import static org.spongepowered.api.command.args.GenericArguments.*;
 
 public class CmdJoin implements CommandExecutor {
-
-    private static final List<GameSession> GAME_SESSIONS = new ArrayList<>();
 
     private static CommandElement player = flags().valueFlag(playerOrSource(Text.of("player")), "p")
             .buildWith(none());
@@ -64,18 +60,6 @@ public class CmdJoin implements CommandExecutor {
 
     private CmdJoin() {
 
-    }
-    public static void remove(GameSession gameSession) {
-        GAME_SESSIONS.remove(gameSession);
-        gameSession.terminate();
-    }
-
-    public static void register(GameSession gameSession) {
-        GAME_SESSIONS.add(gameSession);
-    }
-
-    public static void terminateAll() {
-        GAME_SESSIONS.forEach(GameSession::terminate);
     }
 
     /**
@@ -120,7 +104,7 @@ public class CmdJoin implements CommandExecutor {
         Predicate<GameSession> criteria = (it) ->
                 it.canJoin() && it.getTeamMode().toString().equals(mode.toLowerCase());
 
-        Optional<GameSession> optGame = GAME_SESSIONS.stream().filter(criteria).findAny();
+        Optional<GameSession> optGame = SessionRegistry.GAME_SESSIONS.stream().filter(criteria).findAny();
         if (optGame.isPresent()) {
             return optGame.get();
         }
@@ -130,7 +114,7 @@ public class CmdJoin implements CommandExecutor {
             Arena arena = optArena.get();
             MatchRules matchRules = TeamMode.parse(mode, (int) arena.getStartPoints().count());
             GameSession gameSession = new FullFledgedGameSession(matchRules, optArena.get());
-            GAME_SESSIONS.add(gameSession);
+            SessionRegistry.GAME_SESSIONS.add(gameSession);
             return gameSession;
         }
         return null;

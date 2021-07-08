@@ -16,8 +16,7 @@
 
 package io.github.mrdarcychen.listeners;
 
-import io.github.mrdarcychen.commands.CmdJoin;
-import io.github.mrdarcychen.games.GameSession;
+import io.github.mrdarcychen.commands.SessionRegistry;
 import io.github.mrdarcychen.games.PlayerManager;
 import org.spongepowered.api.entity.living.player.Player;
 import org.spongepowered.api.entity.living.player.User;
@@ -48,7 +47,7 @@ public class ClientConnectionEventListener {
 
     @Listener
     public void onServerStopping(GameStoppingServerEvent event) {
-        CmdJoin.terminateAll();
+        SessionRegistry.terminateAll();
     }
 
 }

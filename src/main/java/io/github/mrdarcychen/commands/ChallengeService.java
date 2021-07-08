@@ -189,7 +189,7 @@ public class ChallengeService {
             rival.sendMessage(ChatTypes.ACTION_BAR,
                     of("You've accepted the challenge from ", challenger.getName(), "!"));
             GameSession session = new FullFledgedGameSession(teamMode, optArena.get());
-            CmdJoin.register(session);
+            SessionRegistry.register(session);
             session.add(challenger);
             session.add(rival);
         }
